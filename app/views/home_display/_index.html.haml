@@ -1,0 +1,16 @@
+-unless @total_block.blank?
+  -@total_block.each do |res|
+    -begin
+      =display_homepage_block(res[0])
+    -rescue
+
+-unless @total_movie_block.blank?
+  -@total_movie_block.each do |res|
+    -begin
+      =display_homepage_block(res[0])
+    -rescue
+
+:javascript
+  $(document).ready(function($) {
+    adjust_boxes();
+  });

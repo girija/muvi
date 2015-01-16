@@ -1,0 +1,48 @@
+- unless @movies.first.blank?
+  - @movies.in_groups_of(2) do |group|
+    - group.each do |movie|
+      - unless movie.blank?
+        .box.left
+          .moviBox.left
+            = link_to image_tag(movie.banner_image), movie_path(movie)
+          .title.left
+            = link_to "<h3> #{movie.name} </h3>".html_safe, movie_path(movie)
+            .clear{:style => "height:3px"}
+
+            -actors = get_actor_name(movie)
+            -actor_name = ""
+            -actor_link = ""
+            -unless actors.blank?
+              -i=0
+              - actors.each do |actor|
+                -if i == 2
+                  -break
+                -unless actor.celebrity.blank?
+                  - unless actor.celebrity.name.blank?
+                    -if actor_name.blank?
+                      -actor_name = (link_to actor.celebrity.name,star_path(actor.celebrity.permalink),:class => "small_orange_font", :style => "font-weight:normal")
+                    -else
+                      -actor_name = actor_name + ", "+ (link_to actor.celebrity.name,star_path(actor.celebrity.permalink),:class => "small_orange_font", :style => "font-weight:normal")
+                  -i = i + 1
+            %span{:class => "small_orange_font"}
+              =actor_name
+           
+            .clear{:style => "height:5px"}
+            %h4{:class => "gray_11px"}
+              Release date:
+              = Time.parse(movie.release_date.to_s).strftime('%d %b %Y').to_s unless movie.release_date.blank?
+          .home_page_rating.left
+            %div{:class => "video_div", :id => "video_div_#{movie.id}", :style => "visibility:hidden"}
+              =render "/shared/trailers", :movie_id => movie.id, :movie_permalink => movie.permalink
+
+            %span.gray_bold
+              = link_to 'Muvibuzz', movie_path(movie, :anchor => "tweets"),:style => "color:#4F4F4F"
+            .home_rating_bar.left
+              = ratingbar(movie.tweet_percent)
+            -if movie.tweet_percent != 0 and !movie.tweet_percent.blank? and !movie.tweet_percent.nil?
+              .home_ratingvalue.left
+                -user = "#{movie.tweet_percent || 0}%"
+                = link_to user, movie_path(movie, :anchor => "tweets"),:style => "color:#4F4F4F"
+-else
+  %h3 No Movies Found
+

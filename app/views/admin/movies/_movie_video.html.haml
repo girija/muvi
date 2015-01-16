@@ -1,0 +1,18 @@
+%div{:style => "width:100%", :class => "col_one"}
+  = ff.object.trailer.url.to_s
+  %br
+  = ff.label :trailer, 'Choose Video:', :style => "float:none"
+  = ff.file_field 'trailer', :style => "width:auto"
+  &nbsp; &nbsp;
+  = ff.label :name, 'Video Name:', :style => "float:none"
+  = ff.text_field 'name', :style => "width:120px"
+  /= image_tag (ff.object.trailer.url.to_s),:width => 45, :height => 45
+  = ff.check_box :default_video,:style => "width:50px",:onclick => "javascript:validate_video_checkbox(this.id);"
+  Set as default
+
+  -unless ff.object.id.blank?
+    %span.delete
+      &nbsp; &nbsp; &nbsp; &nbsp;
+      = link_to "Delete", "#{destroy_trailer_admin_movies_path}/#{@movie.permalink}/#{ff.object.id}", :confirm => 'Are you sure?', :method => :delete
+  %br
+  %br

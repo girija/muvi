@@ -1,0 +1,24 @@
+-conn = ActiveSupport::JSON.decode(@count_follow.connections)
+-if conn.include?@user_profile.user_id
+  = form_for "connections",:url => "/connections/unfollow", :html => {:id => "follow_form"},  :remote => true do |f|
+    = f.hidden_field :user_id, :value => @user_profile.user_id
+
+    %div{:style => 'width:45%;float:left',:id => "follow_div"}
+      .actions.left
+        .gradient-input-button3.ui-corner-all{:style => "width:110px"}
+          .gradient-input-button3.ui-corner-all
+            %input{:type => "submit",:class=>'label',:value => "Following", :name => "commit", :onmouseout=>"$(this).val('Following');$(this).css('background','url(/images/tick_mark.png) no-repeat scroll 7px center transparent'), $(this).css('padding-left','17px')", :onmouseover=>"$(this).val('Unfollow');$(this).css('background','none') , $(this).css('padding-left','5px')", :style=>"background: url(/images/tick_mark.png) no-repeat scroll 7px center transparent; padding-left: 17px;"}
+      .clear
+
+-else
+  = form_for "connections",:url => "/connections/follow", :html => {:id => "follow_form"},  :remote => true do |f|
+    = f.hidden_field :user_id, :value => @user_profile.user_id
+
+    %div{:style => 'width:45%;float:left',:id => "follow_div"}
+      .actions.left
+        .gradient-input-button.ui-corner-all
+          .gradient-input-button.ui-corner-all{:class=>"tip_hint tooltipbottom"}
+            %input{:type => "submit", :value => "Follow", :name => "commit", :id => "comment_submit", :class => "label"}
+            =generate_tooltip_block("follow_btn","profile_page")
+      .clear
+

@@ -1,0 +1,43 @@
+#muviform
+  -unless current_user.blank?
+    -upi =  UserPaymentInfo.find_by_user_id(current_user.id)
+    -unless upi.blank?
+      -name = upi.name
+      -card_no = upi.credit_card_no
+      -cvv = upi.credit_card_cvv
+      -credit_card_mm = upi.credit_card_mm
+      -credit_card_yyyy = upi.credit_card_yyyy
+    -else
+      -name = current_user.display_name
+      -card_no = ""
+      -cvv = ""
+      -credit_card_mm = ""
+      -credit_card_yyyy = ""
+
+    .payment-errors{:style => "color:red;font-size:12px"}
+    - if current_user
+      %form{:action => "/update_cr_info", :method => "POST", :id => "paymentform", "data-remote" => "true"}
+        %div
+          %div{:style=>"font-weight:bold;height:30px;"}
+            Payment information
+          .field
+            %div{:class => 'edit_label'}
+              Name
+            %input{:type => 'text' , :name => 'name_card', :id => 'name_card', :class => 'card-name', :value => "#{name}"}
+          .field
+            %div{:class => 'edit_label'}
+              Credit card number
+            %input{:type => 'text' , :name => 'pay_to_credit_card', :id => 'pay_to_credit_card_1', :class => 'card-number', :maxlength=>"16", :value => "#{card_no}"}
+          /.field
+          /  %div{:class => 'edit_label'}
+          /    Security CVV2
+          /  %input{:type => 'password' , :name => 'pay_to_security_cvv2', :id => 'pay_to_security_cvv2', :class => 'card-cvc', :maxlength=>"4"}
+          .field
+            %div{:class => 'edit_label'}
+              Expiration (MM/YY)
+            %input{:type => 'text' , :name => 'pay_to_expiration_mm', :id => 'pay_to_expiration_mm_1', :style => 'width:90px', :class => 'card-expiry-month', :maxlength=>"2", :value => "#{credit_card_mm}"}
+            %input{:type => 'text' , :name => 'pay_to_expiration_yyyy', :id => 'pay_to_expiration_yyyy_1', :style => 'width:100px', :class => 'card-expiry-year', :maxlength=>"2", :value => "#{credit_card_yyyy}"}
+        .clear{:style => 'height:10px;'}
+        %div{:style => 'text-align:right'}
+          %input{:type => 'submit', :value=>"Update", :class => 'btn btn-primary', :id => 'btn_submit'}
+

@@ -1,0 +1,34 @@
+.detail{:style=>"width:836px;"}
+  %h3{:style=>"width:836px;"}
+    %span
+      = @celebrity.name + " Filmography"
+    %span{:style=>"float:right;"}
+      =link_to "Top Movies","javascript:void(0);", :onclick=>"show_top_movies()", :style=>"font-weight:normal;text-transform:capitalize; "
+  .clear
+  %div{:id=>"all_movies"}
+  .clear
+  -@all_movie = full_filmography(@celebrity)
+  - unless @all_movie.blank?
+    %h4
+      &nbsp;
+    - count = 0
+    - @all_movie.each do |movie|
+    
+      -actors = get_actor_name(movie)
+      -actor_name = ""
+      -actor_link = ""
+      -unless actors.blank?
+        -i=0
+        -actors.each do |act|
+          - unless act.celebrity.blank?
+            -if i == 2
+              -break
+            -if actor_name.blank?
+              -actor_name = act.celebrity.name
+              -actor_link = act.celebrity.permalink
+            -else
+              -actor_name = actor_name + ","+ act.celebrity.name
+              -actor_link = actor_link + "," + act.celebrity.permalink
+            -i=i+1
+      =muvilayout_detail(movie.banner_image_thumb, :name => movie.name, :link_on_name => movie_path(movie), :width => 45, :height => 45, :subtexts => actor_name, :sublink => actor_link)
+  .clear

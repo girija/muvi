@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
+
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="msvalidate.01" content="12F48210ACFB9126A8D69AA7D8089200" />
+          <title><%= title %> </title>
+          <meta name="keywords" content="<%= meta_keyword %>">
+          <meta name="description" content="<%= meta_description %>">
+
+        <meta name="viewport" content="width=device-width">
+        <link href="/icon.png" type="image/png" rel="icon">
+        <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+        <%= stylesheet_link_tag 'bootstrap_home', 'jquery.parallax', 'component', 'default', '960' %>
+        <style>
+            body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }
+
+                        #parallax {
+                          padding:0;
+                          margin:0;
+                          width: 100%;
+                          height: 100%;
+                          position:fixed;
+                          background-color: #aebcc9;
+                        }
+        </style>
+        <%= stylesheet_link_tag 'default_home'%>
+        <%= stylesheet_link_tag 'bootstrap-responsive.min.css', 'main' , 'css/font-awesome.css',  'buffer', 'jquery.jscrollpane.min', 'new_common', 'tags','bootstrap-fileupload.min','jquery.Jcrop','flat-ui','token-input' %>
+        <script src="https://www.google.com/jsapi"></script>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.8.3.min.js"><\/script>')</script>
+        <%= javascript_include_tag 'jquery_ujs', 'jquery.parallax' %>
+                <%= javascript_include_tag "vendor/bootstrap" %>
+                <%= javascript_include_tag "jquery.cookie", "jquery.jscrollpane", "easySlider.packed", "jcarousellite","jquery.easing.pack", "jquery.mousewheel","jquery.Jcrop","jquery.lazyload.min","jquery.tokeninput" %>
+                <%= javascript_include_tag "bootstrap-tour","bootstrap.tooltip","bootstrap.popover", "bootstrap-tagmanager","bootstrap-fileupload.min"%>
+                <%= javascript_include_tag "main", "base64_encode", "webtoolkit.base64", "buffer" %>
+
+                <script>
+                        function login(){
+                                is_logged_in();
+                        }
+                        $(document).ready(function(){
+                                $('#parallax .parallax-layer')
+                                        .parallax({
+                                          mouseport: $('#parallax')
+                                });
+                                $("#src_btn").click(function(){
+                                        /*$("#search_field").animate({
+                                          width:'toggle'
+                                        });*/
+                                         $("#token-input-search_field").animate({
+                                          width:'toggle'
+                                        });
+                                        $(".token-input-list").animate({
+                                          width:'toggle'
+                                        });
+                                });
+                                var chosen = "";
+                         $(document).keyup(function(e){ // 38-up, 40-down
+                           if (e.keyCode == 40) {
+                             $("#search_field").blur();
+                             if(chosen === "") {
+                               chosen = 0;
+                             } else if((chosen) < $('.search_item').length-1) {
+                               chosen++;
+                             }
+                             $('li').css("background-color","#fff").css("cursor","default");
+                             $("#li_"+chosen).css("background-color","#0196EC").css("cursor","pointer");
+                             var link_text = $("#link_"+chosen).text();
+                             $("#search_field").val(link_text);
+                             return false;
+                           }
+                           if (e.keyCode == 38) {
+                             $("#search_field").blur();
+                             if(chosen === "") {
+                               chosen = 0;
+                             } else if(chosen > 0) {
+                               chosen--;
+                             }
+                             $('li').css("background-color","#fff").css("cursor","default");
+                            $("#li_"+chosen).css("background-color","#0196EC").css("cursor","pointer");
+                             var link_text = $("#link_"+chosen).text();
+                             $("#search_field").val(link_text);
+                             return false;
+                           }
+                           if (e.keyCode == 13) {
+                             $("#link_"+chosen).get(0).click();
+                          }
+                         });
+
+                        });
+
+                </script>
+
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+
+                <!----------- Login Modal -->
+                <div class='modal fade hide' id='loginModal' style='width:365px;'>
+                        <div class='modal-header'>
+                                <div aria-hidden="true" class="pull-right" data-dismiss="modal">
+                                  <img src="/images/popup_close.png">
+                                </div>
+
+                                <h4 id='rateModalLabel'>
+                                        Login
+                                </h4>
+                        </div>
+                        <div class='modal-body'></div>
+                        <div class='modal-footer'></div>
+                </div>
+
+                <!----------- Email Join Modal -->
+                <div class='modal fade hide' id='joinModal' style='width:365px;'>
+                        <div class='modal-header'>
+                                <div aria-hidden="true" class="pull-right" data-dismiss="modal">
+                                  <img src="/images/popup_close.png">
+                                </div>
+
+                                <h4 id='rateModalLabel'>
+                                        Join
+                                </h4>
+                        </div>
+                        <div class='modal-body'></div>
+                        <div class='modal-footer'></div>
+                </div>
+
+
+                <div style="width: 500px;height:auto; z-index:4500" id="rateModal" class="modal fade hide in" aria-hidden="false">
+                  <div class="modal-header">
+                    <div data-dismiss="modal" class="pull-right" aria-hidden="true">
+                      <img src="/images/popup_close.png">
+                    </div>
+                    <div style="color:#494949;font-size:20px;font-weight:bold;" id="rating_label">Rate Movie</div>
+                  </div>
+                  <div class="modal-body rating"></div>
+                </div>
+
+
+                <%= yield %>
+
+                <% loc = DisplayHelper.get_location(request.remote_ip) %>
+        <script>
+            var _gaq=[['_setAccount','UA-23408239-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+
+        <script>
+
+	  function set_link(cat, permalink, id, name){
+                        if(cat == "Stars"){
+                           window.location = "/stars/"+permalink;
+                        }else if(cat == "Movies"){
+                           window.location = "/movies/"+permalink;
+                        }else{
+                           window.location = "/profile/"+id+"/"+name;
+                        }
+                }
+
+                $("#search_field").keyup(function(){
+                        var q = $("#search_field").val();
+                        if(q.length >= 3){
+                                $.post( "/autocomplete?q="+q, function( data ) {
+                                        //$( ".result" ).html( data );
+					if(/<[a-z][\s\S]*>/i.test(data) == true){
+		   			  if(data){
+					    data = $(data).text();
+			                    data = JSON.parse(data);
+                    	                  }
+				       }
+
+                                        var category = "";
+					var loc = "";
+
+                                        var html = "<ul>";
+                                        for(var i = 0; i < data.length; i++){
+                                                var permalink = data[i].permalink;
+                                                var cat = data[i].cat;
+                                                var id = data[i].id;
+                                                var name = data[i].name;
+						
+                                                if(cat == "Movies"){
+                                                   loc = "/movies/"+permalink;
+                                                }else if(cat == "Stars"){
+                                                   loc = "/stars/"+permalink;
+                                                }else if(cat == "Lists"){
+                                                   loc = "/list/"+permalink;
+                                                }else{
+                                                   loc = "/"+permalink;
+                                                }
+
+                                                if(category != data[i].cat){
+                                                  category = data[i].cat;
+                                                  html += "<li><div class='autocomplete-header'>"+data[i].cat+"</div></li><li id='li_"+i+"' class='search_item'><a id='link_"+i+"' style='color:#333333;padding:3px; cursor:pointer;' href="+loc+">"+data[i].name+"</a></li>";
+
+                                                }else{
+                                                  html += "<li id='li_"+i+"' class='search_item'> <a id='link_"+i+"' style='color:#333333;padding:3px; cursor:pointer;' href="+loc+">"+data[i].name+"</a></li>";
+
+                                                }
+                                        }
+                                        html += "</ul>";
+                                        $(".token-input-dropdown").html(html);
+                                        $(".token-input-dropdown").show();
+                                });
+                        }
+                });
+
+          var curcat ;
+                //$(document).ready(function() {
+		$("#src_btn").one( "hover", function() {
+			//$(".token-input-dropdown").first().remove();
+	                //$(".token-input-list").first().remove();
+
+                        $(".modal-backdrop").css("z-index", "2400");
+                        $("#search_field_old").tokenInput("/autocomplete" ,{
+                                  hintText: "",
+                                  searchingText: "",
+                                  noResultsText:"",
+                                  animateDropdown: false,
+                                  tokenLimit: 1,
+                                  onResult: function (results) {
+					if(/<[a-z][\s\S]*>/i.test(results) == true){
+                                          if(results){
+                                            results = $(results).text();
+                                            results = JSON.parse(results);
+                                          }
+                                       }
+
+                                        curcat = "";
+                                        return results;
+                                  },
+                                  resultsFormatter: function(item){
+                                        if(curcat != item.cat){
+                                          curcat = item.cat;
+                                          return "<li><div class='autocomplete-header'>"+item.cat+"</div><div style='padding:3px;'>"+item.name+"</div></li>";
+                                        }else{
+                                          return "<li> <div style='padding:3px;'>"+item.name+" </div></li>";
+                                        }
+                                  },
+                                  onAdd: function (item) {
+                                        var permalink = item.permalink;
+                                        var cat = item.cat;
+                                        if(cat == "Stars"){
+                                          window.location = "/stars/"+permalink;
+                                        }else if(cat == "Movies"){
+                                          window.location = "/movies/"+permalink;
+                                        }else{
+                                          var id = item.id;
+                                          var name = item.name;
+                                  window.location = "/profile/"+id+"/"+name;
+                                }
+
+                          }
+                        });
+                        $(".token-input-list").css("float", "left");
+                        //$("#token-input-search_field").hide();
+                        //$(".token-input-list").hide();
+
+                        $("#token-input-search_field").css("background-color", "#252525");
+                        $(".token-input-list").css("border", "none");
+                        $("#token-input-search_field").css("border-radius", "0");
+                        $("#token-input-search_field").css("color", "#FFF");
+
+                        $("#token-input-search_field").click(function(){
+                            $("#token-input-search_field").css("background-color", "#FFF");
+                            $("#token-input-search_field").css("border-radius", "4px");
+                            $("#token-input-search_field").css("color", "#000");
+                        });
+
+                        $("#token-input-search_field").blur(function(){
+                            $("#token-input-search_field").css("background-color", "#252525");
+                            $("#token-input-search_field").css("border-radius", "0");
+                            $("#token-input-search_field").css("color", "#FFF");
+                        })
+
+                });
+
+                $(document).ready(function(){
+                        $("#how_it_works_heading").css("color", "#333333");
+                        $("#features_heading").css("color", "#B9B9B9");
+                        $("#faq_heading").css("color", "#B9B9B9");
+
+
+                        // COOKIE
+                        $.cookie('english', 'yes', { expires: 365, path : "/"});
+                        $('.chkenglish').attr('checked', 'checked');
+
+                        $.cookie("hindi", null, {path : "/"});
+                        $.cookie("telugu", null, {path : "/"});
+                        $.cookie("tamil", null, {path : "/"});
+
+                        $('.chkhindi').removeAttr('checked');
+                        $('.chktelugu').removeAttr('checked');
+                        $('.chktamil').removeAttr('checked');
+
+                        $.cookie('muvi_language_selected', 'yes', { expires: 365, path : "/"});
+
+                        var loc_language = "<%=loc%>";
+
+                        $.cookie(loc_language, 'yes');
+                        $('.chk'+loc_language).attr('checked', 'checked');
+
+                        /////////////// HOW IT WORKS VIDEO
+                        $(".btn_view_trailer").live("click", function(e){
+                          $("#demoModalBody").attr("src", "");
+                          $("#demoModalBody").attr("src", "https://www.youtube.com/embed/w1GJIqCfQM8?autoplay=1");
+                        });
+                        $('#demoModal').modal("hide").on('hide', function() {
+                                 $("#demoModalBody").attr("src", "");
+                        });
+
+                        // Auto play video in the url muvi.com/muvi-intro
+                                var url = document.URL.split("/");
+                                if("<%= params[:controller] %>" == "home" && "<%= params[:action] %>" == "index" && url[3].indexOf("muvi-intro") != -1){
+                                  $("#demoModalBody").attr("src", "");
+                                  $("#demoModalBody").attr("src", "https://www.youtube.com/embed/w1GJIqCfQM8?autoplay=1")
+                                  $("#demoModal").modal("show");
+
+                                }
+                                ////////////////////////////////////////////////
+
+
+
+                        /////////////////////////
+
+                });
+
+                function show_div(id){
+                        //$("#how_it_works").hide();
+                        //$("#features").hide();
+                        //$("#faq").hide();
+
+                        $("#how_it_works_heading").css("color", "#B9B9B9");
+                        $("#features_heading").css("color", "#B9B9B9");
+                        $("#faq_heading").css("color", "#B9B9B9");
+
+                        $("#"+id).show();
+                        $("#"+id+"_heading").css("color", "#333333");
+                }
+
+                $("body").click(function(){
+                        $(".token-input-dropdown").hide()
+                });
+
+        </script>
+</body>
+</html>
+

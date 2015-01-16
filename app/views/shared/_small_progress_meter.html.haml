@@ -1,0 +1,9 @@
+.small_rating
+  .meter.left
+    %span{:style => "width:#{@movie.critics_percent}%"}
+  .small_inner_ratingBar.left
+    = ratingbar(@movie.critics_percent,"criticsmeter")
+  -if @movie.critics_percent != 0 and !@movie.critics_percent.blank? and !@movie.critics_percent.nil?
+    .left{:style=>"padding: 1px 5px;"}
+      -critics_percent = "#{@movie.critics_percent || 0}%"
+      = link_to critics_percent, '#critics', :onclick => "go_to_tab(0);",:style => "font-size:16px; color:#4F4F4F"

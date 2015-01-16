@@ -1,0 +1,15 @@
+= form_for([discussion, Comment.new], :remote => true, :html => {:id => "discu_comment_form_#{discussion.id}"})  do |f|
+  
+  #error_container_id
+    = render '/shared/error_display', {:error_object => f.object }
+  %div{:style => "float:left;margin-left:5px"}
+    - user_id = current_user ? current_user.id : ""
+    /%input{:type => "hidden", :id => "user_id",:name=>"user_id", :value => user_id}
+    %textarea{:id => "item_comment_#{discussion.id}",:name => "discussion_comment_#{discussion.id}", :rows => 1, :cols => 58, :class => "commentBox", :onkeypress => "check_event_and_submit_discussion_reply(event, '#{discussion.id}','#{user_id}');", :placeholder => "Write a comment"}
+    %input{:type => "hidden", :id => "refer_type",:name=>"refer_type", :value => @refer.class.to_s}
+    %input{:type => "hidden", :id => "item_class",:name=>"item_class", :value => discussion.class.to_s}
+    %input{:type => "hidden", :id => "parent_id_#{discussion.id}",:name=>"discussion_comment", :value => discussion.id}
+    = f.hidden_field "parent_id"
+
+.clear
+

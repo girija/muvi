@@ -1,0 +1,11 @@
+<form method="post" id="user_edit" enctype="multipart/form-data" data-remote="true" class="user_edit" action="/user_profiles/update_image" accept-charset="UTF-8"><div style="margin:0;padding:0;display:inline"><input type="hidden" value="✓" name="utf8"><input type="hidden" value="2L9kXppWdrllp7938ie1XUFA9HzuHqGkw/92adNVlto=" name="authenticity_token"></div>
+                <input type="file" name="user[profile_image]" id="new_img">
+                <div class="clear"></div>
+                <div style="color:red;" id="err_block"></div>
+                <div style="padding-top:80px;float:right;">
+                        <input type="hidden" name="from" value="others">
+                        <input type="submit" value="Save" class="btn btn-primary">
+                        <input type="button" value="Cancel" onclick="close_modal();" class="btn">
+                </div>
+        </form>
+

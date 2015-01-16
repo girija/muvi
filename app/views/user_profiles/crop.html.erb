@@ -1,0 +1,69 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<%= stylesheet_link_tag "jquery.Jcrop.css","flat-ui.css" %>
+<%= javascript_include_tag "jquery.Jcrop.js" %>
+<script type="text/javascript" charset="utf-8">
+$(function() {
+  $('#cropbox').Jcrop({
+    onChange: update_crop,
+    onSelect: update_crop,
+    setSelect: [0, 0, 300, 300],
+    aspectRatio: 1
+  });
+});
+
+function update_crop(coords) {
+  var crop_box_width = $(".jcrop-holder div:first-child").css("width").replace("px", "");
+  var crop_box_height = $(".jcrop-holder div:first-child").css("height").replace("px", "");
+  var crop_box_x = $(".jcrop-holder div:first-child").css("left").replace("px", "");
+  var crop_box_y = $(".jcrop-holder div:first-child").css("top").replace("px", "");
+  var rx = 100/coords.w;
+  var ry = 100/coords.h;
+  $('#preview').css({
+    width: Math.round(rx * <%= @user_profile.profile_image_geometry(:original).width %>) + 'px',
+    height: Math.round(ry * <%= @user_profile.profile_image_geometry(:original).height %>) + 'px',
+    marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+    marginTop: '-' + Math.round(ry * coords.y) + 'px'
+  });
+
+  //var ratio = <%#= @user_profile.profile_image_geometry(:original).width %> / <%#= @user_profile.profile_image_geometry(:small).width %>;
+
+  $("#crop_x").val(crop_box_x);
+  $("#crop_y").val(crop_box_y);
+  $("#crop_w").val(crop_box_width);
+  $("#crop_h").val(crop_box_height);
+
+  //$("#crop_x").val(Math.round(coords.x));
+  //$("#crop_y").val(Math.round(coords.y));
+  //$("#crop_w").val(square_size);
+  //$("#crop_h").val(square_size);
+}
+function close_iframe(){
+  //parent.window.location.href = '/profile/<%=@user_profile.user_id%>/<%=@user_profile.display_name%>';  
+  if("<%= params[:from]%>" == 1){
+    parent.window.location.href = 'http://maaflix.muvi.com/site/reload';
+  }else{
+    parent.window.location.href = '/profile/<%=@user_profile.user_id%>/<%=@user_profile.display_name%>';
+  }
+
+}
+</script>
+<div style="float:left;">
+  <%= image_tag("/system/profile_images/#{@user_profile.id}/original/#{@user_profile.profile_image_file_name.gsub(' ', '%20')}", :id => "cropbox") %>
+</div>
+<div style="float:right;padding-right:50px;">
+  <div style="font-weight:bold;font-size:14px;height:30px;">Preview:</div>
+  <div style="width:100px; height:100px; overflow:hidden">
+    <%= image_tag("/system/profile_images/#{@user_profile.id}/original/#{@user_profile.profile_image_file_name.gsub(' ', '%20')}", :id => "preview") %>
+  </div>
+  <form  action="/user_profiles/update_crop" method="post">
+      <input type="hidden" name="profile_id" value="<%= @user_profile.id %>">
+      <input id="crop_x" name="user_profile[crop_x]" type="hidden" >
+      <input id="crop_y" name="user_profile[crop_y]" type="hidden" >
+      <input id="crop_w" name="user_profile[crop_w]" type="hidden" >
+      <input id="crop_h" name="user_profile[crop_h]" type="hidden" >
+    <div style="padding-top:20px;">
+      <input class="btn btn-primary" id="user_profile_submit" name="commit" onclick="close_iframe();" type="submit" value="Crop">
+      <input type="button" class="btn" value="Cancel" onclick="close_iframe();">
+    </div>
+  </form>
+</div>

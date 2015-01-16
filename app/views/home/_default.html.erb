@@ -1,0 +1,182 @@
+<div class="wrapper">
+			<div class="header">
+				<div class="top_bar">
+					<img src="images/logo.png" style="float:left;" />
+					<input style="margin:0 0 0 30px; background:#000; border:solid 1px #4c4c4c; color:#FFF; width:148px; height:23px; float:left;" type="text" name="search" />
+					<input style="background:url(images/search_icon.png) no-repeat; border:none; width:16px; height:15px; float:left; margin:6px 0 0 8px;" type="submit" name="submit" value="" />
+					<p style="color:#cacaca; float:left; padding:0 20px 0 0; margin:0 0 0 400px;">Already have and account?</p>
+					
+					<input type="button" name="signin" value="" style="background:url(images/login.png) no-repeat; cursor:pointer; width:45px; height:25px; border:none;" onclick="login();" />
+
+					</div>
+			</div>
+			<div class="contener">
+				<div class="banner">
+					<div class="left">
+						<img src="images/image1.png"  />
+					</div>
+					<div class="right">
+						<h1>Discover Awesome Movies!</h1>
+						<h3>find movies personalised to you instantly</h3>
+						<input type="button" name="play" value="" style="background:url(images/play_icon.png) no-repeat; border:0; float:left; width:22px; height:22px;" /><p style="color:#00aced; padding:0; margin:0;">See How It Works</p>
+						<input type="button" name="join" style="background:url(images/join_btn.png) no-repeat; border:none; width:220px; height:35px; margin:45px 0 0 -22px; padding:0;" />
+						<p style="margin:15px 0 0 0; color:#FFF;">Or, <a href="#" style="color:#00aced; text-decoration:none;">sign up with your email</a></p>
+					</div>
+				</div>
+				<div class="content">
+					<section>
+						<div style="text-align:center; float:left;; width:100%; font-size:22px;">
+							<span style="cursor:pointer" id="how_it_works_heading" onclick="show_div('how_it_works');">How it Works</span> &nbsp;&nbsp;&nbsp;&nbsp;
+							
+							<span style="cursor:pointer" id="features_heading" onclick="show_div('features');">Features </span>&nbsp;&nbsp;&nbsp;&nbsp;
+							
+							<span style="cursor:pointer" id="faq_heading" onclick="show_div('faq');">FAQ</span> &nbsp;&nbsp;&nbsp;&nbsp;
+							
+							<div style="clear:both"></div>
+							<img src="/images/h_separator.png">
+						</div>
+					</section>
+					
+					<div style="clear:both; height:40px;"></div>
+					
+					<script>
+						$(document).ready(function(){
+							$("#how_it_works").show();
+							$("#features").hide();
+							$("#faq").hide();
+							
+							$("#how_it_works_heading").css("color", "#333333");
+							$("#features_heading").css("color", "#B9B9B9");
+							$("#faq_heading").css("color", "#B9B9B9");
+						}); 
+						
+						function show_div(id){
+							$("#how_it_works").hide();
+							$("#features").hide();
+							$("#faq").hide();
+							
+							$("#how_it_works_heading").css("color", "#B9B9B9");
+							$("#features_heading").css("color", "#B9B9B9");
+							$("#faq_heading").css("color", "#B9B9B9");
+							
+							$("#"+id).show();
+							$("#"+id+"_heading").css("color", "#333333");
+						}
+					</script>
+					
+					<section id="how_it_works">
+						<span style="font-size:26px">Organise, connect and explore</span>
+						<figure><img src="images/img1.png" /></figure>
+						<article>
+							<h2>Create & share lists</h2>
+							<p>Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</article>
+						<article>
+							<h2>Ask & recommend</h2>
+							<p>Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</article>
+						<article>
+							<h2>Discover</h2>
+							<p>Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</article>
+						<div class="clear"></div>
+					</section>
+					
+					<section id="features">
+						<h2 style="margin:0 0 70px 0;">Packed full of awesome features</h2>
+						<aside>
+							<img src="images/icon1.png" />
+							<h3>Discover awesome movies</h3>
+							<p style="margin:0 0 60px 50px;">Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</aside>
+						<aside>
+							<img src="images/icon5.png" />
+							<h3>Discover awesome movies</h3>
+							<p style="margin:0 0 60px 50px;">Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</aside>
+						<aside>
+							<img src="images/icon2.png" />
+							<h3>Discover awesome movies</h3>
+							<p style="margin:0 0 60px 50px;">Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</aside>
+						<aside>
+							<img src="images/icon6.png" />
+							<h3>Discover awesome movies</h3>
+							<p style="margin:0 0 60px 50px;">Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</aside>
+						<aside>
+							<img src="images/icon3.png" />
+							<h3>Discover awesome movies</h3>
+							<p style="margin:0 0 60px 50px;">Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</aside>
+						<aside>
+							<img src="images/icon7.png" />
+							<h3>Discover awesome movies</h3>
+							<p style="margin:0 0 60px 50px;">Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</aside>
+						<aside>
+							<img src="images/icon4.png" />
+							<h3>Discover awesome movies</h3>
+							<p style="margin:0 0 60px 50px;">Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</aside>
+						<aside>
+							<img src="images/icon8.png" />
+							<h3>Discover awesome movies</h3>
+							<p style="margin:0 0 60px 50px;">Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted, Yashvardhan</p>
+						</aside>
+					<div class="clear"></div>
+					</section>
+					
+					
+					<section style="padding:0 0 95px 0;" id="faq">
+						<h2>Frequently asked questions</h2>
+						<aside>
+							<h3>Can I watch movies here?</h3>
+							<p>Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted.</p>
+						</aside>
+						<aside>
+							<h3>Can I watch movies here?</h3>
+							<p>Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted.</p>
+						</aside>
+						<aside>
+							<h3>Can I watch movies here?</h3>
+							<p>Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted.</p>
+						</aside>
+						<aside>
+							<h3>Can I watch movies here?</h3>
+							<p>Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted.</p>
+						</aside>
+						<aside>
+							<h3>Can I watch movies here?</h3>
+							<p>Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted.</p>
+						</aside>
+						<aside>
+							<h3>Can I watch movies here?</h3>
+							<p>Yashvardhan Ras wife, Nandini, and s wife, Nandini, and ichand lives a very wealthy lifestyle along with his wife, Nandini, and two adopted.</p>
+						</aside>
+					<div class="clear"></div>
+					</section>
+				</div>
+				<footer>
+					<section style="float:left; padding:0 0 25px 10px;">
+						<ul>
+							<li><a href="#">About Us</a></li>
+							<li><a href="#">Career</a></li>
+							<li><a href="#">Press</a></li>
+							<li><a href="#">Muvi API</a></li>
+							<li><a href="#">Muvi Studio</a></li>
+							<li><a href="#">Contact Us</a></li>
+						</ul>
+						<p style="padding:0; margin:15px 0 0 0;"> &copy; Muvi.com 2013</p>
+					</section>
+					<section style="float:right;" class="fright">
+						<ul>
+							<li style="color:#989898;">Connect with us:</li>
+							<li><a href="#"><img src="images/twitter_hover.png" /></a></li>
+							<li><a href="#"><img src="images/fb_hover.png" /></a></li>
+							<li><a href="#"><img src="images/gplus_hover.png" /></a></li>
+						</ul>
+					</section>
+				</footer>
+			</div>
+		</div>

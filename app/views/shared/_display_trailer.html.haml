@@ -1,0 +1,24 @@
+-default_trailer = get_default_trailer(@movie.id)
+-if default_trailer != false
+  -video = Video.find_by_id(default_trailer,:conditions => ["rank = 1"])
+  -begin
+    -if video.video_remote_url == ""
+      %a{:href=>'#', :class=>'gradient-button2 left trailerLink'}
+        .gradient-button2
+          .label view trailer
+    -else
+      -video_id_arr = video.video_remote_url.split("/")
+      -video_id = video_id_arr[video_id_arr.size.to_i - 1]
+      %script
+        $("#player").attr('src', 'http://www.youtube.com/embed/#{video_id}?wmode=opaque&autoplay=1&modestbranding=1');
+      %a{:href=>'#', :class=>'gradient-button2 left remote_trailerLink'}
+        .gradient-button2
+          .label view trailer
+  -rescue
+
+-else
+  -default_video = get_default_video(@movie.id)
+  -if default_video != false
+    %a{:href=>'#', :class=>'gradient-button2 left trailerLink'}
+      .gradient-button2
+        .label view trailer

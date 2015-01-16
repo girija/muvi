@@ -1,0 +1,84 @@
+- if !current_user.blank?
+  - @my_wanna_see_movies = []
+  - @my_seen_movies = []
+  - list = ListOfMovie.find_by_user_id(current_user.id)
+  - if list && !list.wanna_see_lists.blank?
+    - wannasee_list = ActiveSupport::JSON.decode(list.wanna_see_lists)
+    - wannasee_list.each do |wanna_see|
+      - @my_wanna_see_movies << wanna_see["object"]["id"].to_i
+  - if list && !list.seen_lists.blank?
+    - seen_list = ActiveSupport::JSON.decode(list.seen_lists)
+    - seen_list.each do |seen|
+      - unless seen["object"].blank?
+        - @my_seen_movies << seen["object"]["id"].to_i
+  - @my_rated_movies = []
+  - rated =  UserMovieList.where(:user_id => current_user.id)
+  - if rated
+    - rated.each do |rate|
+      - if !rate.movie_id.blank?
+        - rated_list = ActiveSupport::JSON.decode(rate.movie_id)
+        - rated_list.each do |movie|
+          - @my_rated_movies << movie.to_i
+  - @my_rated_movies.uniq!
+
+
+- unless @tagged_list.blank?
+  - @tagged_list.each do |tagged|
+    - unless tagged.tag.blank?
+      -first_name = @user_profile.display_name.split(" ")
+      -modal_header ="Users following #{first_name[0]}s list"
+      =render "shared/user_following_modal",{:@tagged=>tagged, :modal_header => modal_header}
+      %a{:name => "#{tagged.id}", :href => '#'}
+      .container-fluid{:id => "list_row_#{tagged.id}", :onmouseover => "show_delete_list('#{tagged.id}');", :onmouseout => "hide_delete_list('#{tagged.id}');"}
+        .row-fluid
+          .row-list-header.media{:style => 'border:1px solid #E5E5E5;padding:5px;margin:3px 0;margin-bottom:-1px;margin-top:8px;background:#f9f9f9;', "data-id" => tagged.id,:id=>"list_header_#{tagged.id}"}
+            /, :onclick => "open_list_page('/list/#{tagged.permalink}')"} 
+            /,:onclick=>"open_movie_list('#{tagged.id}', 1)"}
+
+            .right{:style => "font-size:20px; font-weight:bold; display:none;", :id => "delete_list_#{tagged.id}", :onclick => "delete_list('#{tagged.id}');", :onmouseover => "remove_flip('#{tagged.id}');"}
+              %i{:class => "icon-remove", :style => "font-size: 30px;margin-right: 20px;margin-top: 10px;", :title => "Remove this list"}
+
+            %a.pull-left{:id=>"poster_#{tagged.id}", :href => "/list/#{tagged.permalink}"}
+              - movie = Movie.find_by_id(ActiveSupport::JSON.decode(tagged.movie_id).last.to_i)
+              = image_tag "#{POSTER_URL}#{movie.banner_image_medium}", :class => 'media-object list_poster' if movie
+            .media-body
+              %div.media-heading.pull-left{:style => 'color:#494949;font-size:28px;font-weight:bold;padding-top:10px;line-height:26px;'}
+                %span{:id => "list_name_existing_#{tagged.id}"}
+                  %a{:href => "/list/#{tagged.permalink}"}
+                    = tagged.tag
+
+              .clear{:style => 'padding-top: 25px;'}
+                .pull-left
+                  =image_tag("/images/share.png",:id=>"share_#{tagged.id}",:style=>"display:none;")
+                - unless current_user.blank?
+                  - if current_user.id.to_i !=  params[:user_id].to_i
+                    - if !tagged.followed_by?(current_user)
+                      = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow btn-primary bold_class btn-medium tip_hint', "data-id" => tagged.id, :id => "btn-follow-#{tagged.id}", :style => 'border-radius:2px 2px 2px 2px;width:60px;float:left;',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+                    - else
+                      = link_to "Following".html_safe, "#" , :class => 'btn btn-following bold_class btn-primary btn-medium', "data-id" => tagged.id, :id => "btn-follow-#{tagged.id}", :style => 'border-radius:2px 2px 2px 2px;width:65px;float:left;'
+                  -else
+                    = link_to "<i class='icon-plus'></i> Add Movie".html_safe, "#" , :class => 'btn btn-primary bold_class btn-medium', "data-id" => tagged.id, :id => "btn-addmovie-#{tagged.id}", :style => 'border-radius:2px 2px 2px 2px;float:left;'
+                - else
+                  = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow-login btn-primary bold_class btn-medium tip_hint', "data-id" => tagged.id, :id => "btn-follow-#{tagged.id}", :style => 'border-radius:2px 2px 2px 2px;float:left;',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+                .pull-left{:id => "followers-#{tagged.id}",:style=>"padding-left:30px;padding-top:2px;"}
+                  = render "followers", :@tagged => tagged
+                - movie_ids = ActiveSupport::JSON.decode(tagged.movie_id)
+                - cnt = 0
+                - show_moies = []
+                - movie_ids.each do |movie_id,i|
+                  -if cnt < 2
+                    - reviews = Movie.find_by_id(movie_id).reviews if Movie.find_by_id(movie_id)
+                    - if reviews
+                      -reviews.each do |review|
+                        -if !review.description.blank?
+                          -show_moies << {"movie_id" => movie_id,"review_desc" => review.description}
+                          -break
+                    - cnt += 1
+                -if !show_moies.blank?
+                  .pull-left{:style=>"padding-top:2px;width:100%;"}
+                    -show_moies.each do |s_movie|
+                      -sh_movie = Movie.find_by_id(s_movie["movie_id"])
+                      =render :partial => "shared/movie_block_new", :locals=>{:@list=>tagged,:movie=>sh_movie, :@review_text => s_movie["review_desc"]}
+          /.media{:style => 'display:none',:id=>"movie_list_back_#{tagged.id}", :class=>"movie_list_back_#{tagged.id}"}
+          /  =render template: "user_movie_lists/show_list", :locals=>{:@list=>tagged, :type => "all_list"}
+

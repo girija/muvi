@@ -1,0 +1,115 @@
+#muviform
+  -unless current_user.blank?
+    -upi =  UserPaymentInfo.find_by_user_id(current_user.id)
+    -unless upi.blank?
+      -name = upi.name
+      -card_no = upi.credit_card_no
+      -cvv = upi.credit_card_cvv
+      -credit_card_mm = upi.credit_card_mm
+      -credit_card_yyyy = upi.credit_card_yyyy
+    -else
+      -name = current_user.display_name
+      -card_no = ""
+      -cvv = ""
+      -credit_card_mm = ""    
+      -credit_card_yyyy = ""
+
+    .payment-errors{:style => "color:red;font-size:12px"}
+    %div{:style => "position:absolute; padding-left:45%; padding-top:20%; display:none", :id => "load_icon_home"}
+      %img{:src => '/images/loading.gif'}
+
+    - if current_user
+      %form{:action => "", :method => "POST", :id => "paymentform_home"}
+        %div
+          %div{:style=>"font-weight:bold;height:30px;"}
+            Payment information
+          .field
+            %div{:class => 'edit_label'}
+              Name
+            %input{:type => 'text' , :name => 'name_card', :id => 'name_card_home', :class => 'card-name', :value => "#{name}"}
+          .field
+            %div{:class => 'edit_label'}
+              Credit card number
+            %input{:type => 'text' , :name => 'pay_to_credit_card', :id => 'pay_to_credit_card_home', :class => 'card-number', :maxlength=>"16", :value => "#{card_no}", :EnableViewState => "false"}
+            %input{:type => 'hidden' , :name => 'amount', :id => 'amount_home', :value => "1.99"}
+            %input{:type => 'hidden' , :name => 'movie_coins', :id => 'movie_coins_home'}
+            %input{:type => 'hidden' , :name => 'movie_coins', :id => 'subs_movie_id_home', :value => "#{movie_id}"}
+          .field
+            %div{:class => 'edit_label'}
+              Security CVV2
+            %input{:type => 'password' , :name => 'pay_to_security_cvv2', :id => 'pay_to_security_cvv2_home', :class => 'card-cvc', :maxlength=>"4", :value => "#{cvv}"}
+          .field
+            %div{:class => 'edit_label'}
+              Expiration (MM/YY)
+            %input{:type => 'text' , :name => 'pay_to_expiration_mm', :id => 'pay_to_expiration_mm_home', :style => 'width:90px', :class => 'card-expiry-month', :maxlength=>"2", :value => "#{credit_card_mm}"}
+            %input{:type => 'text' , :name => 'pay_to_expiration_yyyy', :id => 'pay_to_expiration_yyyy_home', :style => 'width:100px', :class => 'card-expiry-year', :maxlength=>"2", :value => "#{credit_card_yyyy}"}
+        .clear{:style => 'height:10px;'}
+        %div{:style => 'text-align:right'}
+          %input{:type => 'button', :value=>"Pay", :class => 'btn btn-primary', :id => 'btn_submit_home', :onclick => "submit_payment_home();"}
+:javascript
+  function stripeResponseHandler_home(status, response) {
+    if (response.error) {
+        // show the errors on the form
+        $(".payment-errors").text(response.error.message);
+        $("#load_icon_home").hide();
+        //$('#btn_submit').prop('disabled', false);
+    } else {
+        var form$ = $("#paymentform_home");
+        // token contains id, last4, and card type
+        var token = response['id'];
+        // insert the token into the form so it gets submitted to the server
+        form$.append("<input type='hidden' name='stripeToken' value='" + token + "'/>");
+        var url = "/after_payment";
+        var amount = $("#amount_home").val();
+        var coins = $("#movie_coins_home").val();
+        var name_card = $("#name_card_home").val();
+        var movie_id = $("#subs_movie_id_home").val();
+
+        var card_no = $("#pay_to_credit_card_home").val();
+        //var cvv = $("#pay_to_security_cvv2").val();
+        var exp_month = $("#pay_to_expiration_mm_home").val();
+        var exp_year = $("#pay_to_expiration_yyyy_home").val();
+
+        $.post(url,{data:response,amount:amount,movie_coins:coins,name_card:name_card,movie_id:movie_id, card_no:card_no, exp_month:exp_month, exp_year:exp_year},function(res){
+        });
+        // and submit
+        //form$.get(0).submit();
+    }
+  }
+  $(document).ready(function() {
+    //$('#btn_submit').attr("disabled", "disabled");
+    var cur_yr = new Date().getFullYear();
+    var two_digit_yr = String(cur_yr).substring(0,2);
+    $("#btn_submit_old").click(function(event) {
+      //$('#btn_submit').prop('disabled', true);
+      $("#load_icon").show();
+
+      Stripe.createToken({
+        amount: $("#amount").val(), 
+        number: $('.card-number').val(),
+        cvc: $('.card-cvc').val(),
+        exp_month: $('.card-expiry-month').val(),
+        exp_year: two_digit_yr+$('.card-expiry-year').val()
+      }, stripeResponseHandler);
+
+      // prevent the form from submitting with the default action
+      return false;
+    });
+  });
+
+  function submit_payment_home(){
+    var cur_yr = new Date().getFullYear();
+    var two_digit_yr = String(cur_yr).substring(0,2);
+    $("#load_icon_home").show();
+    Stripe.createToken({
+      amount: $("#amount_home").val(),
+      number: $('#pay_to_credit_card_home').val(),
+      cvc: $('#pay_to_security_cvv2_home').val(),
+      exp_month: $('#pay_to_expiration_mm_home').val(),
+      exp_year: two_digit_yr+$('#pay_to_expiration_yyyy_home').val(),
+      interval_count: 1,
+      "interval": "month",
+      "name": "Basic Plan"
+    }, stripeResponseHandler_home);
+  }
+

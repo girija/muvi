@@ -1,0 +1,174 @@
+/- @refer = @movie ? @movie : @celebrity
+-@item = item ? item : @item
+- if @item.class.to_s == "Poster"
+  -poster =  item
+  %div{:style=>"border:1px solid #D2D6D9;width:128px;height:195px;float:left;"}
+    %div{:style => "width:124px;height:191px;padding:2px;"}
+      = image_tag ("/system/posters/#{poster.id}/medium/#{poster.poster_file_name.gsub(" ", "%20")}"), :width => "124px", :height => "191px",:onclick => "javascript:show_poster('#{poster.id}','#{@p_item.class.to_s.downcase}','#{@p_item.permalink}');", :style => "cursor:pointer", :id => "poster#{poster.id}"
+- elsif @item.class.to_s == "Video"
+  %div{:style=>"width:532px;float:left"}
+    %div{:style=>"height:20px;"}
+      %div{:style=>"width:180px;"}
+        %div{:id=>"like_#{@item.id}",:style=>"width:40px;height:20px;border:1px solid #D2D6D9;background-color:#EDEDED;border-radius:3px;float:left;"}
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            =link_to image_tag("/images/t_up.png",:style=>"padding:2px;"),"javascript:void(0);",:remote=>'true', :onclick => "check_inner_like_login('#{@item.id}','#{@item.class}','#{@item.class.to_s.downcase}_like_link_','#{@p_item.class.to_s}', '#{@p_item.id}','like');", :id=>"#{@item.class.to_s.downcase}_like_link_#{@item.id}"
+            =generate_tooltip_block("video_like","#{@p_item.class.to_s.downcase}_page")
+          %div{:style=>"padding-right:8px;line-height:1.8em;float:right;"}
+            =link_to "#{@item.like_votes.count}", "javascript:void(0);",:id =>"like_view_#{@item.id}" ,:onclick => "show_likes_popup('#{@item.id}','#{@item.class.to_s}','like','#{@item.like_votes.count}','300','counter_popup');",:style=>"font-weight:normal;color:#AFA7A7;"
+        %div{:id=>"dislike_#{@item.id}",:style=>"width:40px;height:20px;border:1px solid #D2D6D9;background-color:#EDEDED;border-radius:3px;float:left;margin-left:20px;"}
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            =link_to image_tag("/images/t_down.png",:style=>"padding:2px;"),"javascript:void(0);",:remote=>'true', :onclick => "check_inner_like_login('#{@item.id}','#{@item.class}','#{@item.class.to_s.downcase}_dislike_link_','#{@p_item.class.to_s}', '#{@p_item.id}','bad');", :id=>"#{@item.class.to_s.downcase}_dislike_link_#{@item.id}"
+            =generate_tooltip_block("video_dislike","#{@p_item.class.to_s.downcase}_page")
+          %div{:style=>"padding-right:8px;line-height:1.5em;float:right;"}
+            =link_to "#{@item.dislike_votes.count}", "javascript:void(0);",:id =>"dislike_view_#{@item.id}" ,:onclick => "show_likes_popup('#{@item.id}','#{@item.class.to_s}','dislike','#{@item.dislike_votes.count}','300','counter_popup');",:style=>"font-weight:normal;color:#AFA7A7;"
+        %div{:id=>"comment_#{@item.id}",:style=>"width:40px;height:20px;border:1px solid #D2D6D9;background-color:#EDEDED;border-radius:3px;float:left;margin-left:20px;"}
+          =image_tag("/images/chat.png",:style=>"padding:2px;")
+          %div{:style=>"padding-right:8px;line-height:1.5em;float:right;"}
+            =link_to "#{@item.comments.count}", "javascript:void(0);",:id =>"comment_view_#{@item.id}" ,:onclick => "show_likes_popup('#{@item.id}','#{@item.class.to_s}','comment','#{@item.comments.count}','300','counter_popup');",:style=>"font-weight:normal;color:#AFA7A7;"
+      %div{:style=>"float:right;padding-right:5px;height:13px"}
+        %div{:class=>"prev_btn",:onclick=>"show_block_item('#{@item.class.to_s}','#{@item.id}','#{@p_item.class.to_s}','#{@p_item.id}','prev');"}
+        %div{:style=>"width:4px;float:left"}
+        %div{:class=>"next_btn",:onclick=>"show_block_item('#{@item.class.to_s}','#{@item.id}','#{@p_item.class.to_s}','#{@p_item.id}','next');"}
+    %div{:style=>"height:35px;padding-top:5px;"}
+      -if @item.class.to_s == "Video" and @p_item.class.to_s == "Movie"
+        -placeholder = "Add a comment for this clip"
+      -else
+        -placeholder = "Add a comment"
+      = form_for([@item, Comment.new], :remote => true, :html => {:id => "discu_comment_form_#{@item.id}"})  do |f|
+
+        #error_container_id
+          = render '/shared/error_display', {:error_object => f.object }
+        %div{:style => "float:left;"}
+          - user_id = current_user ? current_user.id : ""
+          %input{:type => "hidden", :id => "inner_page",:name=>"inner_page", :value => "true"}
+          %textarea{:id => "item_comment_#{@item.id}",:name => "discussion_comment_#{@item.id}", :class => "commentBox",:style=>"font-size:14px;width:532px;border:1px solid #D2D6D9;", :onkeypress => "check_event_and_submit_discussion_reply(event, '#{@item.id}','#{user_id}');", :placeholder => "#{placeholder}"}
+          %input{:type => "hidden", :id => "refer_type",:name=>"refer_type", :value => "#{@p_item.class.to_s}"}
+          %input{:type => "hidden", :id => "refer_id",:name=>"refer_id", :value => @p_item.id}
+          %input{:type => "hidden", :id => "item_class",:name=>"item_class", :value => @item.class.to_s}
+          %input{:type => "hidden", :id => "parent_id_#{@item.id}",:name=>"discussion_comment", :value => @item.id}
+          = f.hidden_field "parent_id"
+    .clear
+  %div{:style=>"float:left;width:200px;"}
+    -video = item
+    %div{:style => "width:124px;height:191px;padding:2px;"}
+      - unless video.video_remote_url.blank?
+        - video_id_arr = video.video_remote_url.split("/")
+        - video_id = video_id_arr[video_id_arr.size.to_i - 1]
+        %div{:style => "position:relative;height:133px;width:199px;cursor:pointer;", :onclick => "javascript:show_video(#{video.id}, '#{@p_item.class.to_s.downcase}', '#{@p_item.permalink}');", :id => "video#{video.id}"}
+          %img{:src => "http://img.youtube.com/vi/#{video_id}/1.jpg", :style => "position:absolute;height:133px;width:199px;"}
+          %img{:src => "#{URL}/images/play_button.png", :style => "position:absolute;right:5px;bottom:5px"}
+      - else
+        %div{:style => "position:relative;height:133px;width:199px;cursor:pointer;", :onclick => "javascript:show_video('#{video.id}', '#{@p_item.class.to_s.downcase}', '#{@p_item.id}');", :id => "video#{video.id}"}
+          %img{:src => "#{URL}/system/trailer_thumbnails/#{video.id}/1.jpg", :style => "position:absolute;height:133px;width:199px;"}
+          %img{:src => "#{URL}/images/play_button.png", :style => "position:absolute;right:5px;bottom:5px"}
+  %div{:style=>"float:left;width:320px;padding-left:10px;"}
+    -@item.comments.order("id desc").limit(3).each do |comment|
+      %div{:id => "comment_#{comment.id}"}
+        %div{:style => "float:left;"}
+          %div{:class=>'image left tip_hint tooltipbottom',:style=>"height:37px;width:37px;"}
+            - ub = UserBadge.find_by_user_id(comment.user.id)
+            -if !ub.blank?
+              - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+              - if points >= 1 and points < 5
+                - level = "Level: Muvi Scraper"
+              - elsif points >= 5 and points < 10
+                - level = "Level: Muvi Junkie"
+              - elsif points >= 10
+                - level = "Level: Muvi Maniac"
+            =link_to image_tag(comment.user.user_image, :style=>"width:37px;height:37px;border: 1px solid #EEEEEE;"), "/profile/#{comment.user.id}/#{comment.user.display_name}"
+            .tooltip_description{:style =>'display:none'}
+              %b
+                = comment.user.display_name
+              %br
+              = level
+          %div{:style=>"margin-left:45px;height:40px;"}
+            = "<span style='font-weight:normal;font-size:13px;'>#{comment.comment.truncate(100)}</span>".html_safe
+            .small_light_gray
+              = link_to comment.user.display_name, "/profile/#{comment.user.id}/#{comment.user.display_name}", :class => "small_light_gray"
+              ,
+              = distance_of_time_in_words(Time.now, comment.created_at.to_time) + " ago"
+      .clear{:style=>"height:10px;"}
+    .clear
+-elsif @item.class.to_s == "Feed"
+  %div{:style=>"background-image:url(/images/news_block.png);background-repeat:no-repeat;width:128px;height:195px;float:left;"}
+    %div{:style=>"height: 195px;margin: 5px;overflow:hidden"}
+      %h4{:style => "font-size:12px",:rel=>"nofollow"}= link_to item.entry_title.truncate(60).html_safe, "/news/star/#{@p_item.permalink}/#{item.id}", :style => "color:#4F4F4F;"
+      %div{:style=>"padding-top:5px;"}
+        -summary = item.summary.gsub(/<\/?[^>]*>/, "") unless item.summary.blank?
+        =truncate(summary, :length => 190).html_safe unless item.summary.blank?
+-elsif @item.class.to_s == "CelebTweet"
+  %div{:style=>"width:128px;height:195px;float:left;"}
+    %div{:style=>"background-image:url(/images/tweet_block.png);background-repeat:no-repeat;height: 195px;padding: 5px;overflow:hidden;width:128px;"}
+      %div{:style=>"padding-top:30px;height: 195px;width:120px;"}
+        -summary = item.content.gsub(/<\/?[^>]*>/, "")
+        =truncate(summary, :length => 250).html_safe unless item.content.blank?
+-if @item and @item.class.to_s != "Video"
+  %div{:style=>"padding-left:10px;width:390px;float:right"}
+    %div{:style=>"height:20px;"}
+      %div{:style=>"width:180px;"}
+        %div{:id=>"like_#{@item.id}",:style=>"width:40px;height:20px;border:1px solid #D2D6D9;background-color:#EDEDED;border-radius:3px;float:left;"}
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}        
+            =link_to image_tag("/images/t_up.png",:style=>"padding:2px;"),"javascript:void(0);",:remote=>'true', :onclick => "check_inner_like_login('#{@item.id}','#{@item.class}','#{@item.class.to_s.downcase}_like_link_','#{@p_item.class.to_s}', '#{@p_item.id}','like');", :id=>"#{@item.class.to_s.downcase}_like_link_#{@item.id}"
+            =generate_tooltip_block("#{@item.class.to_s.downcase}_like","#{@p_item.class.to_s.downcase}_page")
+          %div{:style=>"padding-right:8px;line-height:1.8em;float:right;"}
+            =link_to "#{@item.like_votes.count}", "javascript:void(0);",:id =>"like_view_#{@item.id}" ,:onclick => "show_likes_popup('#{@item.id}','#{@item.class.to_s}','like','#{@item.like_votes.count}','300','counter_popup');",:style=>"font-weight:normal;color:#AFA7A7;"
+        %div{:id=>"dislike_#{@item.id}",:style=>"width:40px;height:20px;border:1px solid #D2D6D9;background-color:#EDEDED;border-radius:3px;float:left;margin-left:20px;"}
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            =link_to image_tag("/images/t_down.png",:style=>"padding:2px;"),"javascript:void(0);",:remote=>'true', :onclick => "check_inner_like_login('#{@item.id}','#{@item.class}','#{@item.class.to_s.downcase}_dislike_link_','#{@p_item.class.to_s}', '#{@p_item.id}','bad');", :id=>"#{@item.class.to_s.downcase}_dislike_link_#{@item.id}"
+            =generate_tooltip_block("#{@item.class.to_s.downcase}_dislike","#{@p_item.class.to_s.downcase}_page")
+          %div{:style=>"padding-right:8px;line-height:1.5em;float:right;"}
+            =link_to "#{@item.dislike_votes.count}", "javascript:void(0);",:id =>"dislike_view_#{@item.id}" ,:onclick => "show_likes_popup('#{@item.id}','#{@item.class.to_s}','dislike','#{@item.dislike_votes.count}','300','counter_popup');",:style=>"font-weight:normal;color:#AFA7A7;"
+        %div{:id=>"comment_#{@item.id}",:style=>"width:40px;height:20px;border:1px solid #D2D6D9;background-color:#EDEDED;border-radius:3px;float:left;margin-left:20px;"}
+          =image_tag("/images/chat.png",:style=>"padding:2px;")
+          %div{:style=>"padding-right:8px;line-height:1.5em;float:right;"}
+            =link_to "#{@item.comments.count}", "javascript:void(0);",:id =>"comment_view_#{@item.id}" ,:onclick => "show_likes_popup('#{@item.id}','#{@item.class.to_s}','comment','#{@item.comments.count}','300','counter_popup');",:style=>"font-weight:normal;color:#AFA7A7;"
+      %div{:style=>"float:right;padding-right:5px;height:13px"}
+        %div{:class=>"prev_btn",:onclick=>"show_block_item('#{@item.class.to_s}','#{@item.id}','#{@p_item.class.to_s}','#{@p_item.id}','prev');"}
+        %div{:style=>"width:4px;float:left"}
+        %div{:class=>"next_btn",:onclick=>"show_block_item('#{@item.class.to_s}','#{@item.id}','#{@p_item.class.to_s}','#{@p_item.id}','next');"}
+    %div{:style=>"height:35px;padding-top:5px;"}
+      = form_for([@item, Comment.new], :remote => true, :html => {:id => "discu_comment_form_#{@item.id}"})  do |f|
+        -if @item.class.to_s == "Poster" and @p_item.class.to_s == "Movie"
+          -placeholder = "Add a comment for this still"
+        -else
+          -placeholder = "Add a comment" 
+        #error_container_id
+          = render '/shared/error_display', {:error_object => f.object }
+        %div{:style => "float:left;"}
+          - user_id = current_user ? current_user.id : ""
+          %input{:type => "hidden", :id => "inner_page",:name=>"inner_page", :value => "true"}
+          %textarea{:id => "item_comment_#{@item.id}",:name => "discussion_comment_#{@item.id}", :class => "commentBox",:style=>"width:385px;font-size:14px;border:1px solid #D2D6D9;", :onkeypress => "check_event_and_submit_discussion_reply(event, '#{@item.id}','#{user_id}');", :placeholder => "#{placeholder}"}
+          %input{:type => "hidden", :id => "refer_type",:name=>"refer_type", :value => "#{@p_item.class.to_s}"}
+          %input{:type => "hidden", :id => "refer_id",:name=>"refer_id", :value => @p_item.id}
+          %input{:type => "hidden", :id => "item_class",:name=>"item_class", :value => @item.class.to_s}
+          %input{:type => "hidden", :id => "parent_id_#{@item.id}",:name=>"discussion_comment", :value => @item.id}
+          = f.hidden_field "parent_id"
+    .clear
+    %div
+      -@item.comments.order("id desc").limit(3).each do |comment|
+        %div{:id => "comment_#{comment.id}"}
+          %div{:style => "float:left;"}
+            %div{:class=>'image left tip_hint tooltipbottom',:style=>"height:37px;width:37px;"}
+              - ub = UserBadge.find_by_user_id(comment.user.id)
+              -if !ub.blank?
+                - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+                - if points >= 1 and points < 5
+                  - level = "Level: Muvi Scraper"
+                - elsif points >= 5 and points < 10
+                  - level = "Level: Muvi Junkie"
+                - elsif points >= 10
+                  - level = "Level: Muvi Maniac"
+              =link_to image_tag(comment.user.user_image, :style=>"width:37px;height:37px;border: 1px solid #EEEEEE;"), "/profile/#{comment.user.id}/#{comment.user.display_name}"
+              .tooltip_description{:style =>'display:none'}
+                %b
+                  = comment.user.display_name
+                %br
+                = level
+            %div{:style=>"margin-left:45px;height:40px;"}
+              = "<span style='font-weight:normal;font-size:13px;'>#{comment.comment.truncate(100)}</span>".html_safe
+              .small_light_gray
+                = link_to comment.user.display_name, "/profile/#{comment.user.id}/#{comment.user.display_name}", :class => "small_light_gray"
+                ,
+                = distance_of_time_in_words(Time.now, comment.created_at.to_time) + " ago"
+        .clear{:style=>"height:10px;"}
+  .clear

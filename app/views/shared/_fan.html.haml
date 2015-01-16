@@ -1,0 +1,17 @@
+.left
+  %div{:style => "height:33px;width:122px"}
+    - unless current_user.blank?
+      = render :partial => "/fans/form", :locals => {:celebrity => @celebrity}
+    -else
+      /%a{:href => new_user_session_path(:login => 'fan'),:style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px", :onclick => "enableLoginError(registration(), 'You need to login');", "data-remote" => "true", :class=>""}
+      %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+        %a{:onclick => "check_login();", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px"}
+          = image_tag("fan_normal.png", :id => 'fan_btn')
+        =generate_tooltip_block("fan","celebrity_page")
+  
+      /%a{:href => new_user_session_path(:login => 'fan'),:style => "float:left;cursor:pointer;padding-right:1px;padding-top:1px", :onclick => "enableLoginError(registration(), 'You need to login');", "data-remote" => "true", :class=>""}
+      %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+        %a{:onclick => "check_login();", :style => "float:left;cursor:pointer;padding-right:1px;padding-top:1px"}
+          = image_tag("no_normal.png", :id => 'no_fan_btn')
+        =generate_tooltip_block("unfan","celebrity_page")
+    %br

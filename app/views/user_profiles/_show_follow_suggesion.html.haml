@@ -1,0 +1,19 @@
+-count_user = 0
+-@sort_by_activity = Activity.select("user_id, count(*) as activity_count").where("user_id IS NOT NULL and user_id NOT IN (#{@user_profile.user_id})").find(:all, :group => ["user_id"], :order => ["activity_count desc"])
+-@suggested_friend = User.get_suggested_user(current_user)
+-user_id = current_user ? current_user.id : ""
+-@suggested_friend.each do |sug_frnd|
+  -user = User.find_by_id(sug_frnd)
+
+  -unless user.blank? 
+    -if count_user.to_i == 5
+      -break
+    -else
+      -count_user = count_user + 1
+    %div{:style=>"float:left;padding-right:20px;",:id=>"sugg_#{user.id}"}
+      %div{:style=>"width:32px;height:32px;"}
+        -unless user.facebook_id.blank?
+          =link_to image_tag("http://graph.facebook.com/#{user.facebook_id}/picture", :style=>"width:30px;height:30px;border: 1px solid #EEEEEE;"),"/profile/#{user.id}/#{user.display_name}"
+        -else
+          =link_to image_tag(user.user_image, :style=>"width:30px;height:30px;border: 1px solid #EEEEEE;"), "/profile/#{user.id}/#{user.display_name}"
+      =link_to "Follow","javascript:void(0);",:onclick=>"follow_user('#{user.id}','#{user.display_name}');"

@@ -1,0 +1,44 @@
+-if options["is_upcoming"] == false
+  -unless current_user.blank?
+    -user_id = current_user.id
+  -else
+    -user_id = ""    
+  -txt = "Wanna see"
+  -cls = "notseen_text"
+  -seen_cls = "seen_btn"
+  -class1 = "not_seen_btn"
+  -sty = ""
+  -permalink = options["path"][8..-1]
+  /If not seen it
+  -if options["data"]["seenit"].to_i == 1
+    -class1 = "not_seen_btn"
+    -seen_cls = "seen_btn_active"
+  -elsif options["data"]["watch"].to_i == 1
+    -class1 = "not_seen_btn_watch_active"
+    -seen_cls = "seen_btn"
+    -sty = "font-weight:bold; margin-left:15px; margin-top:-2px; font-size:11px"
+    -cls = ""
+
+  %div{:id => "seen_div_#{options["id"]}", :class => "left button_container_div", :style => "/*width: 131px;*/ height: 22px; /*background: url('/images/seen_notseen_bg.png') no-repeat scroll 0px 0px transparent;*/"}
+    .left{:id => "seen_span_#{options["id"]}", :class => "btn_div_1 tip_hint tooltipbottom"}
+      -unless current_user.blank?
+        %button{:id => "seen_btn_#{options["id"]}", :class => "#{seen_cls} left", :style => "padding:0px; margin-left:1px", :onclick => 'show_rating_popup_tab("rating_popup",'"#{options["id"]}"','"#{user_id}"');show_div(1, '"#{options["id"]}"', "seen_btn_'"#{options["id"]}"'", "not_seen_btn_'"#{options["id"]}"'", "seen_btn_active", "not_seen_btn");', :onmouseover => "change_border('#{options["type"]}', 'seen_span_#{options["id"]}', 'seen_btn_#{options["id"]}', 'seen_text_#{options["id"]}', 'seen_icon_o.png');", :onmouseout =>  "remove_border('seen_btn', 'seen_span_#{options["id"]}', 'seen_btn_#{options["id"]}', 'seen_text_#{options["id"]}', 'seen_icon_b.png');"}
+          %div{:id => "seen_text_#{options["id"]}", :class => "seen_text"}
+            Seen
+      -else
+        %button{:id => "seen_btn_#{options["id"]}", :class => "#{seen_cls} left", :style => "padding:0px; margin-left:1px", :onclick => 'show_rating_popup_tab("rating_popup",'"#{options["id"]}"',"");show_div(1, '"#{options["id"]}"', "seen_btn_'"#{options["id"]}"'", "not_seen_btn_'"#{options["id"]}"'", "seen_btn_active", "not_seen_btn");', :onmouseover => "change_border('#{options["type"]}', 'seen_span_#{options["id"]}', 'seen_btn_#{options["id"]}', 'seen_text_#{options["id"]}', 'seen_icon_o.png');", :onmouseout =>  "remove_border('seen_btn', 'seen_span_#{options["id"]}', 'seen_btn_#{options["id"]}', 'seen_text_#{options["id"]}', 'seen_icon_b.png');"}
+          %div{:id => "seen_text_#{options["id"]}", :class => "seen_text"}
+            Seen
+      =generate_tooltip_block("seen_it","home_page")
+    .right{:id => "not_seen_span_#{options["id"]}", :class => "btn_div_2 tip_hint tooltipbottom"}
+      -unless current_user.blank?
+        %button{:id => "not_seen_btn_#{options["id"]}", :style => "padding:0px;width:99px;", :class => "#{class1} left", :onclick => 'save_wanna_see_tab('"#{options["id"]}"','"#{user_id}"');show_div(0, '"#{options["id"]}"', "'"#{class1}"'_'"#{options["id"]}"'", "seen_btn_'"#{options["id"]}"'", "'"#{class1}"'_active", "seen_btn");', :onmouseover => "change_border('#{options["type"]}', 'not_seen_span_#{options["id"]}', 'not_seen_btn_#{options["id"]}', 'not_seen_text_#{options["id"]}', 'notseen_icon_o.png');", :onmouseout =>  "remove_border('#{class1}', 'not_seen_span_#{options["id"]}', 'not_seen_btn_#{options["id"]}', 'not_seen_text_#{options["id"]}', 'notseen_icon_b.png');"}
+          %div{:id => "not_seen_text_#{options["id"]}", :class => "#{cls}", :style => "#{sty}"}
+            =txt
+      -else
+        %button{:id => "not_seen_btn_#{options["id"]}", :style => "padding:0px;width:99px;", :class => "#{class1} left", :onclick => 'save_wanna_see_tab('"#{options["id"]}"',"");show_div(0, '"#{options["id"]}"', "'"#{class1}"'_'"#{options["id"]}"'", "seen_btn_'"#{options["id"]}"'", "'"#{class1}"'_active", "seen_btn");', :onmouseover => "change_border('#{options["type"]}', 'not_seen_span_#{options["id"]}', 'not_seen_btn_#{options["id"]}', 'not_seen_text_#{options["id"]}', 'notseen_icon_o.png');", :onmouseout =>  "remove_border('#{class1}', 'not_seen_span_#{options["id"]}', 'not_seen_btn_#{options["id"]}', 'not_seen_text_#{options["id"]}', 'notseen_icon_b.png');"}
+          %div{:id => "not_seen_text_#{options["id"]}", :class => "#{cls}", :style => "#{sty}"}
+            =txt
+
+      =generate_tooltip_block("notseen_it","home_page")
+

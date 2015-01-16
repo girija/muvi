@@ -1,0 +1,87 @@
+var json_arr = "<%= @movie_list %>";
+//document.write(json_arr);
+
+var html = "";
+var host = "http://www.muvi.com"
+var link;
+
+html += "<div class='parent chrome23 single1 customcontainer black'>";
+/*html += "  <div class='heading alignright' style='display:block;'>";
+html += "    <span class='text'>Muvimeter: Latest Movie Reviews</span>";
+html += "  </div>";
+*/
+html += "  <div class='content'>";
+html += "    <div style='font-family:lucida grande, tahoma, verdana, arial, sans-serif;font-size: 12px;background-color:#FFFFFF; padding:12px 4px 4px 0px'>";
+  
+<% cnt = 0 %>
+<% @movie_list.each do |movie_list| %>
+  <% if cnt == @movie_list.size %>
+    <% border = "" %>
+  <% else %>
+    <% border = 'border-bottom: 1px dashed #D3D3D3' %>
+    <% cnt = cnt + 1 %>
+  <% end %>
+
+  link = "<%= movie_list[:link]%>";
+  html += "<input type='hidden' id='link_<%=cnt%>' value='"+link+"'>";
+  html += "<input type='hidden' id='host' value='"+host+"'>";
+
+  html += "  <DIV style='float:left; cursor:pointer; <%= border%>' onclick='go_to_muvipage(<%=cnt%>);'>";
+  html += "    <div style='float:left;width:38px;height:40px;'><a href='"+host+"/movies/<%= movie_list[:link]%>' target = '_blank'><img style='border:0px; height:35px; height:35px;' src='"+host+"<%=movie_list[:image]%>' /></a>&nbsp;</div>";
+
+  <% if movie_list[:name].length.to_i > 16 %>
+    html += "    <div style='float:left;width:100px;margin-right:4px;'><a href='"+host+"%>/movies/<%= movie_list[:link]%>' style='text-decoration:none' target='_blank'><%=movie_list[:name]%></a></div>";
+ 
+ <% else %>
+   html += "    <div style='float:left;width:100px;margin-right:4px; margin-top:7px;'><a href='"+host+"/movies/<%= movie_list[:link]%>' style='text-decoration:none' target='_blank'><%=movie_list[:name]%></a></div>";
+
+  <% end %>
+
+  if(<%= movie_list[:meter].to_i %> >= 60){
+      html += "  <div style='margin-top:7px; background-color: #D8D8D8; border: 1px solid #BECBD4;border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; height: 15px; padding: 0px 2px 2px 1px; width: 77px;float:left;margin-right:2px'>";
+
+      html += "    <div style='width:<%=movie_list[:meter].to_i %>%; background:url(\""+host+"/images/G-RatingBar.jpg\") repeat-x scroll 0 1px transparent; border-radius:7px; -moz-border-radius: 7px; -webkit-border-radius: 7px; height:17px;'>&nbsp;</div>";
+
+      html += "  </div>";
+  }
+  else if(<%= movie_list[:meter].to_i %> < 60){
+    html += "  <div style='margin-top:7px; background-color: #D8D8D8; border: 1px solid #BECBD4;border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; height: 15px; padding: 0px 2px 2px 1px; width: 77px;float:left;margin-right:3px'>";
+
+    html += "    <div style='width:<%=movie_list[:meter].to_i %>%; background:url(\""+host+"/images/R-RatingBar.jpg\") repeat-x scroll 0 1px transparent; border-radius:7px; -moz-border-radius: 7px; -webkit-border-radius: 7px; height:17px;'>&nbsp;</div>";
+
+    html += "  </div>";
+  }
+
+  html += "    <div style='float:left; margin-top: 7px;'><a href='"+host+"/movies/<%=movie_list[:link]%>'><%=movie_list[:meter]%>%</a></div>";
+  html += " </DIV>";
+  html += "  <div style='clear:both;height:5px'></div>";
+ 
+<% end %>
+
+html += "    <div style='clear:both; height:10px'></div>";
+html += "       <div id='logo_div' style='width:280px;float:left;margin-top:-5px;'>";
+html += "         <span style='color:#ABABAB; font-size:10px; font-weight:bold'>Powered by </span> <img src='"+host+"/images/msn_img.png' style='width:1px; height:1px;'>";
+html += "         <div style='clear:both; height:4px'></div>";
+html += "         <div style='border-top:1px solid #d3d3d3; float:left; width:80%'>&nbsp;</div>";
+html += "         <div style='float:left;margin-top:-12px; margin-left:2px'>";
+html += "               <a href='"+host+"/msn_embed/home' target='_blank'><img border='0' src='"+host+"/images/logo_small.png'></a>";
+html += "         </div>";
+html += "       </div>";
+html += "       <div style='clear:both'></div>";
+html += "   </div>";
+html += "  </div>";
+html += " </div>";
+
+
+document.write(html);
+
+   function go_to_muvipage(id){
+          try{
+            var host = $("#host").val();
+            var link = $("#link_"+id).val();
+            var url = host+"/movies/"+link;
+            window.open(url, '_blank');
+            window.focus();
+          }catch(E){}
+        }
+

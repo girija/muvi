@@ -1,0 +1,20 @@
+= form_for @search, :url => admin_new_tweets_path, :html => {:method => :get} do |f|
+
+  = f.label :name_contains, 'Movie title'
+  = f.text_field :name_contains
+  = f.submit "Search"
+
+%br
+
+=render "menu"
+=render "tweet_today"
+
+-if !params[:search].blank?
+  -if params[:search][:name_contains].blank?
+    .right
+      = will_paginate(@new_tweets)
+      .clear
+-else
+  .right
+    = will_paginate(@new_tweets)
+    .clear

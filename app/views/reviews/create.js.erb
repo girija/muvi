@@ -1,0 +1,38 @@
+//$('#rate_movie').dialog('destroy')i;
+<% if params[:inner_review] == "true" %>
+  $("#list_user_review").html("<%= escape_javascript(render 'shared/show_user_reviews') %>");
+  $("#user_review").show();
+<% elsif params[:profile_review] == "true"%>
+  $("#<%= params[:block]%>_movie_detail").html("<%= escape_javascript(render :partial=>'user_profiles/profile_movie_detail',:locals=>{:item=>@movie,:type=>params[:block],:prev_item => @prev_item,:next_item => @next_item}) %>");
+
+<% else %>
+  $('#rate_movie').html("");
+  $('#rate_movie').html("<div class='small_facebox'>Your awesome review is posted now</div>");
+  $('#not_seen_it_btn').attr('onclick', 'return false;');
+  $("#seen_it").hide();
+  <% if params[:review][:rating].to_i == 4 %>
+    $("#like_it_btn").attr('src', '/images/like_pressed.png');
+    $("#not_like_it_btn").attr('src', '/images/dis_like_normal.png');
+  <% else %>
+    $("#like_it_btn").attr('src','/images/like_normal.png');
+    $("#not_like_it_btn").attr('src','/images/dis_like_pressed.png');
+  <% end %>
+  <% if params[:review][:description] != "" %>
+    $(".first_sec").css("height","380px");
+    $("#information_block").css("height","380px");
+    $('#rating_text').hide();
+  <% end %>
+<% end %>
+<% if params[:review][:rating].to_i == 4 %>
+  successMessage("You liked the movie <%= @movie.name %>");
+  badgePoints('to like this movie',1);
+<% else %>
+  successMessage("You disliked the movie <%= @movie.name %>");
+  badgePoints('to dislike this movie',1);
+<% end %>
+<% if !@new_badge.nil? %>
+  <% if @new_badge['super_fan'].size > 0 or @new_badge['mega_fan'].size > 0 %>
+   showCongratulations('<%= @new_badge['super_fan'] %>', '<%= @new_badge['mega_fan'] %>');
+  <% end %>
+<% end %>
+

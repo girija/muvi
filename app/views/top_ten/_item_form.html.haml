@@ -1,0 +1,26 @@
+- if movie != 0
+  -name = ""
+  -image = '/images/no-image.png'
+  - if list_type == 'movies'
+    - @movie = Movie.find_by_id(movie)
+    -if @movie
+      - name = get_movie_name(movie)
+      - image = @movie.banner_image_thumb
+  - else 
+    - @celeb = Celebrity.find_by_id(movie)
+    -if @celeb
+      - name = get_celebrity_name(movie)
+      - image = @celeb.thumb_image
+- else
+  - image = '/images/no-image.png'
+.row{:style => "#{style};display:block"}
+  .name.left
+    = text_field_tag "item_#{n+1}",name ,:style => 'width:339px' ,:placeholder => 'Enter the name of movie or celebrity'
+    = hidden_field_tag "id_item_#{n+1}" , movie, :name => 'id_item[]'
+    .clear
+    %textarea{:id => "note_#{n+1}",:name => "note[]", :rows => 1, :cols => 40, :style => "height:20px;margin-left:0px", :placeholder => 'Add a note saying why do you like'}
+      = movies_note  
+  %div.image.left{:id => "img_item_#{n+1}", :style => 'margin-left:5px;margin-top:1px;'}
+    = image_tag(image, :size => "45x45")
+  = link_to image_tag("/images/cross.png", :style => 'float:right'), "#" , :class=>'removeBox'
+  .clear

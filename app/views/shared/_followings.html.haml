@@ -1,0 +1,51 @@
+-if @user_profile
+  #followsModal.modal.fade.hide{:style => 'width:680px;'}
+    .modal-header
+      .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+        =image_tag("/images/popup_close.png")
+      #followsModalLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+        = "#{@user_profile.display_name} following lists"
+    .modal-body
+      - user = User.find(@user_profile.user_id)
+      - user.all_follows.each_with_index do |follow,i|
+        - if follow.followable_type == 'notCelebrity'
+          .media
+            - celebrity = Celebrity.find(follow.followable_id)
+            %a.pull-left{:href => "#"}
+              = image_tag(celebrity.image, :style => "height:70px;", :class => 'media-object')
+            .media-body
+              %h5.media-heading{:style => 'margin-top:-4px'}
+                = "Follows filmography of #{celebrity.name}"
+              .clear{:style => 'padding-top: 4px;'}
+                - unless current_user.blank?
+                  - if current_user.id.to_i !=  follow.follower_id.to_i
+                    - if !celebrity.followed_by?(current_user)
+                      = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow-star btn-primary bold_class btn-medium', "data-id" => celebrity.id, :id => "btn-follow-#{celebrity.id}", :style => 'border-radius:2px 2px 2px 2px;width:95px'
+                    - else
+                      = link_to "Following".html_safe, "#" , :class => 'btn btn-following-star btn-success bold_class btn-medium', "data-id" => celebrity.id, :id => "btn-follow-#{celebrity.id}", :style => 'border-radius:2px 2px 2px 2px;width:95px;cursor:default;'
+                - else
+                  = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow-login btn-primary bold_class btn-medium', "data-id" => celebrity.id, :id => "btn-follow-#{celebrity.id}", :style => 'border-radius:2px 2px 2px 2px;width:95px'
+        - elsif follow.followable_type == 'UserMovieList'
+          .media{:style=>"width:315px;float:left;"}
+            - usermovielist = UserMovieList.find(follow.followable_id)
+            %a.pull-left
+              - movie = Movie.find_by_id(ActiveSupport::JSON.decode(usermovielist.movie_id).last.to_i)
+              -total_movie = ActiveSupport::JSON.decode(usermovielist.movie_id).count
+              = image_tag "#{POSTER_URL}#{movie.banner_image_medium}", :class => 'media-object follow_list_poster' if movie
+            .media-body
+              .media-heading.movie_block_title
+                = usermovielist.tag
+              %span{:style =>'color:#a4a4a4;'}
+                ="#{total_movie} Movies"
+              .clear{:style => 'padding-top: 4px;'}
+                - unless current_user.blank?
+                  - if current_user.id.to_i != usermovielist.user_id
+                    - if !usermovielist.followed_by?(current_user)
+                      = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow btn-primary bold_class btn-medium', "data-id" => usermovielist.id, :id => "btn-follow-#{usermovielist.id}", :style => 'border-radius:2px 2px 2px 2px;'
+                    - else
+                      = link_to "Following".html_safe, "#" , :class => 'btn btn-following btn-primary bold_class disabled btn-medium', "data-id" => usermovielist.id, :id => "btn-follow-#{usermovielist.id}", :style => 'border-radius:2px 2px 2px 2px;'
+                - else
+                  = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow-login btn-primary bold_class btn-medium', "data-id" => usermovielist.id, :id => "btn-follow-#{usermovielist.id}", :style => 'border-radius:2px 2px 2px 2px;'
+
+    .modal-footer
+      =link_to "Done","javascript:void(0);",:class=>"btn btn-primary bold_class",:"data-dismiss" => "modal"

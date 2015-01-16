@@ -1,0 +1,52 @@
+<% if params[:block_type] == "notwant_see" || params[:block_type] == "wantsee" %>
+  $("#<%= params[:block_type]%>_movie_detail").html("<%= escape_javascript(render 'user_profiles/profile_movie_detail',:item=>@movie,:type => params[:block_type],:prev_item => @prev_item, :next_item => @next_item) %>");
+  <% if params[:action_type] == "notsee" %>
+    successMessage("You didn't want to see <%= @movie.name%>");
+    badgePoints('for not want to see',1);
+  <%else%>
+    successMessage("You wanted to see <%= @movie.name%>");
+    badgePoints('for want to see',1);
+  <%end%>
+<% else %>
+  <% if params[:action_type] == "see"%>
+    <% if @wanttosee == true%>
+      $("#want_to_see_btn").attr('src','/images/want_to_see_hover.png');
+      $("#not_seen_it_btn").attr('src', '/images/want_to_see_hover.png');
+      //$("#seen_it_btn").attr('width','105px');
+      $("#not_seen_it_btn").parent().css('width','107px');
+      successMessage("You wanted to see <%= @movie.name%>");
+      badgePoints('for want to see',1);
+    <%end%>
+    <% if @notwanttosee == true%>
+      $("#not_want_to_see_btn").attr('src','/images/not_want-hover.png');
+      $("#not_seen_it_btn").attr('src', '/images/not_want-hover.png');
+      $("#not_seen_it_btn").attr('width','51px');
+      $("#not_seen_it_btn").parent().css('width','177px');
+      successMessage("You didn't want to see <%= @movie.name%>");
+      badgePoints('for not want to see',1);
+    <%end%>
+  <% else %>
+    <% if @wanttosee == true%>
+      $("#want_to_see_btn").attr('src','/images/want_to_see_hover.png');
+      $("#not_seen_it_btn").attr('src', '/images/want_to_see_hover.png');
+      $("#seen_it_btn").attr('width','105px');
+      $("#not_seen_it_btn").parent().css('width','242px');
+      successMessage("You wanted to see <%= @movie.name%>");
+      badgePoints('for want to see',1);
+    <%end%>
+    <% if @notwanttosee == true%>
+      $("#not_want_to_see_btn").attr('src','/images/not_want-hover.png');
+      $("#not_seen_it_btn").attr('src', '/images/not_want-hover.png');
+      //$("#not_seen_it_btn").attr('width','51px');
+      $("#not_seen_it_btn").parent().css('width','177px');
+      successMessage("You didn't want to see <%= @movie.name%>");
+      badgePoints('for not want to see',1);
+    <%end%>
+  <% end %>
+<% end %>
+if ($('#seen_it').length > 0) {
+  if ($('#seen_it').is(':visible')) {
+    $("#want_it").hide("slow");
+  }
+}
+

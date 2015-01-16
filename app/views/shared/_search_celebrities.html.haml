@@ -1,0 +1,30 @@
+-unless @celebrities.blank?
+  -@celebrities.each do |celeb|
+    - unless celeb.blank?
+      .search_box
+        .moviBox.left
+          = link_to image_tag(celeb.image,:style=>"height:83;width:55px;") , star_path(celeb)
+        .left{:style=>"padding-left:10px;max-width:320px;"}
+          = link_to celeb.name, star_path(celeb),:class=>"movie_block_title"
+          %div{:style => 'movie_block_cast'}
+            - if celeb.celebrity_type.kind_of?(Array) == true
+              - profession_type=""
+              - celeb.celebrity_type.each do |prof_type|
+                - profession_type += prof_type.capitalize+", "
+              - unless profession_type.blank?
+                = profession_type.chop.chop
+            - else
+              = celeb.celebrity_type
+          .clear{:style => 'padding-top:10px;'}
+            -@tagged = celeb
+            - unless current_user.blank?
+              - if current_user.id.to_i !=  params[:user_id].to_i
+                - if @tagged && !@tagged.followed_by?(current_user)
+                  = link_to "Follow Filmography".html_safe, "#" , :class => 'btn btn-follow-star btn-primary bold_class btn-medium', "data-id" => @tagged.id, :id => "btn-follow-#{@tagged.id}", :style => 'border-radius:2px 2px 2px 2px'
+                - else
+                  = link_to "Following Filmography".html_safe, "#" , :class => 'btn btn-following-star btn-success bold_class  btn-medium', "data-id" => @tagged.id, :id => "btn-follow-#{@tagged.id}", :style => 'border-radius:2px 2px 2px 2px;cursor:default;'
+            - else
+              = link_to "Follow Filmography".html_safe, "#loginModal" , :class => 'btn btn-follow-login btn-primary bold_class btn-medium', :id => "btn-follow-#{@tagged.id}", :style => 'border-radius:2px 2px 2px 2px'
+
+
+

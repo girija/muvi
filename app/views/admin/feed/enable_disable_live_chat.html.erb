@@ -1,0 +1,47 @@
+<% chat = Chat.find(:first) %>
+<%= chat.is_enabled %>
+<br>
+---------
+<br>
+<% if chat.is_enabled == false %>
+	<h3>Live Chat is DISABLED </h3><br>
+	<b>Enable Live Chat:</b> 
+	<input type="checkbox" onclick="enable_disable_chat(this);" class="chk_box">
+
+<% else %>
+	<h3>Live Chat is ENABLED</h3>
+	<b>Disable Live Chat:</b>
+	<input type="checkbox" onclick="enable_disable_chat(this);" checked="true" class="chk_box">
+<% end %>
+	<div class="clear"></div>
+	<img src="/images/loading.gif" class="img_load" style="display:none">
+
+<style>
+	input[type=checkbox]	{
+	  /* Double-sized Checkboxes */
+	  -ms-transform: scale(1.5); /* IE */
+	  -moz-transform: scale(1.5); /* FF */
+	  -webkit-transform: scale(1.5); /* Safari and Chrome */
+	  -o-transform: scale(1.5); /* Opera */
+	  padding: 10px;
+	}
+</style>
+
+<script>
+	function enable_disable_chat(th){
+		var live_chat = 0;
+		if($(th).is(':checked')){
+			//enable
+			live_chat = 1;
+		}
+		else{
+			live_chat = 0;
+		}	
+		$(".chk_box").hide();
+		$(".img_load").show();
+
+		$.post('chat_available?c='+live_chat, function(data) {
+			location.reload(true);
+		});
+	}
+</script>

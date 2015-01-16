@@ -1,0 +1,25 @@
+%h1 Movie Reviews
+= link_to "Back to Movie", edit_admin_movie_path(@movie)
+
+%table.listing
+  %tr
+    %th= check_box_tag('check_all')
+    %th User Name
+    %th rating
+    %th Description
+    %th rated on
+  -unless @reviews.blank?
+    = form_tag(delete_reviews_admin_movie_movie_reviews_path(@movie)) do
+      - @reviews.each do |review|
+        %tr
+          %td= check_box_tag("review_ids[]", review.id, false)
+          %td= review.user.display_name
+          %td= review.rating
+          %td= review.description
+          %td= review.created_at.to_date
+      %tr
+        %td{:colspan => 4} &nbsp;
+        %td= submit_tag "Delete"
+%br
+= will_paginate @reviews
+

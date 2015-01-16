@@ -1,0 +1,236 @@
+= form_for([:admin, @movie], :html => { :multipart => true }) do |f|
+  - if @movie.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@movie.errors.count, "error")
+        prohibited this page from being saved:
+      %ul
+        -@movie.errors.full_messages.each do |msg|
+          %li= msg
+  #movie_div{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:10px 2px; font-size:12px"}
+    .left
+      = f.label :name, "Movie Title"
+      = f.text_field :name ,:class => 'large'
+    .right.checkbox
+      Language
+      = f.select :language, ['Hindi', 'Tamil', 'Telugu', 'English','Kannada', 'Marathi', 'Gujarati', 'Malayalam', 'Bhojpuri', 'Punjabi', 'Bengali']
+      /= f.check_box :dictionary_word
+      /Dictionary Word
+    .clear
+    /= f.label :wiki_link, 'Wikipedia Page'
+    /= f.text_field :wiki_link ,:class => 'large'
+
+    .left
+      %label
+        Youtube Full Movie Link
+      -unless @movie_stream.blank?
+        %input{:type => "text", :name => "youtube_link", :style => "width:300px;", :value => "#{@movie_stream.youtube}"}
+      -else
+        %input{:type => "text", :name => "youtube_link", :style => "width:300px;"}
+
+    .clear
+    /= f.label :imdb_link, 'IMDB Link'
+    /= f.text_field :imdb_link ,:class => 'large'
+    /.clear
+    /= f.label :rotten_tomatoes_link, 'Rotten Tomatoes Link'
+    /= f.text_field :rotten_tomatoes_link ,:class => 'large'
+    /.add.add_related{:style => 'display:inline'}
+    /  %a{:onclick => 'javascript:fetchReviews();',:style => "cursor:pointer" }Fetch Reviews
+    /.clear
+    /= f.label :fbpage_id, "Facebook Page"
+    /= f.text_field :fbpage_id
+    .clear
+    = f.label :release_date, "Released Date"
+    = f.text_field :release_date, :id => 'release_date_lt'
+    .clear
+    /= f.label :estimated_budget, 'Budget'
+    /= f.text_field :estimated_budget
+    .clear
+    /= f.label :gross_revenue, 'Gross Revenue'
+    /= f.text_field :gross_revenue
+    .clear
+    /= f.label :alias_name, 'Alias Name'
+    /= f.text_field :alias_name
+    .clear
+    /= f.label :twitter_hashtags, 'Twitter Hashtag'
+    /= f.text_field :twitter_hashtags
+    .clear
+    = f.label :related_movies, 'Related Movies'
+    - ctr = 1
+    - if !@movie.related_movies.blank? and @movie.related_movies.size > 2
+      - @related_movies =  ActiveSupport::JSON.decode(@movie.related_movies)
+      - @related_movies.each do |related_movie|
+        - if related_movie['id'].to_i != 0
+          %div
+            - if ctr > 1
+              = label_tag :spacer, '&nbsp;'.html_safe
+
+            -begin
+              = text_field_tag 'related_movies[]' ,Movie.find(related_movie['id'].to_i).name,:class => 'movieAutocomplete'
+              = hidden_field_tag 'related_movies_id[]', related_movie['id'].to_i
+            -rescue
+   
+            - @sequel = ""
+            - @remake = ""
+            - @similar_plot = ""
+            - @other = ""
+            - if related_movie['type'] == 'Sequel'
+              - @sequel = "selected=selected"
+            - elsif related_movie['type'] == 'Remake'
+              - @remake = "selected=selected"
+            - elsif related_movie['type'] == 'Similar Plot'
+              - @similar_plot = "selected=selected"
+            - else
+              - @other = "selected=selected"
+
+            = select_tag 'relation_type[]', "<option #{@sequel}>Sequel</option><option #{@remake}>Remake</option><option #{@similar_plot}>Similar Plot</option><option #{@other}>Other</option>".html_safe
+            - if ctr != 1
+              %a{:href => "#r", :class => "clearIT"}Remove
+            - if ctr == 1
+              .add.add_related{:style => 'display:inline'}
+                %a{:onclick => 'javascript:clearIT(this);',:style => "cursor:pointer" }Clear
+              .add.add_related{:style => 'display:inline'}
+                %a{:onclick => 'javascript:appendMore();',:style => "cursor:pointer" }Add
+            - ctr += 1
+            .clear
+    - else
+      = text_field_tag 'related_movies[]' ,'',:class => 'movieAutocomplete'
+      = hidden_field_tag 'related_movies_id[]'
+      = select_tag 'relation_type[]', "<option>Sequel</option><option>Remake</option><option>Similar Plot</option><option>Other</option>".html_safe
+      .add.add_related{:style => 'display:inline'}
+        %a{:onclick => 'javascript:clearIT(this)',:style => "cursor:pointer" }Clear
+      .add.add_related{:style => 'display:inline'}
+        %a{:onclick => 'javascript:appendMore();',:style => "cursor:pointer" }Add
+
+    #related
+
+    .clear
+    = f.label :genre, 'Genre'
+    = select_tag 'movie[genre][]', options_for_select(option_for_genre, @movie.genre || 'drama'), { :multiple => true }
+    .clear
+    = f.label :content_type, 'Content Type'
+    = select_tag 'movie[content_type]', options_for_select(["Movie","Theater","TV","Event"], @movie.content_type || 'Movie')
+
+  .clear
+
+  #cast_div{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:10px 2px; font-size:12px"}
+    %h2.heading Cast & Crews
+    #actors_crews
+      -unless @mov_cast.blank?
+        %input{:type => "hidden", :id => "total_sections", :value => "#{@mov_cast.size}"}
+      -else
+        %input{:type => "hidden", :id => "total_sections", :value => 1}
+
+      =render "movie_actor_crew"
+
+    %div.add.clear
+      %a{:onclick => "javascript:add_more_row('#{request.env["HTTP_HOST"]}')", :style => "cursor:pointer" }Add Cast & Crew
+
+  .clear
+
+  /#movie_poster{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:2px; font-size:12px"}
+  /  %h2.heading Movie Posters
+  /  /- @movie.poster.build if @movie.poster.blank?
+  /  -unless @movie.poster.blank?
+  /    %input{:type => "hidden", :id => "total_poster", :value => "#{@movie.poster.size}"}
+  /  = f.fields_for :poster do |po|
+  /    = render 'movie_poster', { :ff => po }
+  /  %div.add.clear
+  /    = link_to_add_fields "Add Poster", f, :poster, 'movie_poster'
+
+  /.clear
+
+  /#movie_trailer{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:2px; font-size:12px"}
+  /  %h2.heading Movie Trailers
+  /  /- @movie.video.build if @movie.video.blank?
+  /  -unless @movie.video.blank?
+  /    %input{:type => "hidden", :id => "total_trailer", :value => "#{@movie.video.size}"}
+  /  = f.fields_for :video do |vi|
+
+  /    = render 'movie_video', { :ff => vi }
+
+  /  %div.add.clear
+  /    = link_to_add_fields "Add Trailer", f, :video, 'movie_video'
+  /.clear
+  
+  #summary_div{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:10px 2px; font-size:12px"}
+
+    %div.col_one
+      /= f.label :media_updated_date, 'Poster/Trailer Release Date' ,:class => 'date'
+      /= f.text_field :media_updated_date, :value => (@movie.media_updated_date)
+    .clear
+      = f.label :story
+      = f.text_area :story, :rows => 5
+    .clear
+      = f.label :additional_info, "Why Watch"
+      = f.text_area :additional_info, :rows => 5
+
+    .clear
+      /= f.label :review_summary
+      /= f.text_area :review_summary, :rows => 5
+  
+  .clear
+
+  #critics_reviews{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:2px; font-size:12px"}
+    %h2.heading Critics Review
+    .clear
+    = f.label :rotten_tomatoes_link, 'Rotten Tomatoes Link'
+    = f.text_field :rotten_tomatoes_link ,:class => 'large'
+    .add.add_related{:style => 'display:inline'}
+      %a{:onclick => 'javascript:fetchReviews();',:style => "cursor:pointer" }Fetch Reviews
+    .clear
+
+    -@counter = 0
+    = f.fields_for :critics_reviews do |cr|
+      = render 'critics_review', { :ff => cr }
+      -@counter += 1
+    #add_review.add.clear
+      = link_to_add_fields "Add Review", f, :critics_reviews, 'critics_review'
+
+  #meta_detail{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:2px; font-size:12px"}
+    -meta_title = @movie.meta_title ? @movie.meta_title : "#{@movie.name} Pictures | Trailers | Reviews | Latest Updates - #{Date.today.strftime('%b %d')}"
+    -meta_keywords = @movie.meta_keywords ? @movie.meta_keywords :  "#{@movie.name} review, #{@movie.name} trailer, #{@movie.name} clips, #{@movie.name} info, #{@movie.name} pictures, #{@movie.name} videos"
+    -meta_description = @movie.meta_description ? @movie.meta_description : "#{@movie.name} cast and crew information, review, buzz, videos and pictures"
+    = f.label :meta_title
+    = f.text_field :meta_title
+    .clear
+    = f.label :meta_keywords
+    = f.text_area :meta_keywords, :rows => 5
+    .clear
+    = f.label :meta_description
+    = f.text_area :meta_description, :rows => 5
+
+  -if request.env["REQUEST_URI"] =~ /edit/
+    #score_detail{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:2px; font-size:12px"}
+      /= label_tag "Difference Score"
+      /= text_field_tag :diff_score,"", :value => (@movie.score - @movie.history_score)
+      .clear
+      /= label_tag "Add Score"
+      /= text_field_tag :add_score
+      .clear
+      /= label_tag "Set Flag"
+      /=select_tag :flag, options_for_select([["Select One", ""], "Just Released", "Upcoming","Promoted"],"#{@movie.flag}")
+      
+  -unless @movie.new_record?
+    /%p
+    /  Total number of facebook posts
+    /  = @movie.facebook_feeds.all_posts.count
+    /  = link_to "Manage Facebook Posts", admin_movie_movie_posts_path(@movie)
+    /%p
+    /  Total number of tweets
+    /  = @movie.tweets_count
+    /  = link_to "Manage Tweets", admin_movie_movie_tweets_path(@movie)
+    /%p
+    /  Total number of Comments
+    /  = @movie.comments.count
+    /  = link_to "Manage Comments", admin_movie_movie_comments_path(@movie)
+    /%p
+    /  Total number of reviews
+    /  = @movie.reviews_count
+    /  = link_to "Manage User Reviews", admin_movie_movie_reviews_path(@movie)
+  %hr
+  .actions
+    = f.submit 'Save'
+    \- or -
+    = link_to 'Cancel', admin_movies_path
+

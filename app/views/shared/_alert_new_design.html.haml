@@ -1,0 +1,33 @@
+:javascript
+  function show_newpage_popup(){
+    var first_time = "#{session[:first_time]}";
+    if(first_time == ""){
+      _gaq.push(['_trackEvent', 'Alert for new design', 'Open','']);
+      $('#newdesign_alert').dialog({
+        modal: true,
+        resizable: false,
+        maxHeight: 400,
+        width: 420,
+        height:150,
+        //open: function() { $(".ui-dialog-titlebar").hide(); }
+        open: function() { $(".ui-dialog-titlebar").removeClass("ui-widget-header"); $(".ui-dialog-titlebar-close").click(function(){  var n_session = "#{session[:first_time] = 1}"; });},
+        close: function(){ _gaq.push(['_trackEvent', 'Alert for new design', 'Closed','']); }
+      });
+    }
+  }
+  function close_modal(ev){
+    $("#newdesign_alert").dialog("close");
+  }
+  function redirect_new_design(){
+    _gaq.push(['_trackEvent', 'Alert for new design', 'Button Clicked','']);
+    var n_session = "#{session[:first_time] = 1}";
+    window.location = "http://www.muvi.com";
+    return;
+  }
+
+%div{:style=>"padding-left:10px;height:40px;font-family:Helvetica;"}
+  There is new version of Muvi, wanna check it out ?
+%div{:style=>"padding-left:120px;"}
+  %input{:type=>"button", :value=>"Let's Do It.",:class=>"login_link", :style=>"font-size:17px;height:35px;width:150px;border-radius:2px;", :onclick=>"redirect_new_design();"}
+  /%input{:type=>"button", :style=>"font-family:comic sans ms;font-size:14px;height:35px;", :value=>"Close", :onclick=>"close_modal(this);"}
+

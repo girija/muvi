@@ -1,0 +1,27 @@
+%h1.heading Edit Top 10
+.form
+  = form_for([:admin, @topten], :url => "/admin/top_tens/#{@topten.id}/update") do |f|
+    - if @topten.errors.any?
+      #error_explanation
+        %h2
+          = pluralize(@topten.errors.count, "error")
+          prohibited this page from being saved:
+        %ul
+          -@topten.errors.full_messages.each do |msg|
+            %li= msg
+
+    = f.label :name, "Name"
+    = f.text_field :name
+    .clear
+    = f.label :item_type, 'Type'
+    = @topten.item_type == 0 ? 'Movie' : 'Celebrity'
+    .clear
+    = f.label :rank, 'Rank'
+    = f.text_field :rank
+    .clear
+    %hr
+
+    .actions
+      = f.submit 'Save'
+      \- or -
+      = link_to 'Cancel', admin_top_tens_path 

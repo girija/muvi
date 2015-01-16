@@ -1,0 +1,53 @@
+.clear{:style => 'height:5px'}
+.poster
+  - count = 0
+  -object_type = object_type.downcase
+  - if object_type == "celebrity"
+    -hid_link = "stars"
+  -else
+    -hid_link = "movies"
+
+  - unless @poster_list.blank?
+    - @poster_list[0..11].each_with_index do |poster,i|
+      -if (i+1)%6 == 0
+        %div{:id => "poster_image_#{count}", :class => "right",:style=>"padding-top:10px;"}
+          = image_tag ("/system/posters/#{poster.id}/medium/#{poster.poster_file_name.gsub(" ", "%20")}"), :width => "77px", :height => "76px",:onclick => "javascript:show_poster('#{poster.id}','#{object_type}','#{params[:id]}');", :style => "cursor:pointer", :id => "poster#{poster.id}",:title=>"#{poster.name}",:alt => "#{poster.name}"
+
+          .clear
+      -else
+        %div{:id => "poster_image_#{count}", :style => "margin-right:13px;padding-top:10px;", :class => "left"}
+          = image_tag ("/system/posters/#{poster.id}/medium/#{poster.poster_file_name.gsub(" ", "%20")}"), :width => "77px", :height => "76px",:onclick => "javascript:show_poster('#{poster.id}','#{object_type}','#{params[:id]}');", :style => "cursor:pointer", :id => "poster#{poster.id}",:title=>"#{poster.name}",:alt => "#{poster.name}"
+
+          .clear 
+:javascript
+  function show_poster(poster_id,object_type, object_id){
+     $.fancybox({
+       'type' : 'ajax',
+       'centerOnScroll' : true,
+       'opacity' : true,
+       'hideOnOverlayClick' :true,
+       'overlayOpacity' : 1,
+       'overlayColor' : '#0e0e0e',
+       'showCloseButton': false,
+       'autoScale' : true,
+       'padding' : 0,
+       'transitionIn': 'elastic',
+       'transitionOut': 'elastic',
+       'onClosed' : function(){
+         $("body").css("overflow", "auto");
+         var refer = "#{request.env['HTTP_REFERER']}";
+         if("#{params[:autoplay]}" == "poster"){
+           window.location.href = refer;
+         }
+       },
+       'onComplete': function() {
+         $("#fancybox-wrap").css({'top':'10px', 'bottom':'auto'});
+       },
+       'href': "/posters/"+object_type+"/"+object_id+"/"+poster_id+"?hide_link=yes"
+    });
+    //if("#{params[:autoplay]}" != "poster"){
+      var stateObj = { foo: "bar" };
+      history.pushState(stateObj, "", "/"+object_type+"s/"+object_id+"/poster/"+poster_id);
+    //}
+
+  }

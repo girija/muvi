@@ -1,0 +1,47 @@
+%h2
+  %span Featured
+  Star 
+.clear
+
+-unless @featured_celebrity.blank?
+  -@celebrity = Celebrity.find_by_id(@featured_celebrity.subject_id)
+  .left{:style => "width:112px; height:175px;padding:2px;border:1px solid #dddddd; margin-right:10px"}
+    =link_to image_tag(@celebrity.image, :width => "112px", :height => "175px"), "/stars/#{@celebrity.permalink}"
+    =link_to @celebrity.name, star_path(@celebrity)
+    .clear
+  .left
+    .left{:style => "width:240px;height:140px"}
+      -unless @celebrity.summary.blank?
+        =truncate(@celebrity.summary, :length => 140)
+      .clear
+
+      -upcoming = upcoming_movies(@celebrity)
+      -cnt = 1
+      -unless upcoming.blank?
+        %h3
+          Upcoming
+        .clear{:style => "height:2px"}
+        -upcoming.each do |tr|
+          =cnt 
+          =link_to tr.name, movie_path(tr)
+          -if cnt == 4
+            -break
+          -else
+            -cnt = cnt + 1
+          .clear
+
+    .clear{:style => "height:10px"}
+    .home_page_rating{:style => "margin-top:-14px; width:260px"}
+      = link_to "Popularity Index", star_path(@celebrity, :anchor => "users"),:style => "color:#4F4F4F"
+      .clear
+      .home_rating_bar.left
+        = ratingbar(@celebrity.popularity)
+      -if !@celebrity.popularity.blank? and @celebrity.popularity != 0
+        .home_ratingvalue.left
+          = "#{@celebrity.popularity || 0}%"
+      .right{:style => "margin-top:-40px"}
+        -begin
+          =render :partial => "/shared/fan"
+        -rescue
+
+

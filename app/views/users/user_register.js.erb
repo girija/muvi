@@ -1,0 +1,58 @@
+//window.location.href = "/show_invite";
+
+/*if("<%#= params[:from]%>" != ""){
+  $("#joinModal").modal("hide");
+  //location.reload(true);
+  $("#langModal").modal("show");
+}else{
+*/
+<% if @is_allowed == 1 %>
+	/*$(".header").css("opacity","0.2"); 
+
+	$('.header').append('<div style="position: absolute;top:0;left:0;width: 100%;height:100%;z-index:2;opacity:0.4;filter: alpha(opacity = 50)"></div>');
+	$("#modal-9").addClass("md-show");
+	*/
+<%
+	loc = DisplayHelper.get_location(request.remote_ip)
+%>
+	var loc_language = "";
+	loc_language = "<%=loc%>"
+	$.cookie(loc_language, 'yes');
+	//location.reload(true);
+	$.post("/update_user_language", function(data) {
+	  location.reload(true);
+	});
+<% end %>
+
+<% if @is_valid == 0 %>
+        $("#err_message").html("Oops, seems to be an invalid email.");
+        $("#err_message").show();
+        $('#err_message').css("float", "left");
+        $('#err_message').css("padding-left", "120px");
+        $('#err_message').css("color", "red");
+        $('#err_message').css("background", "none");
+        $('#err_message').css("display", "inline");
+        $('#err_message').css("font-size", "12px");
+        $('#err_message').css("font-weight", "normal");
+
+        $(".load_div").hide();
+        $(".join_btn").show();
+
+<% end %>
+
+<% if @is_allowed == 0 %>
+
+        $("#err_message").html("Email ID already exists.");
+        $("#err_message").show();
+        $('#err_message').css("float", "left");
+        $('#err_message').css("padding-left", "120px");
+        $('#err_message').css("color", "red");
+        $('#err_message').css("background", "none");
+        $('#err_message').css("display", "inline");
+        $('#err_message').css("font-size", "12px");
+        $('#err_message').css("font-weight", "normal");
+
+        $(".load_div").hide();
+        $(".join_btn").show();
+<% end %>
+//}

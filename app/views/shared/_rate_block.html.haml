@@ -1,0 +1,27 @@
+.clear{:style=>"height:10px;"}
+-user = @user_profile.user
+%div{:style=>"padding:4px;"}
+  %div{:style=>"float:left;width:250px;"}
+    %div{:style=>"float:left;"}
+      = image_tag("/system/profile_images/#{@user_profile.id}/small/#{@user_profile.profile_image_file_name.gsub(' ', '%20')}",:style => "height:25px;width:25px;", :class => 'media-object img-circle') unless @user_profile.profile_image_file_name.blank?
+      - if @user_profile.profile_image_file_name.blank?
+        - unless user.facebook_id.blank?
+          = image_tag("http://graph.facebook.com/#{user.facebook_id}/picture?type=normal",:style => "height:25px;width:25px;", :class => 'media-object img-circle')
+        - else
+          = image_tag("/images/no-profile.png",:style => "height:25px;width:25px;", :class => 'media-object img-circle')
+    %div{:style=>"padding-left:35px;color:#5f5f5f;font-size:13px;"}
+      = "#{@user_profile.display_name} rated"
+  %div{:style=>"float:right;padding-right:10px;"}
+    -rev = Review.where("user_id = #{@user_profile.user_id} and movie_id = #{movie.id}").first
+    =display_egg(rev) if rev
+  .clear
+  %div{:style=>"padding-top:5px;color:#010101;font-size:13px;"}
+    = rev.description
+  .clear{:style=>"height:10px;"}
+  %div{:style=>"float:right;padding-right:10px;"}
+    -unless current_user.nil? && current_user.blank?
+      -if current_user.id != user.id
+        =link_to "<i class='icon-trophy'></i> Kudos".html_safe,"javascript:void(0);",:style=>"color:#008bdb;font-size:15px;",:onclick=>"add_kudos('#{current_user.id}','#{user.id}','#{movie.id}','#{@list.id}')"
+    -else
+      =link_to "<i class='icon-trophy'></i> Kudos".html_safe,"javascript:void(0);",:style=>"color:#008bdb;font-size:15px;",:onclick=>"is_logged_in('check')"
+.clear{:style=>"height:10px;"} 

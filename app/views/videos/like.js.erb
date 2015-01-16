@@ -1,0 +1,9 @@
+$('#like_button').css("background-image", "url(<%=URL%>/images/pp_like_active.png)");
+$('#dislike_button').css("background-image", "url(<%=URL%>/images/pp_dislike.png)");
+$('#like_button').attr('disabled','disabled');
+$('#dislike_button').removeAttr('disabled');
+badgePoints('to like this video',1);
+successMessage("You liked the video <%= @video.name %>");
+
+//$('#notification').show();
+//$('#notification').text('Thank you for your feedback, your connections will be notified!');

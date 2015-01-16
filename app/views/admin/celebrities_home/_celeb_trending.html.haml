@@ -1,0 +1,14 @@
+-for i in 0..5
+  %input{:type => "text", :id => "celeb_trending_item_#{i}", :name => "celeb_trending_item[]" ,:placeholder => 'Enter the name of movie', :style => "margin-right:5px"}
+  = hidden_field_tag "id_celeb_trending_item_#{i}" , 0, :name => 'celeb_trending_id[]'
+
+-unless @celeb_trending.blank?
+  -t = 0
+  -@celeb_trending.each do |tn|
+    -celeb = Celebrity.find_by_id(tn.subject_id)
+    -unless celeb.blank?
+      %script
+        $("#celeb_trending_item_#{t}").val("#{celeb.name}");
+        $("#id_celeb_trending_item_#{t}").val("#{tn.subject_id}");
+      -t = t + 1
+

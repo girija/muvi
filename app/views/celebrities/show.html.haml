@@ -1,0 +1,93 @@
+- if request.env["REQUEST_URI"] =~ /msn_embed/
+  :javascript
+    $(document).ready(function($) {
+      $(".container").css("background-color", '#FFFFFF');
+      $(".container").css("border", '1px solid #d2d6d9');
+    });
+    var $stickyHeight = 600;
+    var $padding = 10;
+    var $topOffset = 100;
+    var $footerHeight = 83;
+
+    function scrollSticky(){
+      if($(window).height() >= $stickyHeight) {
+        var aOffset = $('#sticky').offset();
+        if($(window).scrollTop() + $padding > $topOffset) {
+          $('#sticky').attr('style', 'position:fixed;margin-top: -99px;');
+        }else{
+          $('#sticky').attr('style', 'position:relative;margin-top: 17px;');
+        }
+      }
+    }
+
+    $(window).scroll(function(){
+      scrollSticky();
+    });
+-else
+  :javascript
+    var $stickyHeight = 600;
+    var $padding = 10;
+    var $topOffset = 100;
+    var $footerHeight = 83;
+
+    function scrollSticky(){
+      if($(window).height() >= $stickyHeight) {
+        var aOffset = $('#sticky').offset();
+        if($(window).scrollTop() + $padding > $topOffset) {
+          $('#sticky').attr('style', 'position:fixed;margin-top: -22px;');
+        }else{
+          $('#sticky').attr('style', 'position:relative;margin-top: 17px;');
+        }
+      }
+    }
+    $(window).scroll(function(){
+      scrollSticky();
+    });
+
+-if params[:costar].blank?
+  = render 'shared/meta_title_and_keywords', { :key => 'celebrity', :object => @celebrity}
+-else
+  = render 'shared/meta_title_and_keywords', { :key => 'celebrity_together', :object =>@celebrity}
+- if request.env["REQUEST_URI"] =~ /msn_embed/
+  -unless @celebrity.blank?
+    -if params[:costar].blank?
+      %div{:style => "height:50px;margin-top:17px;padding-left:12px;",:id => "sticky"}
+        %div{:class=>"top_btn_inner",:id=>"top_btn", :onclick => "celebrity_detail_page()"}
+        -unless @celebrity.celebrity_tweets.blank?
+          %div{:class=>"engage_btn_inner",:id=>"engage_btn", :onclick => "celebrity_engage_page('#{@celebrity.permalink}')"}
+          %div{:class=>"tweet_btn_inner",:id=>"tweet_btn", :onclick => "tweet_block();"}
+        -else
+          %div{:class=>"engage_upcomming",:id=>"engage_btn", :onclick => "celebrity_engage_page('#{@celebrity.permalink}')"}
+    -else
+      .top_name_bar{:style => 'background:none;width:818px'}
+        %h2
+          %span{:style => "color:#404447;"}
+            ="#{@celebrity.name} and #{@costar.name}"
+          In Together
+
+  .clear
+
+  -if params[:costar].blank?
+    = render '/shared/celebrity', {:from => 'celebrities'}
+  -else
+    = render '/shared/costar_movies', {:from => 'celebrities'}
+-else
+  -if !params[:costar].blank?
+    = render '/shared/costar_movies', {:from => 'celebrities'}
+  -else
+    .row-fluid
+      .span12{:style => "background-color:#FFFFFF"}
+        .span3
+          =render :partial => "/home/left_sidebar"
+
+        .span9{:style => "border-left: 4px solid #DFDFDF; margin-left: -2px;"}
+          %div{:class=>"main_content"}
+            = render '/shared/new_celebrity', {:from => 'celebrities'}
+            =render 'shared/celeb_macrodata'
+:javascript
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+

@@ -1,0 +1,120 @@
+.fbPhotoSnowlift.fbxPhoto.fullScreenAvailable.pagingReady{:style => 'overflow-x:auto;overflow-y:scroll' }
+  .fbPhotoSnowliftOuter
+    .fbPhotoSnowliftInner
+      .fbPhotoSnowliftContainer.uiContextualLayerParent
+        .clearfix.fbPhotoSnowliftPopup{:style => 'width: 1000px; height: 520px;clear:both'}
+          #title_popup{:style => 'height:50px'}
+            .left{:style => 'color:#f3f3f3;font-size:18px;font-family:Arial, Helvetica, sans-serif;padding-top:15px;width:550px'}
+              = @poster.name
+            - if params["hide_link"].blank? or  params["hide_link"] == ''
+              .left{:style=> 'cursor:pointer;color:#529bdc;font-weight:bold;padding-top:15px;font-size:13px', :onclick => '$.fancybox.close();$("body").css("overflow", "auto");' }
+                %a{:href => "#{celebrity_path(params['object_id'])}"}
+                  GO TO STAR PAGE
+            .right{:style => 'text-align:center;cursor:pointer', :onclick => '$.fancybox.close();$("body").css("overflow", "auto");'}
+              = image_tag('close.png')
+              %br
+              %span{:style => "font-family:Arial, Helvetica, sans-serif;font-size:9px;color:#747474"} CLOSE
+          #video_block{:style => 'width:944px;'}
+            %div{:style => 'height:470px'}
+              .left{:style => 'display:block;width:640px;position: absolute;'}
+                #container-image-box{:style => 'padding:5px;width: 640px; display: block; height: 430px;text-align:center;background:url("'"#{URL}"'/images/pp_image_bg.png")'}
+                  #image_block
+                    /= image_tag @poster.poster.url(:original), :style => "display: inline;max-height:430px;max-width:640px"
+                    -img_src = "#{URL}/system/posters/#{@poster.id}/original/#{@poster.poster_file_name.gsub(" ", "%20")}"
+                    %img{:src => img_src, :style => "display: inline;max-height:430px;max-width:640px"}
+                  #navigation
+                    %a{:href => '#', :onclick => "show_prev_poster(#{@poster.id})",:id => 'navigation-btnPrev', :style => 'background: url('"#{URL}"'/images/prev_slide.png) no-repeat scroll left 15% transparent;'}
+                    %a{:href => '#', :onclick => "show_next_poster(#{@poster.id})",:id => 'navigation-btnNext', :style => 'background: url('"#{URL}"'/images/next_slide.png) no-repeat scroll right 15% transparent;'}
+                = render "/shared/show_like_dislike"
+              = render "/shared/show_comments"
+          %div{:style => 'padding-bottom:10px'}
+            = image_tag('arrow_popup.png')
+            %span{:style => 'color:#e4e4e4;font-size:12px'}
+              MORE PICTURES FROM STAR
+          %div{:style => 'border:1px solid #222;border-left:0;border-right:0;min-height:170px;width:930px;'}
+            %div{:style => 'height:20px;'}
+            %input{:type => "hidden", :id => "counter", :value => "0"}
+            .left{:style => "margin-top:-25px;margin-right:12px;margin-left:352px"}
+            - if @poster_list.size > 9
+              .sc{:style => "height:15px"}
+                .right_arrow.right{:id => "right", :onclick => "scroll_list('right');"} &nbsp;
+                .left_arrow.right{:id => "left", :onclick => "scroll_list('left');"} &nbsp;
+            .clear
+            - count = 0
+            - @poster_list.each do |poster|
+              - if params[:id].to_i == poster.id.to_i
+                - bg = 'background:url("'"#{URL}"'/images/poster_bg.png")'
+              - else
+                - bg = ''
+              .left{:style => "width:82px;height:128px;padding:7px;margin-right:7px;cursor:pointer;#{bg}", :id => "di#{count}"}
+                /= image_tag poster.poster.url(:medium), :width => "72px", :height => "103px",:onclick => "javascript:show_poster('#{poster.id}','celebrity','#{@celeb.permalink}');", :style => "cursor:pointer", :id => "poster_#{poster.id}"
+
+
+                -img_src = "#{URL}/system/posters/#{poster.id}/medium/#{poster.poster_file_name.gsub(' ', '%20')}"
+                %img{:src => img_src, :style => "cursor:pointer", :id => "poster_#{poster.id}", :width => "72px", :height => "103px", :onclick => "javascript:show_poster('#{poster.id}','celebrity','#{@celeb.permalink}');"}
+
+                .clear
+                  %h4
+                    = truncate(poster.name.html_safe, :length =>18) unless poster.name.blank?
+                .clear
+              %script
+                if("#{count.to_i}" >= 9){
+                $("#di#{count}").hide();
+                }
+
+              -count = count + 1
+
+:javascript
+  $(document).ready(function(){
+    $(".fbPhotoSnowliftPopup").height($(window).height());
+    $("body").css("overflow", "hidden");
+  });
+  function show_next_poster(current_poster_id){
+    if ($("#poster_"+current_poster_id).parent().next().children('img').length > 0 ){
+      $("#poster_"+current_poster_id).parent().next().children('img').trigger('click');
+    }else{
+      $("#di0 > img").trigger('click');
+    }
+  }
+  function show_prev_poster(current_poster_id){
+     if ($("#poster_"+current_poster_id).parent().prev().children('img').length > 0){
+       $("#poster_"+current_poster_id).parent().prev().children('img').trigger('click');
+     }else{
+     }
+
+  }
+ 
+  function scroll_list(p){
+    if(p == "left"){
+      if($("#counter").val() == 0){
+        return false;
+      }
+      if(parseInt($("#counter").val()) > 0){
+        $("#counter").val(parseInt($("#counter").val()) - 9);
+      } else {
+        $("#counter").val(0);
+      }
+      var start = $("#counter").val();
+      var end = parseInt($("#counter").val()) + 9;
+      for(var i = 0; i < "#{@poster_list.size}"; i++){
+        $("#di"+i).hide();
+      }
+      for(var i = start; i < end; i++){
+        $("#di"+i).show();
+      }
+    } else {
+      if(parseInt($("#counter").val()) + 9 >= "#{@poster_list.size}"){
+       return false;
+      }
+      $("#counter").val(parseInt($("#counter").val()) + 9);
+      var start = $("#counter").val();
+      var end = parseInt($("#counter").val()) + 9;
+      for(var i = 0; i < "#{@poster_list.size}"; i++){
+        $("#di"+i).hide();
+      }
+      for(var i = start; i < end; i++){
+        $("#di"+i).show();
+      }
+    }
+  }
+ 

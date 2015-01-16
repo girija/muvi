@@ -1,0 +1,28 @@
+.clear{:style => 'height:10px'}
+%div
+  -if type == "costar"
+    -celeb_list = @top_costars[0..4]
+  -else
+    -celeb_list = @actors[0..4]
+  - celeb_list.each_with_index do |star,i|
+    -celeb = star.celebrity
+    -unless celeb.blank?
+      %div{:class=>"left", :style=>"height:180px;padding-right:10px;width:96px;"}
+        -begin
+          .left{:style => "border:1px solid #d2d6d9;"}
+            .moviImage{:style=>"height:124px;width:84px;padding:2px;"}
+              =link_to image_tag(celeb.image,:style=>"height:124px;width:84px;"),star_path(celeb.permalink)
+        -rescue
+        .clear
+        -unless celeb.blank?
+          = link_to celeb.name.truncate(15),star_path(celeb.permalink),:style=>"font-weight:normal;font-size:13px;color:#000;"
+          %br
+          %span{:class => "small_light_gray"}
+            -if type == "costar"
+              -together_link = "/stars/#{@celebrity.permalink}/#{celeb.permalink}/together"
+              -count_movie = get_movie_name_of_celeb(@celebrity, celeb).count
+              =link_to "In #{count_movie} movies",together_link,:class=>"small_light_gray"
+            -else
+              as
+              = star.role_name.truncate(15) if star.role_name
+

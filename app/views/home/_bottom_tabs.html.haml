@@ -1,0 +1,95 @@
+.row-fluid
+  .span12
+    /.btn-group.row-fluid
+    /  %button{:class => "btn span4", :id => "b1"}
+    /    How It Works
+    /  %button{:class => "btn span4", :id => "b2"}
+    /    Features
+    /  %button{:class => "btn span4", :id => "b3"}
+    /    FAQ
+
+    .btn-group{"data-toggle" => "buttons-radio", :style => "width: 100%;"}
+      %button{:style => "width:31.6239%", :type => "button", :class => "btn btn-tab btn-large active", :id => "b1"}
+        How It Works
+      %button{:class => "btn btn-tab btn-large", :type => "button", :style => "width:31.6239%", :id => "b2"}
+        Features
+      %button{:style => "width: 31.6239%", :type => "button", :class => "btn btn-tab btn-large", :id => "b3"}
+        FAQs
+
+
+  .span11.row-fluid
+    .clear{:style => "height:10px"}
+
+    #how_it_works{:style => "padding-left:150px;"}
+      .clear{:style => "height:20px"}
+      %span{:style => "font-size:18px"}
+        Discover awesome movies personalized for you, based on over 100 factors.
+      .clear{:style => "height:20px"}
+      =image_tag("how_it_works.png")
+      .clear{:style => "height:20px"}
+
+    #features_home{:style => "display:none;"}
+      .left{:style => "background: url(/public/images/light_bg.png) repeat"}
+        .span11
+          %b
+            List
+          .clear{:style => "height:10px"}
+          Collect your favorite movies you saw in lists made just for you. Example if you are into RomCom then you can collect all your favorite RomComs in one list, that you can share with your buddies online.
+
+          .clear{:style => "height:20px"}
+          %b
+            Wanna See
+          .clear{:style => "height:10px"}
+          There are all these special movies that comes and goes, but because of your busy schedule you are not able to find them and track them. Well now you will be, just get them to Wanna See and see the opinions of your friends who watched the movie stream to you.
+          .clear{:style => "height:20px"}
+
+    #faq{:style => "display:none;width:69%; margin-left:-20px"}
+      %b
+        Can I watch movies here?
+      .clear
+        No
+      .clear{:style => "height:10px"}
+
+      %b
+        How do I use the website?
+      .clear
+      Read the "How It Works" and "Features" above. If anything is not clear, send us an email at team@muvi.com, we will reply right away.
+      .clear{:style => "height:10px"}
+  
+      %b 
+        How do I become a member?
+      .clear
+      Muvi is currently in Beta and available by private invitation only. Please request for an invite above.
+      .clear{:style => "height:10px"}
+
+      %b
+        What language of movies you support?
+      .clear
+      Hollywood, Bollywood, Tamil and Telugu.
+      .clear{:style => "height:10px"}
+
+      %b
+        I want to contact your team for some feedback or request. How do I contact?
+      .clear
+      Please email us at team@muvi.com. We value all feedback, will respond right away.
+      .clear{:style => "height:20px"}
+
+:javascript
+
+  $('#b1').click(function (e) {
+    $("#how_it_works").show();
+    $("#features_home").hide();
+    $("#faq").hide();
+  })
+
+  $('#b2').click(function (e) {
+    $("#how_it_works").hide();
+    $("#features_home").show();
+    $("#faq").hide();
+  })
+
+  $('#b3').click(function (e) {
+    $("#how_it_works").hide();
+    $("#features_home").hide();
+    $("#faq").show();
+  })

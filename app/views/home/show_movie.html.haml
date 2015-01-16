@@ -1,0 +1,33 @@
+%h4
+  %span{:style => "font-size:25px"}
+    Step 3:
+  Mark 'Seen' or 'Wanna See' on a few movies, it will get your discover engine started.
+.clear{:style => "height:30px"}
+
+%ul
+  - @user_movies.each do |movie|
+    %li.recent_poster{:style => 'float:left;display:block;position:relative;margin-left:2px;margin-right: 2px;margin-right:40px; '}
+      = link_to image_tag("#{movie.banner_image}", :style => 'width:175px;height:260px'), "/movies/#{movie.permalink}"
+      %ul.poster-meta{:style => 'opacity: 0; display: block;'}
+        %li
+          .div.rate-block{:style => 'display:none'}
+            = render "/shared/movie_rating", movie_name: movie.name, movie_image: "#{movie.banner_image_medium}", movie_id: movie.id, :button => 'small'
+          = link_to "<i class='fa fa-icon-eye-open'></i> Seen".html_safe, "#seen" , :class => 'btn btn-seen-profile btn-small' , 'data-id' => movie.id, :style => 'border-radius:2px 2px 2px 2px'
+ 
+        %li
+          = link_to "<i class='fa fa-icon-plus'></i> Wanna see".html_safe, "#wannasee" , :class => 'btn btn-wanna-see-profile btn-small', "data-id"  => movie.id, :style => 'border-radius:2px 2px 2px 2px'
+
+          /= render "/shared/movie_rating", movie_name: movie.name, movie_image: "#{movie.banner_image_medium}", movie_id: movie.id, :button => 'small' 
+
+
+
+.right
+  %input{:type => "button", :class => "btn btn-info btn-large", :onclick => "show('choose_language');", :value => "Back"}
+  %input{:type => "button", :class => "btn btn-primary btn-large", :onclick => "show_feed('#{current_user.id}');", :value => "Skip"}
+
+.clear{:style => "height:30px"}
+
+:javascript
+  $(".rate-block").click(function (){
+    show_feed("#{current_user.id}")
+  });

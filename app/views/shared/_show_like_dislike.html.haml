@@ -1,0 +1,118 @@
+- if @video.blank?
+  -@item = @poster 
+  - @item_id = @poster.id
+  - path = 'poster'
+  - position = 'position:absolute;bottom:0'
+  - likes = Vote.where("votable_id = #{@item_id} and votable_type = 'Poster' and voter_type = 'User' and vote_flag = 't'")
+- else
+  -@item = @video
+  - @item_id = @video.id
+  - path = 'video'
+  - position = 'margin-top:10px'
+  - likes = Vote.where("votable_id = #{@item_id} and votable_type = 'Video' and voter_type = 'User' and vote_flag = 't'")
+%div{:id => "like_popup_#{@item.id}", :style=>"display:none;padding:5px;max-height:320px;"}
+%div{:style => "width:640px;padding:5px;padding-bottom:0;height:40px;background:url('#{URL}/images/pp_overlay_bg.png');#{position}"}
+  .left{:style => 'width:150px'}
+    .left
+      - likes.each_with_index do |like,i|
+        - if i < 2
+          - voter = User.find(like.voter_id)
+          - unless voter.blank?
+            %div{:class=>'image left tip_hint tooltipbottom'}
+              - ub = UserBadge.find_by_user_id(like.voter_id)
+              - if !ub.blank?
+                - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+                - if points >= 1 and points < 5
+                  - level = "Level: Muvi Scraper"
+                - elsif points >= 5 and points < 10
+                  - level = "Level: Muvi Junkie"
+                - elsif points >= 10
+                  - level = "Level: Muvi Maniac"
+              = link_to image_tag(voter.user_image, :alt =>voter.display_name, :title =>voter.display_name, :style=>"width:30px;height:30px;border: 1px solid #EEEEEE;"), "/profile/#{voter.id}/#{voter.display_name}"
+              .tooltip_description{:style =>'display:none'}
+                %b
+                  = voter.display_name
+                %br
+                = level
+    .left{:style => 'padding-left:10px;padding-top:5px;'}
+      - if likes.size > 0
+        %span{:style => 'color:#848484;font-size:10px;font-family:Arial, Helvetica, sans-serif;'}
+          = link_to "#{likes.size} liked", "javascript:void(0);", :style=>"color:#C1DDE7;", :onclick => "show_likes_popup('#{@item.id}','#{@item.class.to_s}','like_dislike','#{@item.like_votes.count}','550','like_popup_#{@item.id}');"
+     
+  - if @video.blank?
+    - dislikes = Vote.where("votable_id = #{@item_id} and votable_type = 'Poster' and voter_type = 'User' and vote_flag = 'f'")
+  - else
+    - dislikes = Vote.where("votable_id = #{@item_id} and votable_type = 'Video' and voter_type = 'User' and vote_flag = 'f'")
+  .left{:style=>"width:150px;"}
+    .left
+      - dislikes.each_with_index do |dislike,i|
+        - if i < 2
+          - voter = User.find(dislike.voter_id)
+          - unless voter.blank?
+            %div{:class=>'image left tip_hint tooltipbottom'}
+              - ub = UserBadge.find_by_user_id(dislike.voter_id)
+              - if !ub.blank?
+                - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+                - if points >= 1 and points < 5
+                  - level = "Level: Muvi Scraper"
+                - elsif points >= 5 and points < 10
+                  - level = "Level: Muvi Junkie"
+                - elsif points >= 10
+                  - level = "Level: Muvi Maniac"
+              = link_to image_tag(voter.user_image, :alt =>voter.display_name, :title =>voter.display_name, :style=>"width:30px;height:30px;border: 1px solid #EEEEEE;"), "/profile/#{voter.id}/#{voter.display_name}"
+              .tooltip_description{:style =>'display:none'}
+                %b
+                  = voter.display_name
+                %br
+                = level
+    .left{:style => 'padding-left:10px;padding-top:5px;'}
+      - if dislikes.size > 0
+        %span{:style => 'color:#848484;font-size:10px;font-family:Arial, Helvetica, sans-serif;'}
+          = link_to "#{dislikes.size} disliked", "javascript:void(0);", :style=>"color:#C1DDE7;", :onclick => "show_likes_popup('#{@item.id}','#{@item.class.to_s}','like_dislike','#{@item.dislike_votes.count}','550','like_popup_#{@item.id}');"
+  
+  - user_id = current_user ? current_user.id : ""
+  - like_img = 'pp_like.png'
+  - dislike_img = 'pp_dislike.png'
+
+  - if user_id == ''
+    - like_img = 'pp_like.png'
+  - else
+    - if @video.blank?
+      - if Vote.where("votable_id = #{@item_id} and votable_type = 'Poster' and voter_type = 'User' and vote_flag = 't' and voter_id = #{current_user.id}").size > 0
+        - like_img = 'pp_like_active.png'
+      - else
+        - like_img = 'pp_like.png'
+      - if Vote.where("votable_id = #{@item_id} and votable_type = 'Poster' and voter_type = 'User' and vote_flag = 'f' and voter_id = #{current_user.id}").size > 0
+        - dislike_img = 'pp_dislike_active.png'
+      - else
+        - dislike_img = 'pp_dislike.png'
+    - else
+      - if Vote.where("votable_id = #{@item_id} and votable_type = 'Video' and voter_type = 'User' and vote_flag = 't' and voter_id = #{current_user.id}").size > 0
+        - like_img = 'pp_like_active.png'
+      - else
+        - like_img = 'pp_like.png'
+      - if Vote.where("votable_id = #{@item_id} and votable_type = 'Video' and voter_type = 'User' and vote_flag = 'f' and voter_id = #{current_user.id}").size > 0
+        - dislike_img = 'pp_dislike_active.png'
+      - else
+        - dislike_img = 'pp_dislike.png'
+
+  .right
+    = form_tag "/#{path}s/like", "data-remote" => "true",:id => "like_form", :style => "float:left;" do
+      %input{:type => "hidden", :id => "like_#{path}_id", :name => "like_#{path}_id", :value => "#{@item_id}"}
+      %input{:type => "hidden", :id => "user_id",:name=>"user_id", :value => user_id}
+      - if params[:object_type] == 'movie'
+        %input{:type => "hidden", :id => "like_movie_id", :name => "movie_id", :value => "#{@movie.id}"}
+      - elsif
+        %input{:type => "hidden", :id => "like_movie_id", :name => "celebrity_id", :value => "#{@celeb.id}"}
+      %input{:type => "submit", :value => "", :id => "like_button",:onclick=>"return check_login_poster_video_lik_disl('#{@item_id}','like')", :style => "height:26px;width:65px;border:0px;background: url('#{URL}/images/#{like_img}') no-repeat top left;"}
+
+      
+    = form_tag "/#{path}s/dislike", "data-remote" => "true",:id => "dislike_form", :style => "float:left" do
+      %input{:type => "hidden", :id => "dislike_#{path}_id", :name => "dislike_#{path}_id", :value => "#{@item_id}"}
+      %input{:type => "hidden", :id => "user_id",:name=>"user_id", :value => user_id}
+      - if params[:object_type] == 'movie'
+        %input{:type => "hidden", :id => "dislike_movie_id", :name => "movie_id", :value => "#{@movie.id}"}
+      - elsif params[:object_type] = 'celebrity'
+        %input{:type => "hidden", :id => "dislike_movie_id", :name => "celebrity_id", :value => "#{@celeb.id}"}
+      %input{:type => "submit", :value => "", :id => "dislike_button", :onclick=>"return check_login_poster_video_lik_disl('#{@item_id}','dislike')", :style => "height:26px;width:81px;border:0px;background: url('#{URL}/images/#{dislike_img}') no-repeat top left;"}
+#notification{:style => 'position:absolute; background: url("'"#{URL}"'/images/notification_bar.png") no-repeat top left;width:640px;height:20px;color:#747474;cursor:pointer;display:none;font-size:13px;line-height:1.2em;padding:2px;margin-top:3px', :onclick => '$(this).hide()'}

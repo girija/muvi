@@ -1,0 +1,17 @@
+<div class="media-body movie_block movie_block_<%= @movie.id%>_<%= params[:list_id]%>" id="movie_block_<%= @movie.id%>_<%= params[:list_id]%>" style="background-color:#fff;border-top:0px;">
+  <div onclick="remove_movie_fromlist('<%= @movie.id%>','<%= params[:list_id]%>')" class="close_btn_movie_list" style="display: none;">
+    <i class="icon-remove"></i>
+  </div>
+  <div class="media" style="margin-top:10px;">
+    <div style="width:70px" class="pull-left">
+      <a href="/movies/<%= @movie.permalink %>"><img src="<%= POSTER_URL %><%= @movie.banner_image_medium%>" alt="No-image" class="movie_list_poster"></a>
+    </div>
+    <div class="media-body">
+      <a href="/movies/<%= @movie.permalink%>" class="movie_block_title"><%= @movie.name %></a>
+      <div class="movie_block_cast">
+        <%= @movie.get_first_two_actors %>&nbsp;
+      </div>
+      <div style="padding-top:10px;" class="clear"top></div>
+    </div>
+  </div>
+</div>

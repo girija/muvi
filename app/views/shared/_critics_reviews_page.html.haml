@@ -1,0 +1,55 @@
+:javascript
+  $(document).ready(function($) {
+    $('#mas_container').masonry({
+      itemSelector : '.mas_item'
+    });
+  });
+- @critics_reviews.in_groups_of(2) do |group|
+  - group.each do |critics_review|
+    - unless critics_review.blank?
+      %div{ :style => "margin:0 0 8px 8px; width:265px", :class => "left mas_item"}
+        %div.reviewBox.left
+          %div.image.left
+            /= image_tag((critics_review.film_critic.profile_image rescue '/images/no-profile.png'))
+            -fc = critics_review.film_critic
+            -unless fc.blank?
+              -unless fc.profile_image.blank?
+                -unless fc.thumbnail_image_file_name.blank?
+                  =image_tag("/system/thumbnail_images/#{fc.id}/thumb/#{fc.thumbnail_image_file_name.gsub(" ", "%20")}")
+                -else
+                  %img{:src => "#{POSTER_URL}/images/no-profile.png"}                                                                             
+              -else
+                %img{:src => "#{POSTER_URL}/images/no-profile.png"}
+
+          %div.reviewIcon.right
+            = image_tag((critics_review.critic_image))
+          %div.names{:style => "min-height:56px"}
+            %p
+              = truncate(critics_review.summary, :length => 100)
+            .clear
+          .clear
+          %div{:class => "bottom_tab_texts",:style=>"height:28px;"}
+            = critics_review.film_critic.name rescue ''
+            ,
+            = critics_review.film_critic.organization rescue ''
+          %div{:class => "bottom_tab_links"}
+            = link_to "full review >>", critics_review.link, :target => '_blank', :style => "float:right;font-size:10px;top:5px;font-weight:normal"
+          .clear
+            %div{:style=>"width:250px",:id => "like_com_info_#{critics_review.id}"}
+              = render '/shared/review_links', {:review => critics_review}
+            .clear
+            %div{:id => "info_item_likes_#{critics_review.id}", :class=>"discussion_child", :style=>"display:none;margin-left:5px;"}
+              %div{:id=>"list_like_#{critics_review.id}"}
+                = render '/shared/like_dislike', {:review => critics_review,:type=>"all"}
+            .clear
+            %div{:id=>"review_reply_#{critics_review.id}",:style=>"display:none;"}
+              = render '/shared/review_replies', {:review => critics_review}
+            %div
+              = form_for([critics_review,Comment.new], :remote => true, :html => {:id => "comment_form_#{critics_review.id}"})  do |f|
+                %div{:style => "float:left;margin-left:5px"}
+                - user_id = current_user ? current_user.id : ""
+                %input{:type => "hidden", :id => "user_id",:name=>"user_id", :value => user_id}
+                %textarea{:id => "comment_#{critics_review.id}",:name => "movie_review_comment_#{critics_review.id}", :rows => 1, :cols => 28, :class => "commentBox", :onkeypress => "check_event_submit_comment(event, '#{critics_review.id}','#{user_id}');", :placeholder => "Write a comment"}
+                %input{:type => "hidden", :id => "movie_id",:name=>"movie_id", :value => @movie.permalink}
+                %input{:type => "hidden", :id => "parent_id_#{critics_review.id}",:name=>"movie_review_comment", :value => critics_review.id}
+                = f.hidden_field "parent_id"

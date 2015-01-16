@@ -1,0 +1,45 @@
+%script{:src => "http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js", :type => "text/javascript"}
+%script{:src => "/javascripts/ajax_page.js", :type => "text/javascript"}
+%link{:href => "/stylesheets/edit_page.css", :media => "screen", :rel => "stylesheet", :type => "text/css"}
+
+:javascript
+  var cast_clicked = 0;
+  $(document).ready(function($) {
+    $('#release_date').datepicker({ dateFormat: 'yy-mm-dd' });
+  });
+
+.row-fluid
+  .span12{:style => "background-color:#FFFFFF"}
+    .span3
+      =render :partial => "/home/left_sidebar"
+
+    .span9{:style => "border-left: 4px solid #DFDFDF; margin-left: -2px;"}
+      /, :'data-pjax-container' => true}
+      %div{:class=>"main_content"}
+        .left{:id => "add_new_movie"}
+          -unless current_user.blank?
+            -if current_user.is_studio_admin == true or current_user.is_admin == true
+              =render :partial => "/shared/add_new_movie"
+            -else
+              :javascript
+                window.location.href = "/";
+          -else
+            :javascript
+              window.location.href = "/";
+
+:javascript
+  var int = self.setInterval("celeb_dropdown()", 1000);
+
+  function celeb_dropdown(){
+    $(".moviecastName").autocomplete({
+        source: '/celebAutocomplete',
+        select: function( event, ui ) {
+          $(this).val(ui.item.label);
+          $(this).prev().prev().val( ui.item.value );
+          $(".ui-helper-hidden-accessible").hide();
+          return false;
+        }
+    });
+    window.clearInterval(int)
+  }
+

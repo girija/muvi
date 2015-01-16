@@ -1,0 +1,76 @@
+<script type="text/javascript" src="http://www.muvi.com/javascripts/jquery.min.js"></script>
+<script type="text/javascript" src="http://www.muvi.com/javascripts/jquery-ui-1.9.2.custom.min.js"></script>
+
+<script type="text/javascript" src="javascripts/token.js"></script>
+
+<link rel="stylesheet" href="stylesheets/token-input.css" type="text/css" />
+<link rel="stylesheet" href="stylesheets/token-input-facebook.css" type="text/css" />
+
+
+	<!--div>
+        <input type="text" id="demo-input-facebook-theme" name="blah2" />
+        <input type="button" value="Submit" />
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $("#demo-input-facebook-theme").tokenInput("http://shell.loopj.com/tokeninput/tvshows.php", {
+                //theme: "facebook"
+            });
+        });
+        </script>
+    </div-->
+	
+	
+<input type="text" style="height:50px; width:400px">
+<div style="clear:both"></div>
+	
+<input type="text" id="name"/> 
+<br>
+<input type="hidden" id="fbuid" style="width:500px"/>
+<input type="hidden" id="hidden_name" style="width:500px" />
+
+
+
+
+	
+	
+<div id="fb-root"></div>
+
+<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script> 
+
+<script>
+	$(function() {
+
+		// Depends on: jQuery, jQuery UI core & widgets (for the autocomplete method)
+		// Assumes you're already including the FB JS SDK asynchronously...
+
+		//window.fbAsyncInit = function() {
+
+			FB.init({
+				appId      	: '262382387119245', // App ID
+				status     	: true, // check login status
+				cookie     	: true, // enable cookies to allow the server to access the session
+				oauth		: true,
+				xfbml		: true
+			});	
+
+			FB.getLoginStatus(function (response) {				
+				if (response.authResponse) {	// if the user is authorized...
+					var accessToken = response.authResponse.accessToken
+					
+					var tokenUrl = "https://graph.facebook.com/me/friends?access_token=" + accessToken;
+alert(tokenUrl);
+					$("#name").tokenInput(tokenUrl, {
+						theme: "facebook"
+					});					
+					
+				}
+			});
+		//};
+		
+	});
+</script>
+
+
+
+	
+	

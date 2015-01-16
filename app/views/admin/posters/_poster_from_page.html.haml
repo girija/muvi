@@ -1,0 +1,38 @@
+= form_for :poster, :url => "/save_poster_from_page", :html => { :multipart => true, :onsubmit => "return put_poster_id();" } do |f|
+
+  .form{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:10px 2px; font-size:12px"}
+    %input{:id=>"movie_id", :type => "hidden", :name => "movie_id", :value => "#{params[:movie_id]}"}
+
+    %input{:id=>"p_id", :type => "hidden", :name => "poster_id", :value => "#{params[:poster_id]}"}
+    %input{:id=>"new_poster", :type => "hidden", :name => "new_poster", :value => "#{params[:new_poster]}"}
+
+    %input{:type => "hidden", :value => "#{request.env["HTTP_REFERER"]}", :name => "referer_url"}
+    -if params[:new_poster].to_i == 1
+      .left
+        = f.label :Title, "Title", :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+        = f.text_field :name ,:class => 'large'
+
+    .clear
+    =f.label "poster", "Poster", :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+    = f.file_field :poster
+    .clear
+    =f.label "poster_remote_url", "Poster Remote URL", :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+    = f.text_field :poster_remote_url,:class => 'large'
+
+    -if params[:new_poster].to_i == 1
+      .clear
+      = f.label :movie_tag, 'Movie Tag', :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+      %input{:type => "text", :name => "movie_tag", :class => "movieAutocompleteMulti", :value => "#{params[:movie_name]}"}
+
+      .clear
+      = f.label :other_tag, 'Context Tag', :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+      %input{:type => "text", :name => "other_tag", :class => "poster", :value => "Poster"}
+
+      .clear
+      = f.label :rank, "Rank", :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+      = select_tag 'poster[rank]', options_for_select([['0','0'],['1', '1'], ['2','2'],['3', '3'],['4', '4'],['5', '5'],['6', '6'],['7', '7'],['8', '8'],['9', '9'],['10', '10']], 1)
+
+
+    .clear
+    = f.submit "Save Poster", :class => "btn btn-primary bold_class", :style => "margin-left:110px"
+

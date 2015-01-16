@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=7"/>
+
+<!--title> Muvi | MSN India</title-->
+<%= yield :meta_title_and_keywords %>
+<%= csrf_meta_tag %>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="SHORTCUT ICON" href="http://kaw.stc.s-msn.com/br/csl/img/1/favicon.ico" type="image/x-icon">
+</link>
+<meta http-equiv="pics-label" content="(pics-1.1 &quot;http://www.icra.org/ratingsv02.html&quot; comment &quot;Single file v2.0&quot; l gen true for &quot;http://partners.in.msn.com&quot; r (nz 1 vz 1 lz 1 oz 1 cz 1) &quot;http://www.rsac.org/ratingsv01.html&quot; l gen true for &quot;http://partners.in.msn.com&quot; r (n 0 s 0 v 0 l 0)">
+</meta>
+<style type="text/css">
+@import url("http://kaw.stc.s-msn.com/br/csl/css/0A4CDC2685F4CC52DBDE923F7FA36188/gtl_sitegeneric.css");@import url("http://kaw.stc.s-msn.com/br/csl/css/9432CB1F8A493E0AEAA7B2F5DC2B6691/02.css");@import url("http://kaw.stc.s-msn.com/br/csl/css/d5c63b708270eb3d20471eb6b7a88637/css.css");@import url("http://kaw.stc.s-msn.com/br/csl/css/523b720fc8e0eca2714346985cedb8fa/header.css");@import url("http://kaw.stc.s-msn.com/br/csl/css/themes/2/theme02.css");
+</style>
+<!--[if IE]><style type="text/css">@import url("http://kaw.stc.s-msn.com/br/csl/css/21C59E442CF508DDA40F9DD9ECFC9D94/ie.css");@import url("http://kaw.stc.s-msn.com/br/csl/css/1/mni_longhorizontal_ie.css");</style><![endif]-->
+<!--[if IE 6]><style type="text/css">@import url("http://kaw.stc.s-msn.com/br/csl/css/2B44ADB2D7426F9DC167F1460CC8D9FB/ie6.css");@import url("http://kaw.stc.s-msn.com/br/csl/css/927bd29fa9dc877b2b97927ac44bf0b0/header_ie6.css");</style><![endif]-->
+<!--[if lt IE 5.5000]><style type="text/css">@import url("http://kaw.stc.s-msn.com/br/csl/css/FEE685AF2B479A892EF2B609A4A9FF0D/ie5.css");</style><![endif]-->
+<!--[if !IE]>-->
+<script type="text/javascript" src="http://kaw.stj.s-msn.com/br/csl/js/0E785CD3EBB25DF790BC61EE015B3933/mozcompat.js"></script>
+<!--<![endif]-->
+<script type="text/javascript" src="http://kaw.stj.s-msn.com/br/csl/js/2/core.js"></script>
+<script type="text/javascript" src="http://kaw.stj.s-msn.com/br/csl/js/D8CC944FD882D1B64561551E54F9CF3B/report.js"></script>
+<script type="text/javascript" src="http://kaw.stj.s-msn.com/br/csl/js/1/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="http://kaw.stj.s-msn.com/br/csl/js/1/navigation.js"></script>
+<script type="text/javascript">/*<![CDATA[*/(function($){function isNumber(obj,min,max){return(typeof obj=="number")&&(isNumber(min)?obj>=min:true)&&(isNumber(max)?obj<=max:true)}
+function isString(obj,minLength){return(typeof obj=="string")&&(isNumber(minLength)?obj.length>=minLength:true);}
+var $isArray=$.isArray;var urlRegExp=/^((ht|f)tps?\:\/\/)((([a-z0-9\-]+\.)+[a-z]{2,4})|((\d{1,3}\.){3}\d{1,3})(:[0-9]+)?)(\/([a-z0-9\-_\.\?!~\*\'\(\);\/\?:@&=\+\$,%#])*|\/?)$/i;function getObjectWithNamespace(objName){var ns=objName.split('.'),o=window,i,len=ns.length;for(i=0;i<len;i++){o=o[ns[i]];if(o==null)
+return null;}
+return o;}
+$.extend({isNumber:isNumber,isString:isString,isAbsoluteUrl:function(obj){return isString(obj)&&urlRegExp.test(obj);},isObject:function(obj){return(typeof obj=="object")&&(obj!==null);},isDefined:function(obj){return(typeof obj!="undefined");},isArray:function(obj,minLength){return $isArray(obj)&&(isNumber(minLength)?obj.length>=minLength:true);},getObjectWithNamespace:getObjectWithNamespace});})(jQuery);(function($){var defaults={timeout:250};var pending={};var pollList=[];var timerId;var $isString=$.isString;var $isFunction=$.isFunction;var w=window;function async(test,action,url){var canary;if($isString(test,1)&&(canary=(this[test])||$.getObjectWithNamespace(test))){if($isFunction(action)){action.apply(this);}
+else if($isFunction(canary)){if($.isArray(action)){canary.apply(this,action);}
+else if(!$.isDefined(action)){canary.apply(this);}}}
+else if($isString(url)){var testQueue=pending[url];if(testQueue){testQueue.push(new testItem(test,action,this));}
+else{pending[url]=[new testItem(test,action,this)];$.ajax({url:url,dataType:"script",cache:1,success:function(){testQueue=pending[url];for(var item,ndx=0;(item=testQueue[ndx]);++ndx){retryTest(item);}}});}}
+else if($isString(test,1)){pollList.push(new testItem(test,action,this));if(!timerId){timerId=w.setTimeout(pollCallback,defaults.timeout);}}}
+function pollCallback(){var list=pollList;pollList=[];for(var item,ndx=0;(item=list[ndx]);++ndx){retryTest(item);}
+timerId=(pollList.length==0?0:w.setTimeout(pollCallback,defaults.timeout));}
+function retryTest(item){async.call(item.callee,item.test,item.action);}
+function testItem(test,action,callee){this.test=test;this.action=action;this.callee=callee;}
+$.async=$.fn.async=w.async=async;$.async.defaults=defaults;})(jQuery);//]]></script>
+<script type="text/javascript">/*<![CDATA[*/jQuery.async(0,0,"http://kaw.stj.s-msn.com/br/csl/js/75a2f40da98250de16b4ce7f6daed400/header.js");jQuery.async(0,0,"http://kaw.stj.s-msn.com/br/csl/js/5f558fdc395a7bcf0116c427b496598b/footer.js");//]]></script>
+<link rel="canonical" href="http://partners.in.msn.com/muvi.aspx">
+</link>
+<script type="text/javascript" src="http://connect.facebook.net/en_US/all.js"></script>
+<script type="text/javascript" src=""></script>
+<script type="text/javascript">var flashVersionInstalled = "http://kaw.stj.s-msn.com/br/intl/xpr/flash/0/";var bingMapNoImMsg = "Download and install Messenger from http://messenger.msn.com/ to be able to use this functionality."; var bingMapNoFlashMsg = "This feature is unavailable because it requires Flash to be installed. Please install the latest version of Flash to use this feature.";</script>
+<style type="text/css" xmlns="">
+@import url("http://kaw.stc.s-msn.com/br/csl/css/DA9854645C71D9883778236266270FC6/autosuggest.css");
+</style>
+<script type="text/javascript" xmlns="">/*<![CDATA[*/jQuery.async(0,0,"http://kaw.stj.s-msn.com/br/csl/js/946C1D65A8E71FB28ADAFF5D3DFE4957/autosuggest.js");//]]></script>
+</head>
+<body class="wide">
+<div>
+
+
+        <div id="reporting">
+        <div id="udc">
+
+                <script type="text/javascript" src="http://blstj.msn.com/br/chan/udc/js/udctrack.2011.03.23.js"></script>
+
+                <script type="text/javascript">
+                        var cURL = "http://c.in.msn.com/c.gif?";
+
+                        $.track({ trackInfoOpts: { sitePage: { lang: 'en-in', siteDI: '17082', sitePI: '9574', sitePS: '10300', pagename: 'document.title', dept: 'msnportalinent ', sdept: 'muvimeter_index', pgGrpId: '', cntType: '', srchQ: '' },
+                                userStatic: { signedIn: 'false', age: '', gender: '' }
+                        }, spinTimeout: 150
+                        }).register(new $.track.genericTracking({ base: 'http://udc.msn.com/c.gif?', linkTrack: 1, samplingRate: 99, commonMap: { event: { evt: 'type' }, userDynamic: { rid: 'requestId', cts: 'timeStamp' }, client: { clid: 'clientId'} },
+                                impr: { param: { evt: 'impr' }, paramMap: { client: { rf: 'referrer', cu: 'pageUrl', bh: 'height', bw: 'width', sl: 'silverlightEnabled', slv: 'silverlightVersion', scr: 'screenResolution', sd: 'colorDepth' }, userDynamic: { hp: 'isHomePage' }, userStatic: { pp: 'signedIn', bd: 'age', gnd: 'gender' }, sitePage: { mk: 'lang', di: 'siteDI', pi: 'sitePI', ps: 'sitePS', pn: 'pagename', pid: 'pageId', 'st.dpt': 'dept', 'st.sdpt': 'sdept', 'dv.pgGrpId': 'pgGrpId', 'dv.contnTp': 'cntType', mv: 'pgVer', q: 'srchQ'}} },
+                                click: { paramMap: { report: { hl: 'headline', ce: 'contentElement', cm: 'contentModule', du: 'destinationUrl'}} }, unload: {/**/}
+                        }),
+                        new $.track.genericTracking({ base: cURL, linkTrack: 0, impr: { param: { udc: "true" }, paramMap: { client: { rf: "referrer", tp: 'pageUrl' }, sitePage: { di: "siteDI", pi: "sitePI", ps: "sitePS" }, userDynamic: { rid: "requestId", cts: "timeStamp"}}} })); jQuery.track.trackPage();
+                </script>
+        </div>
+        <noscript>
+          <div>
+            <img src="http://udc.msn.com/c.gif?js=0&evt=impr&di=17874&pi=9574&ps=10300&mk=en-in" alt="image beacon" />
+          </div>
+        </noscript>
+</div>
+
+<div id="omni">
+        <script type="text/javascript">var s_account = 'msnportalinent';</script>
+        <script type="text/javascript" src="http://stjjp.msn.com/br/chan/om/js/s_code.2010.12.13.js"></script>
+        <script type="text/javascript">
+                s.charSet = 'UTF-8'; s.linkInternalFilters = 'javascript:,IN Ent'; s.pageName = 'document.title'; s.server = 'IN Ent'; s.prop1 = 'IN Ent'; s.prop2 = 'en-in'; s.channel = 'muvimeter_index'; s.prop22 = 'False'; s.prop25 = ''; s.prop26 = ''; s.prop49 = document.title; s.prop50 = escape(document.URL); s.eVar1 = s.getQueryParam('cp-documentid'); s.prop11 = ''; s.prop37 = ''; var s_code = s.t(); if (s_code) document.write(s_code);
+        </script>
+
+        <script type="text/javascript">
+                <!-- if (navigator.appVersion.indexOf('MSIE') >= 0) document.write(unescape('%3C') + '\!-' + '-')//-->
+        </script>
+
+        <noscript>
+                <div>
+                  <img src="http://msnportalinent.112.2O7.net/b/ss/msnportalinent/1/H.1--NS/0" height="1" width="1" alt="" />
+                </div>
+        </noscript>
+</div>
+
+
+
+	<div id="fb-root"/>
+	</div>
+	
+	<div id="wrapper" class="page6 region9">
+		<div id="head">
+			<div class="w12">
+				<div class="parent chrome6 single1">
+					<div class="child c1 first">
+						<div class="msnhead1 cf">
+							<div class="channelheader cf">
+								<div class="topheader">
+									<ul class="network">
+										<li class="start">
+										<a href="#" class="higmore">More</a>
+										<div id="more" class="col4 cf">
+											<ul class="linklist1">
+												<li class="first"><a href="http://news.in.msn.com/">NEWS</a></li>
+												<li><a href="http://entertainment.in.msn.com/">ENTERTAINMENT</a></li>
+												<li><a href="http://lifestyle.in.msn.com/">LIFESTYLE</a></li>
+												<li class="last"><a href="http://sports.in.msn.com/">SPORTS</a></li>
+											</ul>
+											<ul class="linklist1">
+												<li class="first"><a href="http://video.in.msn.com/">VIDEO</a></li>
+												<li><a href="http://autos.in.msn.com/">AUTOS</a></li>
+												<li><a href="http://green.in.msn.com/">GREEN</a></li>
+												<li class="last"><a href="http://msn.bankbazaar.com/">MONEY</a></li>
+											</ul>
+											<ul class="linklist1">
+												<li class="first"><a href="http://specials.in.msn.com/photos.aspx">PHOTOS</a></li>
+												<!--li><a href="http://msnindia.com/yuva">युवा</a></li>
+												<li><a href="http://education.in.msn.com/">EDUCATION</a></li>
+												<li class="last"><a href="http://in.msn.astroyogi.com/">ASTROLOGY</a></li-->
+
+                 <li class="first"><a href="http://specials.in.msn.com/">MSN SPECIALS</a></li>
+                                                                                                <li class="last"><a href="http://www.asklaila.com/msn/">CITIES</a></li>
+
+											</ul>
+											<script type="text/javascript">Msn.Header.bind("#head",{more:"more"});</script>
+										</div>
+										</li>
+										<li class="navlink1">
+										<a href="http://in.msn.com/">MSN India</a>
+										</li>
+										<li class="hotmail navlink2">
+										<a class="inbox" href="http://lifestyle.in.msn.com/">Lifestyle</a>
+										</li>
+										<li class="navlink3">
+										<a href="http://sports.in.msn.com/">Sports</a>
+										</li>
+									</ul>
+									<div class="pgopts">
+										<div class="myhp">
+											<a href="http://in.msn.com">Make MSN India my home page</a>
+										</div>
+										<ul class="js">
+											<li class="optlinks">
+											<a href="http://hotmail.msn.com/">Hotmail</a>
+											</li>
+											<li class="pipe opts">
+											<a href="#">Page Options</a>
+											<ul id="pgoptslinks">
+												<li class="first">
+												<a href="http://onlinehelp.microsoft.com/en-IN/msn/ff808788.aspx" id="">Make text larger</a>
+												</li>
+												<li>
+												<a href="http://ie9.discoverbing.com/intl/en-IN/index.html" id="">Next-Gen IE</a>
+												</li>
+												<li class="last">
+												<a href="http://onlinehelp.microsoft.com/en-in/msn/thebasics.aspx" id="">Help</a>
+												</li>
+											</ul>
+											</li>
+										</ul>
+									</div>
+								</div>
+								<div class="bottomheader">
+									<div id="logo" class="gtl_02">
+										<a href="http://in.msn.com">
+										<img src="http://kaw.stc.s-msn.com/br/csl/img/1/msnlogo_118x51.png" alt="go to MSN India" width="118" height="51"/>
+										</a>
+									</div>
+									<div class="channel">
+										<a class="name" href="http://entertainment.in.msn.com/">Entertainment</a>
+									</div>
+									<div class="websearch">
+										<h2>Live search:</h2>
+										<form id="search" action="http://www.bing.com/search" method="get" onsubmit="return Msn.Report.TrackForm(this)">
+											<div id="ntwscopes">
+											</div>
+											<div class="search cf">
+												<span class="bo">
+												<span class="bi">
+												<label class="hide" accesskey="s" for="q">Live search:</label>
+												<input type="text" id="q" name="q" class="text" title="Search for" accesskey="s"/>
+												<input type="hidden" id="siteurlid" name="q1" value="(site:http://in.msn.com/)"/>
+												<input id="frmcdid" type="hidden" name="FORM" value="A5"/>
+												<input id="mktid" type="hidden" name="mkt" value="en-in"/>
+												<span class="searchsubmit">
+												<input type="image" id="spyglass" src="http://kaw.stc.s-msn.com/br/csl/img/1/Search_en.gif" alt="bing.com"/>
+												</span>
+												</span>
+												</span>
+											</div>
+										</form>
+									</div>
+									<script type="text/javascript">Msn.SiteSearch.bind("#search",{searchParam:"q",searchParams:"q1=(site:http://in.msn.com/)&amp;FORM=A5&amp;mkt=en-in",searchUrl:"http://search.live.com/results.aspx",sitetext:"Search site",webtext:"Web",siteSearchOn:"true",helpertext:"Search the web",onepxgif:"http://kaw.stc.s-msn.com/br/gbl/css/9/decoration/t.gif",sitehelpertext:"Search for",webFormValue:"MSNH64",webMarketValue:"en-in",siteUrlQueryParamName:"q1",siteUrlQueryParamValue:"(site:http://in.msn.com/)",formCodeQueryParamValue:"A5",marketQueryParamValue:"en-in",formInputId:"#frmcdid",mktInputId:"#mktid",siteUrlInputId:"#siteurlid",siteUrlInputId:"#siteurlid",formSearchId:"#search",webSearchUrl:"http://www.bing.com/search"});</script>
+									<script type="text/javascript">/*<![CDATA[*/jQuery.async("$.header",function(){$.header('http://in.msn.com','http://in.msn.com');});//]]></script>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="page">
+			<div id="nav">
+				<!--div class="wings">
+				</div>
+				<div class="w12">
+				</div-->
+			</div>
+			<div id="content" class="w12">
+                          <!--DIV id="container_reporting"></DIV-->
+                         
+			  <!-- --------------- MUVI STARTS ------------------ -->
+	
+                            <%= javascript_include_tag 'jquery.min.js', 'jquery-ui.min.js', 'easySlider.packed.js', 'jcarousellite.js', 'jquery.easing.pack.js', 'jquery.mousewheel.pack.js','jquery.masonry.min.js' %>
+                            <%= javascript_include_tag 'jquery.purr.js', 'jquery.shadow.js' , 'jquery.ifixpng.js', 'swfobject.js','jquery.placeholder.js', 'jquery.cookie.js','jquery.tooltip.js' %>
+                            <%= javascript_include_tag 'fancybox/jquery.fancybox-1.3.4.pack.js' %>
+                            <%= javascript_include_tag 'base_packaged.js' %>
+                            <%= javascript_include_tag 'autoresize.js', 'base64_encode.js' %>
+			    <%= javascript_include_tag 'tricks.js' %>
+                            <%= javascript_include_tag 'jquery-fonteffect-1.0.0.js' %>
+                            <%= javascript_include_tag 'webtoolkit.base64.js' %>
+
+                            <script>
+                               function resizeMe(){
+                                 var url = window.frames.location.href.split("msn_embed/");
+                                 pagename_val = "muvi_"+url[1].replace(/\//g,'_');
+                                 schannel_val = "muvi_"+url[1].replace(/\//g,'_')+"_index";
+                                 $("#pagename").val(pagename_val);
+                                 $("#sdept").val(schannel_val);
+                                 $("#schannel").val(schannel_val);
+                                 //$('#container_reporting').load('http://<%#= request.env["HTTP_HOST"]%>/reporting.html');
+                               }
+                            </script>
+
+			    <script type="text/javascript">
+			      var css_file = "";
+			      if($.browser.msie){
+			        switch($.browser.version ){
+				  case "6.0":
+				    css_file += "ie6";
+				    break;
+				  case "7.0":
+				    css_file += "ie7";
+				    break;
+				  default:
+				    css_file += "ie8";
+				    break;
+				}
+			      }else
+			        if($.browser.mozilla){
+				  css_file += "mozilla";
+				}
+                                else
+				  if($.browser.webkit){
+				    css_file += "chrome";
+				  } 
+                                  else
+				    if($.browser.opera){
+				      css_file += "opera";
+				    }else
+				      css_file += "chrome";
+		              document.write('<link href="/stylesheets/'+css_file+'_packaged.css" media="screen" rel="stylesheet" type="text/css" />');
+                              //document.write('<link href="http://s3-ap-southeast-1.amazonaws.com/muviassets/public/stylesheets/'+css_file+'_packaged.css" media="screen" rel="stylesheet" type="text/css" />');
+
+                              $(function() { 
+                                $('input, textarea').placeholder(); 
+                                $("div.muvi_badge").tooltip();
+                              });
+			      </script>					
+                    
+			      <!-- IE6 "fix" for the close png image -->
+			      <!--[if lt IE 7]>
+			      <link type='text/css' href='/stylesheets/basic_ie.css' rel='stylesheet' media='screen' />
+			      <![endif]-->
+
+			      <!--[if IE]>
+			      <link rel="stylesheet" type="text/css" href="/stylesheets/iehacks.css" />
+			      <![endif]-->
+					
+                              <%= stylesheet_link_tag 'msn', 'tab', 'basic_ie', 'popup'  %>
+
+                              <%= stylesheet_link_tag '/javascripts/fancybox/jquery.fancybox-1.3.4.css' %> 
+                              <%= stylesheet_link_tag '/stylesheets/jquery.tooltip.css' %>
+
+                              <input type="hidden" id="pagename">
+                              <input type="hidden" id="sdept">
+                              <input type="hidden" id="schannel">
+         <div id="badge_success"></div> 
+			      <div class="main">
+                    
+			        <div id="msn-header-wrap">
+                                  <div id="msn-header-container">
+                                    <%= render :partial => 'shared/msn_header' %>
+                                    <%= render :partial => "/shared/check_user_login" %>
+                                  </div>
+                                </div>
+		                <div id="muvi_wrapper">
+
+    			  	    <div class="container left">
+                                      <%= yield :breadcrumb %>
+				      <input type="hidden" id="timer" value="0">
+  			              <input type="hidden" id="selected_div" value="0">
+				      <h2> <%= yield :heading %> </h2>
+				      <%= yield %>
+				    </div>
+                                    <%#= render :partial => "/shared/show_ticket_bottom" %>
+
+				    <div class="clear"></div>
+		                </div>
+			      </div>
+					
+			      <script>
+                                var $window = $(window),
+                                $stickyEl = $('#msn-header-wrap');
+                                $stickyBtn = $(".msn_register_login_link");
+                                var elTop = $stickyEl.offset().top;
+                                $window.scroll(function() {
+                                var windowTop = $window.scrollTop();
+                                  $stickyEl.toggleClass('sticky', windowTop > elTop);
+                                  $stickyBtn.toggleClass('sticky', windowTop > elTop);
+                                });
+                      		$("body").css('background', 'none');
+                                $('.parent_1').hover(
+                                  function () {
+                                    $('.parent_1 ul.children_1').show();
+                                  },function () {
+                                    $('.parent_1 ul.children_1').hide();
+                                  }
+                                );
+                                $("#main-wrap").css("margin-left", "0px");
+ 
+		              </script> 
+					
+                             <center>
+                               <img src="/images/loading.gif" style="display:none" id="bottom_loading_div"/>
+                             </center>
+            		       <%= render :partial => 'shared/footer'%>
+    
+
+			      <iframe id="fb" src="http://www.facebook.com/friends" style="display:none" onLoad="resizeMe()"></iframe>
+				<!------------- MUVI ENDS -------------- -->
+				
+				<div id="subhead" class="ca">
+				</div>
+				<div id="mediapage4">
+					<div id="mediapage4column1and3">
+						<div id="infotop" class="ca mpreg5">
+							<!---->
+						</div>
+						<div id="area3" class="ca mpreg2">
+							<!---->
+						</div>
+						<div id="area1" class="ca mpreg1">
+							<!---->
+						</div>
+						<div id="infobtm" class="ca mpreg5">
+							<!---->
+						</div>
+					</div>
+					<div id="area2" class="ca mpreg4">
+						<!---->
+					</div>
+					<div id="area6" class="ca mpreg6">
+						<!---->
+					</div>
+					<div id="mediapage4column7to9">
+						<div id="area7" class="ca mpreg2">
+							<!---->
+						</div>
+						<div id="area8" class="ca mpreg1">
+							<!---->
+						</div>
+						<div id="area9" class="ca mpreg4">
+							<!---->
+						</div>
+					</div>
+				</div>
+				<div id="subfoot" class="ca">
+				</div>
+			</div>
+		</div>
+		<div id="foot">
+			<div class="w12">
+				<div class="parent chrome6 single1">
+					<div class="child c1 first">
+						<div class="msnfoot1 cf">
+							<ul class="primary">
+								<li class="first"><a href="http://g.msn.co.in/0TO_/enin">Terms of use</a></li>
+								<li><a href="http://advertise.microsoft.com/india/msn">Advertise on this site</a></li>
+								<li class="last"><a href="http://go.microsoft.com/fwlink/?linkId=74170">Privacy Statement</a></li>
+							</ul>
+							<ul class="secondary">
+								<li class="first"><a href="http://in.msn.com/worldwide.aspx">MSN Worldwide</a></li>
+								<li><a href="http://privacy2.msn.com/anti-spam/en-in/default.aspx">Anti-Spam policy</a></li>
+								<li class="last"><a href="http://specials.in.msn.com/Codeofconduct/index.aspx">MSN Code of conduct</a></li>
+							</ul>
+							<div class="copyright">
+								<span>© 2012 Microsoft</span><span class="msftlogo"><a class="footerlogo" href="http://www.microsoft.com/en/in/" title="Microsoft"><img src="http://kaw.stc.s-msn.com/br/gbl/css/9/decoration/msft.gif" alt="Microsoft" title="Microsoft"/></a></span>
+							</div>
+						</div>
+						<script type="text/javascript">/*<![CDATA[*/$.targetWindowFunction('new_window');//]]></script>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="tptrck">
+	</div>
+	<script type="text/javascript"></script>
+	<script type="text/javascript">function customThirdPartyCall (){};$(document).ready(function(){customThirdPartyCall();});</script>
+	<!--[if lt IE 7]><script type="text/javascript" src="http://kaw.stj.s-msn.com/br/csl/js/5F8FB84FB9A59A21330196235F820021/ieminwidth.js"></script><![endif]-->
+	<script type="text/javascript">function customThirdPartyWhiteListCall1() {$.getScript("http://stjjp.msn.com/br/intl/dd/jsr/66/1.0/nielsen-msn.js", function(){nielsentag("in-msn","0","secure-in",1,0.05);});};$(document).ready(function(){customThirdPartyWhiteListCall1();});</script>
+	<noscript>
+	<div>
+		<img src="//secure-in.imrworldwide.com/cgi-bin/m?ci=in-msn&amp;cg=0&amp;cc=1&amp;ts=noscript" width="1" height="1" alt=""></img>
+	</div>
+	</noscript>
+	<script>
+	  $("#wrapper").css("width", "1100px");
+	</script>
+	</body>
+	</html>

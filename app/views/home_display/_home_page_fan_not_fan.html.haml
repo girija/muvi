@@ -1,0 +1,35 @@
+-unless options["data"]["fan"].blank?
+  -unless current_user.blank?
+    -user_id = current_user.id
+  -else
+    -user_id = ""
+
+  // If want to see
+  -if options["data"]["fan"] == 1
+    -class_name1 = "fan_btn_active"
+    -class_name2 = "un_fan_btn"
+
+  -elsif options["data"]["fan"].to_i == 0 and options["data"]["unfan"] == 1
+    -class_name1 = "fan_btn"
+    -class_name2 = "un_fan_btn_active"
+  -else
+    -class_name1 = "fan_btn"
+    -class_name2 = "un_fan_btn"
+
+  %div{:id => "fan_div_#{options["id"]}", :class => "left button_container_div", :style => "width: 80px; height: 22px; /*background: url('/images/fan_unfan_bg.png') no-repeat scroll 0px 0px transparent;*/"}
+
+    .left{:id => "fan_span_#{options["id"]}",:class=>"tooltipbottom tip_hint btn_div_1"}
+      %button{:id => "fan_btn_#{options["id"]}", :style => "padding:0px;margin-left:1px", :class => "#{class_name1} left", :onclick => 'fan_unfan("'"#{options["id"]}"'", "'"#{user_id}"'", "fan", "fan_btn_'"#{options["id"]}"'", "un_fan_btn_'"#{options["id"]}"'", "fan_btn_active", "un_fan_btn", "You became a fan of '"#{options["name"]}"'")', :onmouseover => "change_border('#{options["type"]}', 'fan_span_#{options["id"]}', 'fan_btn_#{options["id"]}', 'fan_text_#{options["id"]}', 'fan_icon_o.png');", :onmouseout =>  "remove_border('#{class_name1}', 'fan_span_#{options["id"]}', 'fan_btn_#{options["id"]}', 'fan_text_#{options["id"]}', 'fan_icon_b.png');"}
+
+        %div{:id => "fan_text_#{options["id"]}", :class => "fan_text"}
+          Fan
+      =generate_tooltip_block("fan","home_page")
+        
+    .right{:id => "unfan_span_#{options["id"]}", :class => "btn_div_2 tooltipbottom tip_hint"}
+      %button{:id => "un_fan_btn_#{options["id"]}",:style => "padding:0px", :class => "#{class_name2} left", :onclick => 'fan_unfan("'"#{options["id"]}"'", "'"#{user_id}"'", "unfan", "un_fan_btn_'"#{options["id"]}"'", "fan_btn_'"#{options["id"]}"'", "un_fan_btn_active", "fan_btn", "You are not a fan of '"#{options["name"]}"'")', :onmouseover => "change_border_1('#{options["type"]}', 'unfan_span_#{options["id"]}', 'un_fan_btn_#{options["id"]}', 'unfan', #{options["id"]});", :onmouseout =>  "remove_border_1('#{class_name2}', 'unfan_span_#{options["id"]}', 'un_fan_btn_#{options["id"]}', 'unfan', '#{options["id"]}');"}
+
+        %div{:id => "unfan_text_#{options["id"]}", :class => "unfan_text"}
+          No  
+      =generate_tooltip_block("unfan","home_page")
+
+

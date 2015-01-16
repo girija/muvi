@@ -1,0 +1,2 @@
+class AllNotificationsController < ApplicationController
+end

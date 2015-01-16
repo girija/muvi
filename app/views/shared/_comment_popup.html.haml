@@ -1,0 +1,29 @@
+-comments = item.comments
+-if comments.count > 0
+  %div{:style => "float:left;width:250px;max-height:300px;"}
+    %h2{:style=>"height:30px;color:#F87413; text-align:left;", :id=>"header_comments_#{item.id}"}
+      ="#{comments.count} Comments"
+    - comments.each do |comment|
+      - user = comment.user
+      %div
+        %div{:class => "image left tip_hint tooltipbottom",:style=>"height:42px;width:42px;"}
+          - ub = UserBadge.find_by_user_id(comment.user.id)
+          - if !ub.blank?
+            - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+            - if points >= 1 and points < 5
+              - level = "Level: Muvi Scraper"
+            - elsif points >= 5 and points < 10
+              - level = "Level: Muvi Junkie"
+            - elsif points >= 10
+              - level = "Level: Muvi Maniac"
+          =link_to image_tag(user.user_image, :style=>"width:40px;height:40px;border: 1px solid #EEEEEE;"), "/profile/#{user.id}/#{user.display_name}"
+          .tooltip_description{:style =>'display:none'}
+            %b
+              = comment.user.display_name
+            %br
+            = level
+        %div{:style => "float:left;margin-left:5px"}
+          = link_to user.display_name, "/profile/#{user.id}/#{user.display_name}"
+        .clear
+        %br
+

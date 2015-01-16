@@ -1,0 +1,187 @@
+#loginModal.modal.fade.hide{:style => 'width:365px;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    %h4#loginModalLabel
+      Login
+  .modal-body.login
+  .modal-footer
+
+#myTrailer.modal.fade.hide{:style => 'width:640px;height:435px;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    #myModalLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+      Trailer
+  .modal-body{:style => 'max-height:290px'}
+    %a{:href => "#" , :id => 'video_player', :style => 'display:block;height:300px;width:610px;'}
+  .modal-footer
+    %button.btn.btn-primary.bold_class{"data-dismiss" => "modal", "aria-hidden" => "true" }
+      Done
+
+%input{:type => "hidden", :id => "current_celeb_id", :value => "#{@celebrity.id}"}
+
+- if !current_user.blank?
+  %input{:type => 'hidden', :name=> 'logged_in_user_id' , :id => 'logged_in_user_id', :value => current_user.id}
+
+:javascript
+
+  $(document).ready(function($) {
+    if("#{params[:show]}" == "upcoming"){
+      showMe("upcoming");
+    }else if("#{params[:show]}" == "play"){
+      showMe("play");
+    }else{
+      showMe("all");
+    }	
+    //get_all_movie(#{@celebrity.id});
+  });
+
+  function showMe_1(type){
+    //$(document).ready(function($) {
+      var celeb_id = $("#current_celeb_id").val();
+      $("#lnk-all").removeClass("subtab_active");
+      $("#lnk-top").removeClass("subtab_active");
+      $("#lnk-upcoming").removeClass("subtab_active");
+      $("#lnk-"+type).addClass("subtab_active");
+      $('div').remove('.arrow_div');
+      $("#lnk-"+type).parent().append("<div class='arrow_div'></div>");
+      if(type == "all"){
+        $("#all-movie-block").show();
+        $("#top-movie-block").hide();
+        $("#upcoming-movie-block").hide();
+      }
+      else{
+        if($("#"+type+"-movie-block").html() == ""){
+          $("#all-movie-block").hide();
+          $("#top-movie-block").hide();
+          $("#upcoming-movie-block").hide();
+
+          $("#"+type+"-movie-block").show();
+          $("#"+type+"-movie-block").html("<img src='/images/loading.gif' style='padding:50px 350px;'>");
+
+          $.post("/get_"+type+"?celeb_id="+celeb_id, function(data){
+            $("#"+type+"-movie-block").html("");
+            $("#"+type+"-movie-block").html(data);
+
+            //$("#"+type+"-movie-block").show();
+          });
+        }else{
+          $("#all-movie-block").hide();
+          $("#top-movie-block").hide();
+          $("#upcoming-movie-block").hide();
+
+          $("#"+type+"-movie-block").show();
+        }
+      }
+    //});
+  }
+
+  function showMe_old(type){
+    $("#all-movie-block").hide();
+    $("#top-movie-block").hide();
+    $("#upcoming-movie-block").hide();
+    $("#"+type+"-movie-block").show();
+    $("#lnk-all").css("font-weight", "normal");
+    $("#lnk-top").css("font-weight", "normal");
+    $("#lnk-upcoming").css("font-weight", "normal");
+    $("#lnk-"+type).css("font-weight", "bold");
+  }
+  
+  function play_trailer(videourl,movie_name){
+    $("#myModalLabel").html(movie_name+" Trailer");
+    if (videourl == "") {
+      return false;
+    }
+    $('#video_player').remove();
+    var $video = $('<a />', {
+      href: videourl,
+      id: 'video_player',
+      style: 'display:block;height:290px;width:610px;'
+    });
+    $('#myTrailer .modal-body').append($video);
+    $('#myTrailer').modal("show");
+    flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+
+  }
+
+.container-fluid
+  .row-fluid
+    .span12.well-small
+      .row-fluid
+        .media{:style=>"margin-left: -14px; margin-top: -9px;"}
+          %a.pull-left{:href => "#"}
+            /= image_tag(@celebrity.image, :style => "height:130px;width:130px;", :class => 'media-object')
+            %div{:class=>"media-object",:style=>"height:130px;width:130px;border:1px solid #ececec;background:url(#{@celebrity.image});background-repeat:no-repeat;background-position:0px -10px;"}
+          .media-body
+            .media-heading{:class => 'page_heading',:style=>"float:left;"}
+              = @celebrity.name
+            .clear
+            %div{:style => 'font-size:15px;margin-top:5px;color:#a4a4a4;font-weight:bold;'}
+              %div{:style=>"float:left;"}
+                - if @celebrity.celebrity_type.kind_of?(Array) == true
+                  - profession_type=""
+                  - @celebrity.celebrity_type.each do |prof_type|
+                    - profession_type += prof_type.capitalize+", "
+                  - unless profession_type.blank?
+                    = profession_type.chop.chop
+                - else
+                  = @celebrity.celebrity_type
+                ,
+              - if !@celebrity.birthdate.blank?   
+                %div{:style=>"float:left;padding-left:50px;"}
+                  ="BirthDay: #{@celebrity.birthdate.strftime("%d %b %Y")}"
+            .clear
+            - if @celebrity.summary
+              %div{:style=>"margin-top:10px;color:#707070;font-size:13px;"}
+                = @celebrity.summary
+
+  - @all_movies = celeb_all_movies(@celebrity)
+  - @top_rated_movies = ApplicationHelper.celeb_top_rated_movies(@celebrity)
+  - @upcoming_movies = ApplicationHelper.celeb_upcoming_movies(@celebrity)
+  - @play_movies = ApplicationHelper.celeb_play_movies(@celebrity)
+
+  .row-fluid
+    .span12.well-small{:style=>"background-color:#f9f9f9;border:1px solid #E5E5E5;"}
+      .row-fluid{:style=>"height:100px;"}
+        .pull-left{:class => 'page_heading'}
+          Filmography
+        .pull-left{:style=>"padding-top:15px;margin-left:20px;"}
+          .pull-left
+            %span{:class=>"sub_tab", :id => 'lnk-all'}
+              = link_to "All (#{@all_movies.count})", "javascript:showMe('all')"
+            .arrow_div
+          /.pull-left
+          /  %span{:class=>"sub_tab", :id => 'lnk-top'}
+          /    = link_to "Top (#{@top_rated_movies.count})", "javascript:showMe('top')"
+          .pull-left
+            %span{:class=>"sub_tab", :id => 'lnk-upcoming'}
+              = link_to "Upcoming (#{@upcoming_movies.count})", "javascript:showMe('upcoming')"
+
+          .pull-left
+            %span{:class=>"sub_tab", :id => 'lnk-play'}
+              = link_to "Play (#{@play_movies.count})", "javascript:showMe('play')"
+        .clear
+        %div{:style=>"padding-top:20px;"}
+          .pull-left
+            -@tagged = @celebrity
+            - unless current_user.blank?
+              - if current_user.id.to_i !=  params[:user_id].to_i
+                - if @tagged && !@tagged.followed_by?(current_user)
+                  = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow-star btn-primary bold_class btn-medium tip_hint', "data-id" => @tagged.id, :id => "btn-follow-#{@tagged.id}", :style => 'border-radius:2px 2px 2px 2px',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','celeb_page')
+                - else
+                  = link_to "Following".html_safe, "#" , :class => 'btn btn-following-star btn-success bold_class  btn-medium tip_hint', "data-id" => @tagged.id, :id => "btn-follow-#{@tagged.id}", :style => 'border-radius:2px 2px 2px 2px;cursor:default;',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('following','celeb_page')
+            - else
+              = link_to "Follow".html_safe, "#loginModal" , :class => 'btn btn-follow-login btn-primary bold_class btn-medium tip_hint', :id => "btn-follow-#{@tagged.id}", :style => 'border-radius:2px 2px 2px 2px',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','celeb_page')
+          .pull-left
+            #followers-star.pull-left{:style => 'padding-left:15px;'}
+              = render "celebrities/followers", :@tagged => @celebrity
+
+        .clear{:style => 'height:10px'}
+        
+
+      #all-movie-block.container-fluid 
+      /#top-movie-block.container-fluid.hide
+      #upcoming-movie-block.container-fluid.hide
+      #play-movie-block.container-fluid.hide
+

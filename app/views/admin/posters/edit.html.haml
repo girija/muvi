@@ -1,0 +1,50 @@
+= form_for [:videos, @poster], :url => update_poster_admin_posters_path, :html => { :multipart => true } do |f|
+  -unless @poster.blank?
+    -if @poster.errors.any?
+      #error_explanation
+        %h2
+          = pluralize(@poster.errors.count, "error")
+          prohibited this page from being saved:
+        %ul
+          -@poster.errors.full_messages.each do |msg|
+            %li= msg
+
+
+  .form{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:10px 2px; font-size:12px"}
+    %input{:type => "hidden", :name => "poster_id", :value => "#{params[:id]}"}
+    .left
+      = f.label :Title, "Title"
+      = f.text_field :name ,:class => 'large'
+    .clear
+    = f.label :poster, "Poster"
+    = f.file_field :poster
+    &nbsp; &nbsp;
+    =image_tag f.object.poster.url(:thumb)
+    .clear
+    =f.label "poster_remote_url", "Poster Remote URL"
+    = f.text_field :poster_remote_url,:class => 'large',:value=>""
+    .clear
+    = f.label :movie_tag, 'Movie Tag'
+    %input{:type => "text", :name => "movie_tag", :value => "#{@poster.tags.find(:all, :conditions => ["taggings.tagger_type='Movie'"]).collect {|t| t.name }.join(", ")}", :class => "movieAutocompleteMulti"}
+    .clear
+    = f.label :celebrity_tag, 'Celebrity Tag'
+    %input{:type => "text", :name => "celebrity_tag", :value => "#{@poster.tags.find(:all, :conditions => ["taggings.tagger_type='Celebrity'"]).collect {|t| t.name }.join(", ")}", :class => "starAutocompleteMulti"}
+    .clear
+    = f.label :other_tag, 'Context Tag'
+    %input{:type => "text", :name => "other_tag", :value => "#{@poster.tags.find(:all, :conditions => ["taggings.tagger_type IS NULL or taggings.tagger_type = 'poster' or taggings.tagger_type = 'profilepic'"]).collect {|t| t.name }.join(", ")}", :class => "poster"}
+    .clear
+    = f.label :rank, "Rank"
+    = select_tag 'poster[rank]', options_for_select([['0','0'],['1', '1'], ['2','2'],['3', '3'],['4', '4'],['5', '5'],['6', '6'],['7', '7'],['8', '8'],['9', '9'],['10', '10']], @poster.rank)
+    .clear
+    -if request.env["REQUEST_URI"] =~ /edit/
+      = label_tag "Difference Score"
+      = text_field_tag :diff_score,"", :value => (@poster.score.to_i - @poster.history_score.to_i)
+      .clear
+      = label_tag "Add Score"
+      = text_field_tag :add_score
+      .clear
+      = label_tag "Set Flag"
+      =select_tag :flag, options_for_select([["Select One", ""], "Latest Poster","Promoted"],"#{@poster.flag}")
+      .clear
+    = f.submit "Update Poster"
+

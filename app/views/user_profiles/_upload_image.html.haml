@@ -1,0 +1,49 @@
+%div{:class=>"homeContainerIn", :style=>"font-size:11px"}
+  %div{:style=>"padding:5px;height:450px;"}
+    %div{:style=>"width:355px;float:left;"}
+      =form_tag "/user_profiles/update_image",:id=>"user_edit", :class=>"user_edit", :multipart => true ,:remote => true do
+        %input{:type=>"file",:id=>"new_img" , :name=>"user[profile_image]"}
+        .clear
+        %div{:id=>"err_block",:style=>"color:red;"}
+        %div{:style=>"padding-top:80px;float:right;"}
+          %input{:type => "submit",:value=>"Save",:class=>"btn btn-primary"}
+          %input{:type => "button",:value=>"Cancel",:class=>"btn", :onclick=>"close_modal();"}
+:javascript
+  var _URL = window.URL || window.webkitURL;
+  var height,width;
+  $("#new_img").change(function(e) {
+    var file, img;
+    if ((file = this.files[0])) {
+      img = new Image();
+      img.onload = function() {
+        height = this.height;
+        width = this.width;
+        if(width > 900){
+          $("#err_block").html("image width can not be greater than 900px!");
+          $("#new_img").val("");
+        }else{
+          $("#err_block").html("");
+          return true;
+        }
+      },
+
+      img.onerror = function() {
+          alert( "not a valid file: " + file.type);
+      };
+      img.src = _URL.createObjectURL(file);
+    }
+  });
+  function close_modal(){
+    $(".modal-header .pull-right").click();
+  }
+  function show_save_btn(){
+    $("#save_btn").show();
+  }
+  function browse_file(){
+    $("#profile_picture").click();
+  }
+
+  function upload_image(){
+    $("#user_edit").submit();
+    
+  }

@@ -1,0 +1,14 @@
+-for i in 0..5
+  %input{:type => "text", :id => "nextweek_item_#{i}", :name => "nextweek_item[]",:placeholder => 'Enter the name of movie', :style => "margin-right:5px"}
+  = hidden_field_tag "id_nextweek_item_#{i}" , 0, :name => 'nextweek_id[]'
+
+-unless @celeb_nextweek.blank?
+  -t = 0
+  -@celeb_nextweek.each do |tb|
+    -celeb = Celebrity.find_by_id(tb.subject_id)
+    -unless celeb.blank?
+      %script
+        $("#nextweek_item_#{t}").val("#{celeb.name}");
+        $("#id_nextweek_item_#{t}").val("#{tb.subject_id}");
+      -t = t + 1
+

@@ -1,0 +1,17 @@
+= form_for([review, Comment.new], :remote => true, :html => {:id => "review_comment_form_#{review.id}"})  do |f|
+  
+  #error_container_id
+    = render '/shared/error_display', {:error_object => f.object }
+
+  %ul
+    %li{:style => "list-style:none; margin-left:42px"}
+      %div{:style => "float:left",:class => "user_image"}
+      %div{:style => "float:left;margin-left:0px"}
+        %textarea{:id => "review_comment_#{review.id}",:name => "review_comment_#{review.id}", :rows => 1, :cols => 40, :style => "height:15px", :onkeypress => "check_event_submit_review_comment(event, '#{review.id}');"}
+        =f.text_area :comment, :style => "display:none"
+        -if(defined? comment)
+          %input{:type => "hidden", :id => "review_parent_id_#{review.id}", :value => comment.id}
+        %input{:type => "hidden", :name => "review_comment", :value => "#{review.id}" }
+        = f.hidden_field :user_id, :value => "#{params[:user_id]}"
+  .clear
+

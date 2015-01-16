@@ -1,0 +1,44 @@
+/.large_box.left{:style => "width:760px"}
+%h2
+  %span New Movies
+  Announced
+
+-count_movie = 1
+-@new_movie_announced.each do |mov|
+  = succeed "." do
+    %span{:class => "small_light_gray"}
+      =count_movie
+  =link_to mov.name, movie_path(mov)
+  .clear
+  -director = ""
+  -actors = get_actor_name(mov)
+  -actor_name = ""
+  - unless actors.blank?
+    -i=0
+    - actors.each do |actor|
+      -if i == 2
+        -break
+      -unless actor.celebrity.blank?
+        - unless actor.celebrity.name.blank?
+          -if actor_name.blank?
+            -actor_name = (link_to actor.celebrity.name,star_path(actor.celebrity.permalink),:class => "small_light_gray", :style => "font-weight:normal")
+          -else
+            -actor_name = actor_name + ", "+ (link_to actor.celebrity.name,star_path(actor.celebrity.permalink),:class => "small_light_gray", :style => "font-weight:normal")
+          -i = i + 1
+
+  %span{:class => "small_light_gray"}
+    =actor_name
+
+  -director_name = mov.movie_casts.includes(:celebrity).find(:all, :conditions => ["cast_type = 'director'"]).first
+  -unless director_name.blank?
+    &nbsp;
+    %span{:class => "small_light_gray"}
+      -begin
+        Directed by
+        = link_to director_name.celebrity.name,star_path(director_name.celebrity.permalink), :class => "small_light_gray"
+      -rescue
+
+  .clear{:style => "height:10px"}
+  
+
+  -count_movie = count_movie + 1

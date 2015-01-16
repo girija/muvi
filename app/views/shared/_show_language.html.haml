@@ -1,0 +1,97 @@
+#language.left{:style =>'margin-top: 4px; width: 35px;'}
+  %ul.dropdown.dropdown-horizontal
+    %li
+      %a{:href => "#", :class=>'dir'}
+        .left{:style => 'height:18px;width:18px;background-color:#F2F2F2;padding-left:4px;padding-top:4px;'}
+          EN
+      %ul
+        %li
+          %a{:href => "#"}
+            %input{:type => 'checkbox', :value => 'English', :onclick => "setLanguage(this)", :name => "language[]",  :id => "chkenglish"} 
+            Hollywood
+        %li
+          %a{:href => "#"}
+            %input{:type => 'checkbox', :value => 'Hindi', :onclick => "setLanguage(this)", :name => "language[]",  :id => "chkhindi" }
+            Bollywood
+        %li
+          %a{:href => "#"}
+            %input{:type => 'checkbox', :value => 'Tamil', :onclick => "setLanguage(this)", :name => "language[]",  :id => "chktamil"  }
+            Tamil
+        %li       
+          %a{:href => "#"}
+            %input{:type => 'checkbox', :value => 'Telugu', :onclick => "setLanguage(this)", :name => "language[]",  :id => "chktelugu" }
+            Telugu
+
+-loc = ""
+-begin
+  -loc = DisplayHelper.get_location(request.remote_ip)
+-rescue Exception => exc
+  /=exc.message
+
+
+.clear
+=render :partial => "/shared/js_function"
+
+:javascript
+
+  var page = 1;
+  var loading = false;
+
+  if("#{params[:lang]}" != ""){
+    $.cookie('hindi', null);
+    $.cookie('tamil', null);
+    $.cookie('telugu', null);
+    $.cookie('english', null);
+    var lang =  "#{params['lang']}"
+    var langs =  lang.split(',');
+    for(i = 0; i < langs.length; i++){
+       $.cookie(langs[i].toLowerCase(), 'yes');
+       $.cookie('muvi_language_selected', 'yes', { expires: 365, path : "/"});
+       $('#chk'+langs[i].toLowerCase()).attr('checked', 'checked');
+    }
+  }else{
+    var lang_ctr = 0;
+    if ($.cookie('hindi') == 'yes'){
+      $('#chkhindi').attr('checked', 'checked');
+      lang_ctr = lang_ctr + 1;
+    }
+    if ($.cookie('tamil') == 'yes'){
+      $('#chktamil').attr('checked', 'checked');
+      lang_ctr = lang_ctr + 1;
+    }
+    if ($.cookie('telugu') == 'yes'){
+      $('#chktelugu').attr('checked', 'checked');
+      lang_ctr = lang_ctr + 1;
+    }
+    if ($.cookie('english') == 'yes'){
+      $('#chkenglish').attr('checked', 'checked');
+      lang_ctr = lang_ctr + 1;
+    }
+    if (lang_ctr == 0){
+      var loc_language = "";
+      try{
+        loc_language = "#{loc}"
+      }catch(E){}
+      if(loc_language != ""){
+        $.cookie(loc_language, 'yes');
+        $('#chk'+loc_language).attr('checked', 'checked');
+      }else{
+        $.cookie('english', 'yes');
+        $('#chkenglish').attr('checked', 'checked');
+      }
+    }
+  }
+
+
+  $(document).ready(function($) {
+    try{
+      self.setInterval("check_adjust_boxes()",2000);
+      //Show Language Hint
+      if($.cookie('muvi_language_selected') == null){
+        $("#language_hint").show();
+      }
+      setTimeout("$('#join_hint').hide().fadeIn('slow').delay(30000).fadeOut('slow');", 10000);
+      //setTimeout("$('#join_hint').hide().fadeIn('slow')",10000);
+    }catch(E){}
+  });
+

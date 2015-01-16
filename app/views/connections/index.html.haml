@@ -1,0 +1,32 @@
+= render 'shared/meta_title_and_keywords', { :key => 'connections'}
+
+-unless current_user.blank?
+  -unless @connection_activity.blank?
+    #conn
+    %script
+      //$("#conn").load('/connections/activities/all');
+      if("#{params[:msn_embed]}" != ""){
+      window.location.href = "/msn_embed/connections/activities?layout=msn"
+      }
+      else{
+      window.location.href = "/connections/activities"
+      }
+
+  -else
+    .clear{:style => "height:5px"}
+
+    %div{:style => "padding-left:10px;font-size:15px;"}
+      Find your friends and family, and start following them to build your connections.
+    .clear{:style => "height:10px"}
+
+    %div{:style => "padding-left:10px;font-size:15px; font-weight:bold;"}
+      Suggested Members to Follow
+    .clear{:style => "height:20px"}
+
+    -unless @sort_by_activity.blank?
+      =render :partial => "show_suggested_follow"
+    
+    .clear
+-else
+  =render :partial => "show_connection_message"
+

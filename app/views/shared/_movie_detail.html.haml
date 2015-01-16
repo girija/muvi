@@ -1,0 +1,64 @@
+%div{:style=>"width:20px;border:1px solid grey;height:599px;float:left;text-align:center;",:onclick=>"close_more_info();"}
+  = image_tag("arrow.png", :style => 'padding-top:0', :alt => ">" )
+  = image_tag("v-line.png", :style => "padding-top:300px;")
+
+%div{:style=>"float:left;padding:5px;height:590px;overflow:auto;width:455px;"}
+  %div
+    %div{:style=>"font-weight:bold;float:left;font-size:17px;"}
+      =@movie.name
+    %div{:style=>"float:right;"}
+      =link_to "Go To Movie Page" , movie_path(@movie)
+  .clear{:style=>"height:10px;"}
+  %div{:style=>"font-weight:bold;"}
+    More Info
+  %div{:style=>"margin-top:10px;"}
+    %div{:style=>"width:190px;float:left;"}
+      = "Genre: #{@movie.genre.to_sentence rescue @movie.genre}"
+    %div{:style=>"width:180px;float:left;"}
+      ="Release: #{Time.parse(@movie.release_date.to_s).strftime('%d %B %Y').to_s unless @movie.release_date.blank?}"
+  .clear
+  %div{:style=>"margin-top:10px;font-weight:bold;"}
+    Cast & Crew
+  %div{:style=>"margin-top:10px;"}
+    -celeb_list = @actors[0..3]
+    - celeb_list.each_with_index do |star,i|
+      -celeb = star.celebrity
+      -unless celeb.blank?
+        %div{:class=>"left", :style=>"height:180px;padding-right:10px;width:96px;"}
+          -begin
+            .left{:style => "border:1px solid #d2d6d9;"}
+              .moviImage{:style=>"height:124px;width:84px;padding:2px;"}
+                =link_to image_tag(celeb.image,:style=>"height:124px;width:84px;"),star_path(celeb.permalink)
+          -rescue
+          .clear
+          -unless celeb.blank?
+            = link_to celeb.name.truncate(15),star_path(celeb.permalink),:style=>"font-weight:normal;font-size:13px;color:#000;"
+            %br
+  .clear
+  %div{:style=>"margin-top:10px;font-weight:bold;"}
+    Reviews
+  %div{:style=>"margin-top:10px;"}
+    -@critics_reviews.each do |critics_review|
+      - unless critics_review.blank?
+        %div{ :style => "margin:5px 0 8px 8px; width:420px;font-size:12px;", :class => "left"}
+          %div
+            %div.image.left
+              -fc = critics_review.film_critic
+              -unless fc.blank?
+                -unless fc.profile_image.blank?
+                  -unless fc.thumbnail_image_file_name.blank?
+                    =image_tag("/system/thumbnail_images/#{fc.id}/thumb/#{fc.thumbnail_image_file_name.gsub(" ", "%20")}")
+                  -else
+                    %img{:src => "#{POSTER_URL}/images/no-profile.png"}                                                                             
+                -else
+                  %img{:src => "#{POSTER_URL}/images/no-profile.png"}
+
+            %div.reviewIcon.right{:style=>"width:0px;"}
+              = image_tag((critics_review.critic_image),:style=>"height:20px;")
+            %div.names{:style => "min-height:56px;padding-left:55px;"}
+              = truncate(critics_review.summary, :length => 150)
+              .clear
+              %div{:class=>"bottom_tab_texts",:style=>"width:300px;margin-top:-5px;color:#8b8484;font-size:10px;"}
+                = "#{critics_review.film_critic.name rescue ''}, #{critics_review.film_critic.organization.truncate(30) rescue ''}"
+              .clear
+

@@ -1,0 +1,10 @@
+%input{:type => "text", :id => "featured_movie_item", :name => "featured_movie" ,:placeholder => 'Enter the name of movie'}
+= hidden_field_tag "id_featured_movie_item" , 0, :name => 'featured_movie_id'
+.clear
+
+-unless @featured_movie.blank?
+  -movie = Movie.find_by_id(@featured_movie.subject_id)
+  %script
+    $("#featured_movie_item").val("#{movie.name}");
+    $("#id_featured_movie_item").val("#{@featured_movie.subject_id}");
+

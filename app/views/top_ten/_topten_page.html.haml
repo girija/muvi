@@ -1,0 +1,66 @@
+- if !@topten_by_years.blank? or !@topten_by_tweets.blank?
+  %h2
+    %span
+      Top 10 by
+    Muvimeter
+  .clear
+
+  .homeContainerIn.topTenBorderDiv
+    .clear{:style => 'height:10px'}
+    .right
+    = render :partial => 'topten_default'
+    .clear
+
+  .clear{:style => 'height:20px'}
+
+- unless @topten.blank?
+  %h2
+    %span
+      Top 10
+    Movies by Users
+  .clear
+
+  -if params[:msn_embed] != "msn_embed"
+    .right{:style => "margin-top:-30px"}
+      - if current_user
+        %a{:href => '/top_ten/create/movies', :id => 'add-top-10', :class => 'gradient-button2 left ui-corner-all'}
+          .gradient-button2
+            .label Add a top 10
+      - else
+        /%a{:href=>'#', :id=>'add-top-10', :class=>'gradient-button2 left ui-corner-all', :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login to add your top 10");' }
+        %a{:onclick => "check_login();", :class=>'gradient-button2 left ui-corner-all', :style => "cursor:pointer", :id=>'add-top-10'}           
+          .gradient-button2
+            .label Add a Top 10
+    .clear{:style => "height:5px"}
+
+  -unless @topten.blank?
+    .homeContainerIn.topTenBorderDiv
+      = render :partial => 'topten_movies'
+      .clear
+
+  .clear{:style => 'height:20px'}
+  %h2
+    %span
+      Top 10
+    Stars by Users
+  .clear
+
+  -if params[:msn_embed] != "msn_embed"
+    .right{:style => "margin-top:-30px"}
+      - if current_user
+        %a{:href => '/top_ten/create/celebs', :id => 'add-top-10', :class => 'gradient-button2 left ui-corner-all'}
+          .gradient-button2
+            .label Add a top 10
+      - else
+        /%a{:href=>'#', :id=>'add-top-10', :class=>'gradient-button2 left ui-corner-all', :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login to add your top 10");' }
+        %a{:onclick => "check_login();", :class=>'gradient-button2 left ui-corner-all', :style => "cursor:pointer", :id=>'add-top-10'}
+          .gradient-button2
+            .label Add a Top 10
+    .clear{:style => "height:5px"}
+
+  -unless @topten_celebs.blank?
+    .homeContainerIn.topTenBorderDiv
+      = render :partial => 'topten_celebs'
+      .clear
+
+

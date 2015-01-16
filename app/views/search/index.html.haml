@@ -1,0 +1,151 @@
+:javascript
+  function show_tab(block){
+    $("#lnk-all").removeClass("subtab_active");
+    $("#lnk-movie").removeClass("subtab_active");
+    $("#lnk-list").removeClass("subtab_active");
+    $("#lnk-celeb").removeClass("subtab_active");
+    $("#lnk-user").removeClass("subtab_active");
+ 
+    $("#lnk-"+block).addClass("subtab_active");
+    $('div').remove('.arrow_div');
+    $("#lnk-"+block).parent().append("<div class='arrow_div'></div>");
+
+    if(block == "all"){
+      $("#movie_result").show();  
+      $("#list_result").show();
+      $("#celeb_result").show();
+      $("#user_result").show();
+    }else if(block == "movie"){
+      $("#movie_result").show();
+      $("#list_result").hide();
+      $("#celeb_result").hide();
+      $("#user_result").hide();
+    }else if(block == "list"){
+      $("#movie_result").hide();
+      $("#list_result").show()
+      $("#celeb_result").hide();
+      $("#user_result").hide();
+
+    }else if(block == "celeb"){
+      $("#movie_result").hide();
+      $("#list_result").hide();
+      $("#celeb_result").show();
+      $("#user_result").hide();
+    }else{
+      $("#movie_result").hide();
+      $("#list_result").hide();
+      $("#celeb_result").hide();
+      $("#user_result").show();
+    }
+
+  }
+= render 'shared/meta_title_and_keywords', { :key => 'home'}
+- if !current_user.blank?
+  %input{:type => 'hidden', :name=> 'logged_in_user_id' , :id => 'logged_in_user_id', :value => current_user.id}
+  - @my_wanna_see_movies = []
+  - @my_seen_movies = []
+  - list = ListOfMovie.find_by_user_id(current_user.id)
+  - if list && !list.wanna_see_lists.blank?
+    - wannasee_list = ActiveSupport::JSON.decode(list.wanna_see_lists)
+    -if wannasee_list
+      - wannasee_list.each do |wanna_see|
+        - @my_wanna_see_movies << wanna_see["object"]["id"].to_i
+  - if list && !list.seen_lists.blank?
+    - seen_list = ActiveSupport::JSON.decode(list.seen_lists)
+    -if seen_list
+      - seen_list.each do |seen|
+        - unless seen.blank?
+          - unless seen["object"].blank?
+            - @my_seen_movies << seen["object"]["id"].to_i
+  - @my_rated_movies = []
+  - rated =  UserMovieList.where(:user_id => current_user.id)
+  - if rated
+    - rated.each do |rate|
+      - if !rate.movie_id.blank?
+        - rated_list = ActiveSupport::JSON.decode(rate.movie_id)
+        - rated_list.each do |movie|
+          - @my_rated_movies << movie.to_i
+  - @my_rated_movies.uniq!
+#loginModal.modal.fade.hide{:style => 'width:365px;'}
+  .modal-header
+    %button.close{:type => "button", "data-dismiss" => "modal" , "aria-hidden" => "true"}
+      x
+    %h4#loginModalLabel
+      Login
+  .modal-body.login
+  .modal-footer
+
+#myTrailer.modal.fade.hide{:style => 'width:670px;'}
+  .modal-header
+    %button.close{:type => "button", "data-dismiss" => "modal" , "aria-hidden" => "true"}
+      x
+    %h3#myModalLabel
+      Trailer
+  .modal-body{:style => 'height:400px'}
+    %a{:href => "#" , :id => 'video_player', :class => 'video_player', :style => 'display:block;height:390px;width:640px;'}
+  .modal-footer
+    %button.btn{"data-dismiss" => "modal", "aria-hidden" => "true" }
+      Close
+
+
+.row-fluid
+  .span12{:style => "min-height:500px;background-color:#FFFFFF"}
+    .span3
+      =render :partial => "/home/left_sidebar"
+    .span9{:style => "min-height:500px;border-left: 4px solid #DFDFDF; margin-left: -2px;"}
+      %div{:class=>"main_content",:style=>"padding-left:10px;"}
+        .page_heading
+          ="Results for &ldquo;&nbsp;#{(params[:q] rescue '')}&nbsp;&rdquo;".html_safe
+        .clear{:style=>"height:15px;"}
+        -all_cnt = @movies.length + @celebrities.length + @users.length
+        .pull-left{:style=>"padding-top:15px;"}
+          .pull-left
+            %span{:class=>"sub_tab subtab_active", :id => 'lnk-all'}
+              = link_to "All (#{all_cnt})", "javascript:show_tab('all')"
+            .arrow_div
+          .pull-left
+            %span{:class=>"sub_tab", :id => 'lnk-movie'}
+              = link_to "Movies (#{@movies.length})", "javascript:show_tab('movie')"
+
+          .pull-left
+            %span{:class=>"sub_tab", :id => 'lnk-list'}
+              = link_to "Lists (#{@lists.length})", "javascript:show_tab('list')"
+
+          .pull-left
+            %span{:class=>"sub_tab", :id => 'lnk-celeb'}
+              = link_to "Actors (#{@celebrities.length})", "javascript:show_tab('celeb')"
+          .pull-left
+            %span{:class=>"sub_tab", :id => 'lnk-user'}
+              = link_to "Users (#{@users.length})", "javascript:show_tab('user')"
+          %div{:style=>"float:left;border-bottom:1px solid #ececec;width:500px;margin-left:20px;height:10px;"}
+        .clear{:style=>"height:15px;"}
+
+        -unless @movies.blank?
+          #movie_result
+            .heading
+              MOVIES
+            =render 'shared/search_movies',  { :from => 'home'}
+
+        .clear{:style=>"height:15px;"}
+        -unless @lists.blank?
+          #list_result
+            .heading
+              LISTS
+            =render 'shared/search_lists'
+
+        .clear{:style=>"height:15px;"}
+        - unless @celebrities.blank?
+          #celeb_result
+            .heading
+              ACTORS
+            = render 'shared/search_celebrities'
+        .clear{:style=>"height:15px;"}
+        -unless @users.blank?
+          #user_result
+            .heading 
+              USERS
+            =render 'shared/users'
+
+        -if @movies.blank? and @celebrities.blank? and @users.blank?
+          %h3
+            No result found. Please refine your search.

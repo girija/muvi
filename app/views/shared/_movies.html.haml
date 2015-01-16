@@ -1,0 +1,165 @@
+-unless params[:q]
+  //////////////////////
+  /TOP muvimeter, tweeter buzz, trending now
+-cache "top_slider",:expires_in => 30.minutes do
+  %div
+    %div{:style => "height:298px; border-bottom:1px solid #DDDDDD"}
+      #slide_div_1{:style => "display:none;position:absolute;"}
+        -unless @muvi_meter.blank?
+          -@muvi_meter.each do |mm|
+            -@movie = Movie.find_by_id(mm.subject_id)
+            .right_1px.left
+              .home_page_movie_image
+                =link_to image_tag(@movie.standard_image, :class => "home_page_movie_image"), movie_path(@movie)
+              .home_page_overlay
+                /=@movie.name
+              -if !@movie.release_date.nil? and !@movie.release_date.blank? and @movie.release_date <= Date.today or !@movie.critics_reviews.blank?
+                =render :partial => "/shared/show_muvimeter"
+              -else
+                =render :partial => "/shared/show_tweeter_buzz"
+
+
+      /.clear
+      #slide_div_2{:style => "display:none;position:absolute;"}
+        -unless @tweeter_buzz.blank?
+          -@tweeter_buzz.each do |tb|
+            -@movie = Movie.find_by_id(tb.subject_id)
+            .right_1px.left
+              .home_page_movie_image
+                =link_to image_tag(@movie.standard_image, :class => "home_page_movie_image"), movie_path(@movie)
+              .home_page_overlay
+              =render :partial => "/shared/show_tweeter_buzz"
+
+      /.clear
+      #slide_div_3{:style => "display:none;position:absolute;"}
+        -unless @trending_now.blank?
+          -@trending_now.each do |tn|
+            -@movie = Movie.find_by_id(tn.subject_id)
+            .right_1px.left
+              .home_page_movie_image
+                =link_to image_tag(@movie.standard_image, :class => "home_page_movie_image"), movie_path(@movie)
+              .home_page_overlay
+              -if !@movie.release_date.nil? and !@movie.release_date.blank? and @movie.release_date <= Date.today or !@movie.critics_reviews.blank?
+                =render :partial => "/shared/show_muvimeter"
+              -else
+                =render :partial => "/shared/show_tweeter_buzz"
+
+
+
+    .clear
+    .right{:style => "margin-right:28px"}
+      .left
+        %div{:id => "0", :class => "slide_div_class", :onclick => "playslide(this.id);"}
+          /Muvimeter
+          In Theaters
+      .left
+        %div{:id => "1", :class => "slide_div_class", :onclick => "playslide(this.id);"}
+          /Tweeter Buzz
+          Upcoming
+      .left
+        %div{:id => "2", :class => "slide_div_class", :onclick => "playslide(this.id);"}
+          Trending Now
+
+  :javascript
+    if("#{@muvi_meter[0].start}" == "true"){
+      $("#selected_div").val(0);
+      $("#slide_div_1").css("display", "");
+      $("#0").addClass("slide_div_class_active");
+    }
+    if("#{@tweeter_buzz[0].start}" == "true"){
+      $("#selected_div").val(1);
+      $("#slide_div_2").css("display", "");
+      $("#1").addClass("slide_div_class_active");
+    }
+    if("#{@trending_now[0].start}" == "true"){
+      $("#selected_div").val(2);
+      $("#slide_div_3").css("display", "");
+      $("#2").addClass("slide_div_class_active");
+    }
+
+
+
+
+  .clear{:style => "height:5px"}
+  .connectionborderDiv{:style => "padding:0px"}
+-cache "latest_trailers", :expires_in => 30.minutes do
+  -unless @latest_trailers.blank?
+    .left{:style => "width:412px; border:0px solid #dddddd;height:250px;padding-bottom:5px;margin-left:5px;"}
+      =render :partial => "/shared/show_latest_trailer"
+  //////////////////////////////////////
+  /Latest Picture
+-cache "latest_pictures", :expires_in => 30.minutes do
+  -unless @latest_pictures.blank?
+    .left{:style => "width:400px; border:0px solid #dddddd; height:250px"}
+      =render :partial => "/shared/show_latest_pictures"
+
+  .clear
+  .connectionborderDiv{:style => "padding:0px"}
+
+  //////////////////////////////////////
+  /Happy Birthday
+-cache "birthday_list",:expires_in => 30.minutes do
+  -unless @birthday_today.blank?
+    .left{:style => "width:412px; border:0px solid #dddddd;height:250px;padding-bottom:5px;margin-left:5px;"}
+      =render :partial => "/shared/show_birthday"
+  //////////////////////////////////////
+  /Featured Celebrity
+-cache "featured_celebrity",:expires_in => 30.minutes do
+  -unless @featured_celebrity.blank?
+    .left{:style => "width:400px; border:0px solid #dddddd; height:250px"}
+      =render :partial => "/shared/show_featured_celebrity"
+
+  .clear
+
+  //////////////////////////////////////
+  /Latest News
+-cache "latest_news",:expires_in => 30.minutes do
+  -unless @latest_news.blank?
+    .connectionborderDiv{:style => "padding:0px"}
+    .left{:style => "border:0px solid #dddddd;"}
+      =render :partial => "/shared/show_latest_news"
+
+
+  .clear
+
+  //////////////////////////////////////
+  /Celebrity Tweets
+  /-unless @celebrity_tweets.blank?
+  /  .left{:style => "border:0px solid #dddddd; height:250px"}
+  /    =render :partial => "/shared/show_celebrity_tweets"
+
+  //////////////////////////////////////
+  /User Tweets
+  /-unless @user_tweets.blank?
+  /  .left{:style => "border:0px solid #dddddd; height:250px"}
+  /    =render :partial => "/shared/show_user_tweets"
+
+
+  .clear{:style => "height:10px"}
+.connectionborderDiv{:style => "padding:0px"}
+  //////////////////////////////////////
+  /Featured Member
+-cache "featured_member",:expires_in => 30.minutes do
+  -unless @featured_member.blank?
+    /.connectionborderDiv{:style => "padding:0px"}
+    .left{:style => "border:0px solid #dddddd;width:415px"}
+      =render :partial => "/shared/show_featured_member"
+
+-unless @featured_topten.blank?
+  /.connectionborderDiv{:style => "padding:0px"}
+  .left{:style => "border:0px solid #dddddd;width:395px;"}
+    =render :partial => "/shared/show_featured_topten"
+
+.connectionborderDiv{:style => "padding:0px"}
+
+-cache "featured_movie",:expires_in => 30.minutes do
+  -unless @featured_movie.blank?
+    .left{:style => "width:420px; border:0px solid #dddddd;"}
+      =render :partial => "/shared/show_featured_movie"
+
+-unless @new_movie_announced.blank?
+  .left{:style => "width:370px; border:0px solid #dddddd;"}
+    =render :partial => "/shared/show_new_movie_announced"
+  .clear
+
+

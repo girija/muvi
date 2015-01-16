@@ -1,0 +1,124 @@
+-if defined?(@list_type)
+  -@user_profile = current_user.user_profile
+-else
+  -@user_profile = UserProfile.find_by_user_id(@list.user_id)
+
+
+-if request.fullpath.include?("list") && !defined?(@list_type) && @list.class.to_s != "ListOfMovie" && @user_profile
+  #loginModal.modal.fade.hide{:style => 'width:365px;'}
+    .modal-header
+      .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+        =image_tag("/images/popup_close.png")
+      %h4#rateModalLabel
+        Login
+    .modal-body
+    .modal-footer
+  #myTrailer.modal.fade.hide{:style => 'width:640px;height:435px;'}
+    .modal-header
+      .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+        =image_tag("/images/popup_close.png")
+      #myModalLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+        Trailer
+    .modal-body{:style => 'max-height:290px'}
+      %a{:href => "#" , :id => 'video_player', :style => 'display:block;height:300px;width:610px;'}
+    .modal-footer
+      %button.btn.btn-primary.bold_class{"data-dismiss" => "modal", "aria-hidden" => "true" }
+        Done
+  /= render :partial => "/shared/followings"
+  -first_name = @user_profile.display_name.split(" ")
+  -modal_header ="Users following #{first_name[0]}s list"
+  =render "shared/user_following_modal",{:@tagged=>@list, :modal_header => modal_header}
+  - last_movie = Movie.find_by_id(ActiveSupport::JSON.decode(@list.movie_id).last.to_i)
+
+  -img_path = ""
+  -unless last_movie.blank?
+    - img_path = "#{POSTER_URL}#{last_movie.banner_image_medium}"
+
+  -desc = ""
+  - movie_ids = ActiveSupport::JSON.decode(@list.movie_id)
+  - movie_ids = movie_ids.uniq
+  - movie_ids.each do |movie_id|
+    - movie = Movie.find_by_id(movie_id)
+    -unless movie.blank?
+      -desc += "#{movie.name}, "
+  -description = desc.chop
+  =content_for :header do
+    %meta{:property=>"og:site_name", :content=>"Muvi"}
+    %meta{:property=>"og:title", :content=>"#{@list.tag}"}
+    %meta{:property=>"og:type", :content=>"muvidotcom:list"}
+    /%meta{:property=>"og:url", :content=>"http://muvi.com/movie_list/#{@list.id}/#{@list.tag}"}
+    %meta{:property=>"og:image", :content=>"#{img_path}"}
+    %meta{:property=>"og:description", :content=>"#{description}"}
+-if @user_profile
+  .row-fluid
+    .span12{:style => "background-color:#FFFFFF;"}
+      .span3
+        =render :partial => "user_movie_lists/list_user_info"
+
+      .span9{:style => "border-left: 4px solid #DFDFDF; margin-left: -2px;min-height:500px;"}
+        %div{:class=>"main_content"}
+          = render 'user_movie_lists/list_detail'
+:javascript
+  function play_trailer(videourl,movie_name){
+    alert("dddd");
+    $("#myModalLabel").html(movie_name+" Trailer");
+    if (videourl == "") {
+      return false;
+    }
+    $('#video_player').remove();
+    var $video = $('<a />', {
+      href: videourl,
+      id: 'video_player',
+      style: 'display:block;height:290px;width:610px;'
+    });
+    $('#myTrailer .modal-body').append($video);
+    $('#myTrailer').modal("show");
+    flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+
+  }
+  $(function() {
+    $(".tip_hint").tooltip({
+      placement: "bottom",
+      html: true
+    });
+    var movie_id = "#{params[:movie_id]}";
+    var list_id = "#{params[:id]}";
+    if(movie_id != ""){
+      $("#movie_block_"+movie_id+"_"+list_id).first().children().css("background-color","#dddddd");
+      $("#movie_div_"+movie_id+"_"+list_id).first().css("background-color","#dddddd");
+    }
+
+    var map = {};
+    var list_id;
+    $('.movie_name').typeahead({
+      minLength:2,
+      source: function (query,process) {
+        list_id = this.$element.attr('data-id');
+
+        $.get("/fetch_movies", { term: query ,list_id:list_id}, function (data) {
+           var movies = [];
+           $.each(data, function (i, movie) {
+            map[movie.label] = movie;
+            movies.push(movie.label);
+           });
+           $(".typeahead").css("width","235px");
+           return process(movies);
+        });
+      },
+      updater: function(item){
+        var id = map[item].id;
+        $("#movie_id_"+list_id).val(id);
+        $("#movie_story_"+list_id).html(map[item].story);
+        $("#movie_pic_"+list_id).attr("src",map[item].thumb);
+        return item;
+      }
+
+    });
+    $(".movie_block").live({ mouseenter: function(){
+      $(this).children(".close_btn_movie_list").show();
+    }, mouseleave: function(){
+      $(this).children(".close_btn_movie_list").hide();
+    }});
+
+  });
+

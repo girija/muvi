@@ -1,0 +1,10 @@
+%input{:type => "text", :id => "featured_celebrity_item", :name => "featured_celebrity" ,:placeholder => 'Enter the name of celebrity'}
+= hidden_field_tag "id_featured_celebrity_item" , 0, :name => 'featured_celebrity_id'
+.clear
+
+-unless @featured_celebrity.blank?
+  -celeb = Celebrity.find_by_id(@featured_celebrity.subject_id)
+  %script
+    $("#featured_celebrity_item").val("#{celeb.name}");
+    $("#id_featured_celebrity_item").val("#{@featured_celebrity.subject_id}");
+

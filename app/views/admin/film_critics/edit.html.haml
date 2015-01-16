@@ -1,0 +1,12 @@
+%h1.heading Edit Film Critic
+.form
+  = form_for(@user, :url => admin_film_critic_path(@user), :html => {:method => :put, :multipart => true}) do |f|
+    - if @user.errors.any?
+      #error_explanation
+        %h2
+          = pluralize(@user.errors.count, "error")
+          prohibited this page from being saved:
+        %ul
+          -@user.errors.full_messages.each do |msg|
+            %li= msg
+    = render :partial => 'form', :locals => { :f => f }

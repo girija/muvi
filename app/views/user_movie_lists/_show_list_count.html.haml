@@ -1,0 +1,23 @@
+.modal.fade.hide{:id => "list_modal", :style => 'width:525px;height:auto;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    #list_moviewLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+      =@modal_header
+  .modal-body
+    -list = ActiveSupport::JSON.decode(@ms.list_json)
+    -unless list.blank?
+      -list.each do |li|
+        .pull-left{:style=>"margin-top:10px;"}
+          .pull-left{:style => "width:50px; height:50px"}
+            =link_to(image_tag("#{POSTER_URL}#{li["image"]}", :style => "width:45px;height:45px;border-radius:100px;"), li["profile_page"])
+
+          .movie_block_title{:style => "float:left;padding-left:5px;color:#494949;font-size:16px;font-weight:bold;padding-top:10px;line-height:26px;"}
+            =link_to li["list_name"], "/movie_list/#{li["list_id"]}/#{li["list_name"]}", :style => "color:#494949"
+        .clear
+
+
+  .modal-footer
+    %button.btn.btn-primary.bold_class{"data-dismiss" => "modal", "aria-hidden" => "true" }
+      Done
+

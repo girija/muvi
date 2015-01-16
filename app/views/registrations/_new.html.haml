@@ -1,0 +1,113 @@
+:javascript
+  $("#register_from").hide();
+  $("#simplemodal-overlay").hide();
+  //window.open("/auth/facebook", "mywin", "width=500px,height=300px");
+
+#login
+  .register
+    /.fb-signup{:style=>"height: auto;"}
+    /  = link_to image_tag('register_fb_connect.png',  :alt => "Facebook"), "/auth/facebook", :class => "popup", :"data-width" => 700, :"data-height" => 600
+    /.fb-signup-text{:style=>"height: auto;"}
+    /  -#%h3
+    /    -#Register using Facebook
+    /  %p
+    /    %a{:'data-width'=>700, :'data-height'=>600, :class=>'popup', :href=>'/auth/facebook', :style=>'font-weight: normal;'} See your friends movie reviews and interest by registering using Facebook
+    /.clear
+    /%hr{:style=>"margin-top: 15px; margin-bottom: 10px;"}
+    /.clear
+    = form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :multipart => true, :remote => true }) do |f|
+      = devise_error_messages!
+      #message
+      #errors
+      %fieldset.registration
+        - resource.user_tokens.build if resource.user_tokens.blank?
+        = f.fields_for :user_tokens do |ut|
+          = ut.hidden_field :provider
+          = ut.hidden_field :uid
+          = ut.hidden_field :token
+          = ut.hidden_field :secret
+        - resource.build_user_profile if resource.user_profile.blank?
+        = f.fields_for :user_profile do |ff|
+          .field
+            = ff.label :display_name, "Full Name"
+            = ff.text_field :display_name
+        .clear
+        #need_from_facebook{:style=>"display: none; text-shadow: none; color: #545454; font-size: 10px; padding-left: 145px; background: url('/images/astrik_12x12.png') no-repeat scroll 125px center transparent;"} Click on 'Register using Facebook' button above to register using Facebook. You can see the movies your friends like and want to see
+        .clear
+        .field
+          = f.label :email, 'Email'
+          = f.text_field :email
+        .clear
+        .field
+          = f.label :password
+          = f.password_field :password
+        .clear
+        %hr
+        %p.terms_service
+          %span
+            By clicking 'Register', you are indicating that you have read & agree to the
+          = link_to "Terms of service", user_agreement_path, :remote => true
+        %br
+        /.actions
+        /  .right
+        /    = image_submit_tag('register_btn.png')
+        .actions.right
+          .orange-gradient-input-button.ui-corner-all
+            .orange-gradient-input-button.ui-corner-all
+              %input{:type => "submit", :value => "Register", :name => "commit", :id => "comment_submit", :class => "label"}
+        .clear
+
+:javascript
+  self.setInterval("show_reg()", 1000);
+  function show_reg(){
+    if($("#user_user_tokens_attributes_0_provider").val() == "" && "#{session[:notconfirmed]}" == 1){
+      $("#register_from").show();
+      $("#simplemodal-overlay").show();
+      $("#message").show();
+      $("#message").html("You have to confirm your account before continuing. Please check your mail.");
+      $('#message').css("float", "none");
+      $('#message').css("color", "red");
+      $('#message').css("background", "none");
+      $('#message').css("display", "inline");
+    }
+
+    if($("#user_user_tokens_attributes_0_provider").val() != ""){
+      $("#register_from").show();
+      $("#simplemodal-overlay").show();
+    }
+  }
+  $(document).ready(function($) {
+
+    $('#user_new').submit(function(){
+        var chk1 = jQuery.trim($('#user_user_profile_attributes_display_name').val());
+        var chk2 = jQuery.trim($('#user_email').val());
+        var chk3 = jQuery.trim($('#user_password').val());
+        var msg = "";
+        if(chk1 == ""){
+            msg += "Fullname";
+        }
+        if(chk2 == ""){
+            msg += (msg != "")?", ":"";
+            msg += "Email";
+        }
+        if(chk3 == ""){
+            msg += (msg != "")?" and ":"";
+            msg += "Password";
+        }
+        if(msg != ""){
+            $('#errors').html(msg+" can't be blank").fadeIn('slow');
+            return false;
+        }else{
+            if(!validateEmail(chk2)){
+                $('#errors').html("Oops! seems an invalid email!").fadeIn('slow');
+                return false;
+            }
+        }
+
+        if(chk1 != "" && chk2 != "" && chk3 != ""){
+            return true;
+        }
+
+    });
+  });
+

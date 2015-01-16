@@ -1,0 +1,44 @@
+%h2
+  %span Latest
+  News
+.clear
+
+/.left{:style => "margin-top:-25px;margin-right:12px;margin-left:342px"}
+.right{:style => "width:70px;margin-right:12px;margin-top:-25px;"}
+  %a{:href => "/news", :class => "normal_font"}
+    read more
+    .right_arrow.right &nbsp;
+.clear
+
+-unless @latest_news.blank?
+  -count = 0
+  -@latest_news.each do |feed|
+    -news = feed.taggings.find(:first, :conditions => ["tagger_type IS NOT NULL and tagger_id IS NOT NULL"], :order => ["id asc"])
+    -unless news.blank?
+      /-@news.each do |news|
+      -if news.tagger_type == "Movie"
+        -@name = Movie.find_by_id(news.tagger_id)
+        -img = @name.banner_image_thumb
+        -link = "/news/movie/#{@name.permalink}/#{news.id}"
+
+      -else
+        -@name = Celebrity.find_by_id(news.tagger_id)
+        -img = @name.thumb_image
+        -link = "/news/star/#{@name.permalink}/#{news.id}"
+
+      -if count == 4
+        -break
+      -else
+        -count = count + 1
+
+      .home_large_box.left
+        .friendsBox.left
+          =link_to image_tag(img), link
+
+        .friendtitle.left{:style => "width:320px; margin-top:-5px;"}
+          = link_to raw(truncate(feed.entry_title, :length => 50)), link, :style => "color:#196EA4; font-size:12px;"
+          .clear
+          -unless feed.summary.blank?
+            -summary = feed.summary.gsub(/<\/?[^>]*>/, "")
+            =truncate(feed.summary.gsub(/<\/?[^>]*>/, ""), :length => 180)
+

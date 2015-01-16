@@ -1,0 +1,82 @@
+%h2
+  %span Featured
+  Pictures
+.clear  
+
+%input{:type => "hidden", :id => "pic_counter", :value => "0"}
+
+.left{:style => "margin-top:-25px;margin-right:12px;margin-left:342px"}
+  -if @celeb_latest_pictures.size > 3
+    .left_arrow.left{:id => "pic_left", :onclick => "picture_show('left');", :style => "visibility:hidden"} &nbsp; 
+    .right_arrow.right{:id => "pic_right", :onclick => "picture_show('right');"} &nbsp;
+
+
+.clear
+
+
+-unless @celeb_latest_pictures.blank?
+  -count = 0
+  -@celeb_latest_pictures.each do |pic|
+    .left{:id => "picture_#{count}", :style => "width:112px; height:175px;padding:2px;border:1px solid #dddddd; margin-right:10px"}
+      =link_to image_tag(pic.image, :width => "112px", :height => "175px"), "/stars/#{pic.permalink}#poster"
+      .clear
+      =link_to pic.name, star_path(pic)
+
+      %script
+        if("#{count.to_i}" >= 3){
+        $("#picture_#{count}").hide();
+        }
+      -count = count + 1
+
+  :javascript
+    function picture_show(p){
+      if(p == "left"){
+        if(parseInt($("#pic_counter").val()) > 0){
+          $("#pic_counter").val(parseInt($("#pic_counter").val()) - 3);
+        }
+        else{
+          $("#pic_counter").val(0);
+        }
+
+        var pic_start = $("#pic_counter").val();
+        var pic_end = parseInt($("#pic_counter").val()) + 3;
+
+        for(var i = 0; i < "#{@celeb_latest_pictures.size}"; i++){
+          $("#picture_"+i).hide();
+        }
+        for(var i = pic_start; i < pic_end; i++){
+          $("#picture_"+i).show();
+        }
+        if($("#pic_counter").val() == 0){
+          $("#pic_right").css("visibility", "visible");
+          $("#pic_left").css("visibility", "hidden");
+        }
+        else{
+          $("#pic_right").css("visibility", "visible");
+          $("#pic_left").css("visibility", "visible");
+        }
+     }
+      else{
+        $("#pic_counter").val(parseInt($("#pic_counter").val()) + 3);
+  
+        var pic_start = $("#pic_counter").val();
+        var pic_end = parseInt($("#pic_counter").val()) + 3;
+
+        for(var i = 0; i < "#{@celeb_latest_pictures.size}"; i++){
+          $("#picture_"+i).hide();
+        }      
+        for(var i = pic_start; i < pic_end; i++){
+          $("#picture_"+i).show();
+        }  
+
+        if(parseInt($("#pic_counter").val()) + 3 >= "#{@celeb_latest_pictures.size}"){
+          $("#pic_right").css("visibility", "hidden");
+          $("#pic_left").css("visibility", "visible");
+        }
+        else{
+          $("#pic_right").css("visibility", "visible");
+          $("#pic_left").css("visibility", "visible");
+        }
+      }
+    }
+

@@ -1,0 +1,50 @@
+= render 'shared/meta_title_and_keywords', { :key => 'home'}
+/= content_for :breadcrumb do
+/  %span
+/    = link_to "Home &#187;".html_safe, root_path
+/    contact us
+
+%div{:style => "background-color: #FFFFFF; border: 1px solid #DBDBDB; padding: 10px; float:left; width:97%;"}
+  .containerIn.borderDiv
+    .left{:style => "width:14%; margin-right:1%; margin-top:15px;"}  
+      %ul{:id => "footer_link"}
+        %li{:class => ('active' if params[:id] == "what-is-muvi")}
+          -if params[:msn_embed] == "msn_embed"
+            = link_to "About Us", find_page_msn('what-is-muvi')
+          -else
+            = link_to "About Us", find_page('what-is-muvi')
+
+        %li{:class => ('active' if params[:id] == "career")}
+          -if params[:msn_embed] == "msn_embed"
+            = link_to "Career", find_page_msn('career')
+          -else
+            = link_to "Career", "http://www.muvi.com/careers"
+
+        %li 
+          =link_to "Press", "http://www.muvi.com/press"
+        %li
+          =link_to "Partners", "http://www.muvi.com/partners"
+
+        %li
+          %a{:href => "http://www.studio.muvi.com", :target => "_blank"}
+            Content Partners
+
+        %li{:class => 'active'}
+          =link_to "Contact Us", contact_us_path
+
+    .left{:style => "width:85%"}
+      %h2 Contact Us
+      %div{:style => "border-top:2px solid #EEEEEE"}
+      .clear{:style => "height:10px;"}
+
+      %div{:style=>"font-size:20px;font-weight:bold;color:#494949;"}
+        Use the following form to contact us.
+
+      - if notice
+        %h5.notice{:style=>"color:#51AA4B;"}
+          = notice
+
+      #enquiry_form
+        .form
+          = render '/user_messages/form'
+

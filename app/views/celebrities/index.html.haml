@@ -1,0 +1,12 @@
+= render 'shared/meta_title_and_keywords', { :key => 'celebrity'}
+/= content_for :heading do
+/  Celebrities
+
+/- unless @celebrities.blank?
+.homeContainerIn.homeborderDiv
+  = render 'shared/celebrities',  { :from => 'home'}
+  .clear
+
+/.right
+/  = will_paginate(@celebrities)
+/.clear

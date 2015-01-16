@@ -1,0 +1,69 @@
+#login
+  .login
+    .heading
+      .heading_label{:style=>"display: none;"} You need to login to rate movies
+      -#%h3
+        -#-if params[:login]
+          -#= t(params[:login])
+    /#message
+    .clear
+    #errors
+    = form_for(@user,  :url => session_path(@user), :remote => true) do |f|
+   
+      /Home Page
+      =hidden_field_tag "home_refer_type","",:value=>params[:home_refer_type] if params[:home_refer_type]
+      =hidden_field_tag "path", "", :value=>params[:path] if params[:path]
+      =hidden_field_tag "id", "", :value=>params[:id] if params[:id]
+      =hidden_field_tag "method_name", "", :value=>params[:method_name] if params[:method_name]
+      =hidden_field_tag "message", "", :value=>params[:message] if params[:message]
+      =hidden_field_tag "status", "", :value=>params[:status] if params[:status]
+      =hidden_field_tag "flag_detail", "", :value=>params[:flag_detail] if params[:flag_detail]
+      /Home page ends
+
+      =hidden_field_tag "refer_cls","",:value=>params[:refer_cls] if params[:refer_cls]
+      =hidden_field_tag "refer_type","",:value=>params[:refer_type] if params[:refer_type]
+      =hidden_field_tag "login_for","",:value=>params[:login_for] if params[:login_for]
+      =hidden_field_tag "refer_id","",:value=>params[:refer_id] if params[:refer_id]
+      %fieldset.registration
+      .field
+        = f.label :email, 'Email'
+        = f.email_field :email
+      .clear
+      .field
+        = f.label :password
+        = f.password_field :password
+      .clear
+      .left.forgot_password
+        = link_to "Forgot password?", "/forgot_password" , :style=>"font-size: 15px;padding-left:85px;"
+      #register{:class=>"pull-right hide"}
+        = link_to "Register", "javascript:void(0)", :class=>"btn-email-join" , :style=>"font-size: 15px;padding-left:85px;"
+      .clear{:style=>"height:10px;"}
+      .actions.right
+        %input{:type=>"button", :style=>"color:#494949;", :value=>"Cancel", :"aria-hidden"=>"true", :"data-dismiss"=>"modal", :class=>"btn bold_class"}
+        %input{:type => "submit", :value => "Login", :name => "commit", :id => "comment_submit", :class => "btn btn-primary bold_class"}
+
+
+        -#.left
+          -#\- or -
+          -#= link_to "Cancel", "#", :onclick => "$.modal.close();return false;"
+    .clear
+    -#.links
+      -#= render :partial => "devise/shared/links"
+:javascript
+  $(document).ready(function() {
+    $("#simplemodal-overlay").css('z-index','5000');
+    $("#register_from").css('z-index','5010');
+    $("#new_user").submit(function(){
+      //if($("#errors").html() != ""){
+      //  $("#errors").show();
+      //}
+       $("#user_password").val(Base64.encode($("#user_password").val()));
+        if(jQuery.trim($("#user_email").val()) == "" || jQuery.trim($("#user_password").val()) == ""){
+            $("#errors").html("<p>Oh Beep! something went wrong please try again.</p>");
+            //$('#login > .login > .heading > div.heading_label').html('Oh Beep! something went wrong please try again.').show();
+            return false;
+        }else{
+            return true;
+        }
+    });
+  });

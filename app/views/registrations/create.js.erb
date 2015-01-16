@@ -1,0 +1,12 @@
+<% if resource.errors.empty?  %>
+  $('#registration').dialog('destroy');
+  location.reload(true);
+
+  //registration();
+  //$('#registration').html('<%= escape_javascript(render '/devise/sessions/new') %>')
+ <%else%>
+  <% messages = resource.errors.full_messages.join(', ') %>
+  $('#errors').html("<p><%= messages %></p>").show();
+ <%end%>
+
+

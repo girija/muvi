@@ -1,0 +1,30 @@
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12" style="background-color:#FFFFFF">
+      <div class="span3">
+        <%=render :partial => "/home/left_sidebar" %>
+      </div>
+   
+      <div class="span9" style="border-left:4px solid #DFDFDF; margin-left: -2px;">
+        <div class="main_content" style="padding:10px;min-height:500px;">
+		<div style="font-size:20px;font-weight:bold;height:45px;"> Change your password</div>
+
+		<%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :put }) do |f| %>
+ 		  <%= devise_error_messages! %>
+ 		  <%= f.hidden_field :reset_password_token %>
+
+		  <div><%= f.label :password, "New password" %><br />
+		  <%= f.password_field :password, :autofocus => true %></div>
+
+		  <div><%= f.label :password_confirmation, "Confirm new password" %><br />
+		  <%= f.password_field :password_confirmation %></div>
+
+		  <div><%= f.submit "Change my password", :class => "btn btn-primary bold_class" %></div>
+		<% end %>
+
+		<%#= render "devise/shared/links" %>
+         </div>
+      </div>
+    </div>
+  </div>
+</div>

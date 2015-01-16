@@ -1,0 +1,12 @@
+.rating{:style => 'width:590px;height:25px;'}
+  .meter.left
+    %span{:style => "width:#{@movie.muvimeter}%"}
+  .inner_ratingBar.left{:class=>"tip_hint tooltipbottom"}
+    = ratingbar(@movie.muvimeter)
+    = generate_tooltip_block("muvi_buzz","movie_page")
+
+  -if @movie.muvimeter != 0 and !@movie.muvimeter.blank? and !@movie.muvimeter.nil?
+    .ratingvalue.left
+      -user = "#{@movie.muvimeter || 0}%"
+      = link_to user, '#users', :onclick => "go_to_tab(0);", :style => "font-size:20px;color:#4F4F4F"
+  .clear{:style => "height:10px"}

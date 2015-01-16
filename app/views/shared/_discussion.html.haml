@@ -1,0 +1,88 @@
+%div{:class=>'row',:style=>"padding-right:0px;"}
+  -if item.class.to_s == "Discussion"
+    -discussion = item
+    %div{:class=>'image left',:style=>"height:32px;width:32px;"}
+      =link_to image_tag(discussion.user.user_image,:alt =>discussion.user.display_name, :style=>"width:30px;height:30px;border: 1px solid #EEEEEE;"), "/profile/#{discussion.user.id}/#{discussion.user.display_name}"
+    %div{:style=>"margin-left:45px;"}
+      = "<span style='font-weight:normal;'>#{discussion.question}</span>".html_safe
+      .small_light_gray
+        %span{:id=>"like_#{discussion.id}",:style=>"margin-right:10px;"}
+          <a href='javascript:void(0);' data-remote='true' onclick = "check_like_login('#{discussion.id}','#{discussion.class}');" class="small_light_gray" id="discussion_like_link_#{discussion.id}">Like</a>
+          (<a href='javascript:void(0);' data-remote='true' id ="like_view_#{discussion.id}" onclick = "show_likes_popup('#{discussion.id}','#{discussion.class.to_s}','like','#{discussion.votes.count}','300','engage_like_dislike');" class="small_light_gray" ><span id='like_cnt_#{discussion.id}' style='font-weight:normal;'>#{discussion.like_votes.count}</span></a>)
+        %span{:id=>"reply_#{discussion.id}",:style=>"margin-right:10px;"}
+          = link_to "Reply(#{discussion.comments.count}).","javascript:void(0);",:onclick=>"show_discussion_comment('#{discussion.id}');",:class=>"small_light_gray"
+        %span{:id=>"time_#{discussion.id}",:style=>"margin-right:10px;"}  
+          = "<span style='font-weight:normal'> #{discussion.user.display_name} &nbsp;&nbsp;".html_safe + distance_of_time_in_words(Time.now,discussion.created_at) + " ago</span>".html_safe
+  -elsif item.class.to_s == "CelebTweet"
+    -tweet = item
+    %div{:class=>'image left',:style=>"height:32px;width:32px;"}
+      %a{:href=>"http://www.twitter.com/#!/#{tweet.twitter_screen_name}", :target=>"_blank"}
+        %img{:src => "http://api.twitter.com/1/users/profile_image?screen_name=#{tweet.twitter_screen_name}&size=normal", :style=>"width:30px;height:30px;border: 1px solid #EEEEEE;"}
+    %div{:style=>"margin-left:45px;"}
+      = "<a href='/stars/#{tweet.celebrity.permalink}'>#{tweet.celebrity.name}</a> - <span style='font-weight:bold;'>#{tweet.content}</span>".html_safe
+      .small_light_gray
+        %span{:id=>"like_#{tweet.id}",:style=>"margin-right:10px;"}
+          <a href='javascript:void(0);' data-remote='true' onclick = "check_like_login('#{item.id}','#{item.class}');" class="small_light_gray" id="discussion_like_link_#{item.id}">Like</a>
+          (<a href='javascript:void(0);' data-remote='true' id ="like_view_#{item.id}" onclick = "show_likes_popup('#{item.id}','#{item.class.to_s}','like','#{item.like_votes.count}','300','engage_like_dislike');" class="small_light_gray" ><span id='like_cnt_#{item.id}' style='font-weight:normal;'>#{item.like_votes.count}</span></a>)
+        %span{:id=>"reply_#{tweet.id}",:style=>"margin-right:10px;"}
+          = link_to "Reply(#{tweet.comments.count}).","javascript:void(0);",:onclick=>"show_discussion_comment('#{tweet.id}');",:class=>"small_light_gray"
+  -elsif item.class.to_s == "Video"
+    -video = item
+    %div{:id => "video_image_#{video.id}",:style=>"height:32px;width:32px;float:left;"}
+      - unless video.video_remote_url.blank?
+        - video_id_arr = video.video_remote_url.split("/")
+        - video_id = video_id_arr[video_id_arr.size.to_i - 1]
+        %div{:style => "position:relative;background:url('http://img.youtube.com/vi/#{video_id}/1.jpg'); height:30px;width:30px;cursor:pointer;", :onclick => "javascript:show_video(#{video.id},'#{refer.class.to_s.downcase}','#{refer.permalink}');"}
+          %img{:src => "/images/play_button.png", :style => "position:absolute;right:5px;bottom:5px"}
+      - else
+        %div{:style => "position:relative;background:url('/system/trailer_thumbnails/#{video.id}/1.jpg'); height:30px;width:30px;cursor:pointer;", :onclick => "javascript:show_video('#{video.id}','#{refer.class.to_s.downcase}','#{refer.permalink}');"}
+          %img{:src => "/images/play_button.png", :style => "position:absolute;right:5px;bottom:5px"}
+
+    %div{:style=>"margin-left:45px;"}
+      = "<span style='font-weight:bold;'>#{video.name}</span>".html_safe unless video.name.blank?
+      .small_light_gray
+        %span{:id=>"like_#{video.id}",:style=>"margin-right:10px;"}
+          <a href='javascript:void(0);' data-remote='true' onclick = "check_like_login('#{item.id}','#{item.class}');" class="small_light_gray" id="discussion_like_link_#{item.id}">Like</a>
+          (<a href='javascript:void(0);' data-remote='true' id ="like_view_#{item.id}" onclick = "show_likes_popup('#{item.id}','#{item.class.to_s}','like','#{item.like_votes.count}','300','engage_like_dislike');" class="small_light_gray" ><span id='like_cnt_#{item.id}' style='font-weight:normal;'>#{item.like_votes.count}</span></a>)
+          /= link_to "Like(#{video.votes.count}).","javascript:void(0);",:onclick=>"show_discussion_likes('#{video.id}');",:class=>"small_light_gray"
+        %span{:id=>"reply_#{video.id}",:style=>"margin-right:10px;"}
+          = link_to "Reply(#{video.comments.count}).","javascript:void(0);",:onclick=>"show_discussion_comment('#{video.id}');",:class=>"small_light_gray"
+
+  -elsif item.class.to_s == "Poster"
+    -poster = item
+    %div{:id => "poster_#{poster.id}",:style=>"height:32px;width:32px;float:left;"}
+      - unless poster.poster.url(:thumb).blank?
+        = image_tag "/system/posters/#{poster.id}/thumb/#{poster.poster_file_name.gsub(" ", "%20")}", :width => "32px", :height => "32px",:onclick => "javascript:show_poster('#{poster.id}','#{refer.class.to_s.downcase}','#{refer.permalink}');", :style => "cursor:pointer"
+    %div{:style=>"margin-left:45px;"}
+      = "<span style='font-weight:bold;'>#{poster.name.html_safe}</span>".html_safe unless poster.name.blank?
+      .small_light_gray
+        %span{:id=>"like_#{poster.id}",:style=>"margin-right:10px;"}
+          <a href='javascript:void(0);' data-remote='true' onclick = "check_like_login('#{item.id}','#{item.class}');" class="small_light_gray" id="discussion_like_link_#{item.id}">Like</a>
+          (<a href='javascript:void(0);' data-remote='true' id ="like_view_#{item.id}" onclick = "show_likes_popup('#{item.id}','#{item.class.to_s}','like','#{item.like_votes.count}','300','engage_like_dislike');" class="small_light_gray" ><span id='like_cnt_#{item.id}' style='font-weight:normal;'>#{item.like_votes.count}</span></a>)
+          /= link_to "Like(#{poster.votes.count}).","javascript:void(0);",:onclick=>"show_discussion_likes('#{poster.id}');",:class=>"small_light_gray"
+        %span{:id=>"reply_#{poster.id}",:style=>"margin-right:10px;"}
+          = link_to "Reply(#{poster.comments.count}).","javascript:void(0);",:onclick=>"show_discussion_comment('#{poster.id}');",:class=>"small_light_gray"
+    
+  .clear
+  %div{:id => "engage_like_dislike", :style=>"display:none;padding:5px;max-height:320px;"}
+  -reply_cnt = item.comments.count
+  -if !item.comments.blank?
+    -style_attr = "block"
+  -else
+    -style_attr = "none"
+  %div{:id => "item_comments_#{item.id}",:class=>"discussion_child",:style=>"display:#{style_attr}"}
+    -reply_cnt = item.comments.count
+    %div{:id=>"list_reply_#{item.id}"}
+      %div{:id=>"latest_two_discussion_reply_#{item.id}"}
+        -item_comments = item.comments.to_level.includes(:user).sort { |p1, p2| p1.created_at <=> p2.created_at }
+        -item_comments.each_with_index do |comment,i|
+          -if i >  item_comments.count-3
+            = render '/shared/discussion_comment', { :comment => comment}
+            .clear
+      %div{:id=>"all_discussion_reply_#{item.id}",:style=>"display:none;"}
+        -item_comments = item.comments.to_level.includes(:user).sort { |p1, p2| p1.created_at <=> p2.created_at }
+        -item_comments.each_with_index do |comment,i|
+          = render '/shared/discussion_comment', { :comment => comment}
+      = render '/comments/discussion_form', {:discussion => item}
+  .clear
+

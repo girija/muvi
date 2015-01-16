@@ -1,0 +1,232 @@
+-if @trailer != false
+  -video_url = "#{VIDEO_URL}/system/trailers/#{@trailer.id}/original/#{@trailer.trailer_file_name.to_s}"
+-else
+  -video_url = ""
+:javascript
+  $(document).ready(function($) {
+    $("#lnk-all").removeClass("subtab_active");
+    $("#lnk-review").removeClass("subtab_active");
+
+    $("#lnk-all").addClass("subtab_active");
+    /*if(document.URL.indexOf("#trailer") != -1){
+      //setTimeout(function(){$(".btn_view_trailer_inside").click()},5000);
+      var movie_name = "#{@movie.name}";
+      //$("#myModalLabel").html(movie_name+" Trailer");
+      videourl = "#{video_url}";
+      if (videourl == "") {
+        return false;
+      }
+      $('#video_player').remove();
+      var $video = $('<a />', {
+        href: videourl,
+        id: 'video_player',
+        style: 'display:block;height:290px;width:610px;'
+      });
+      $('#myTrailer .modal-body').append($video);
+      $('#myTrailer').modal('show');
+      flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+    }*/
+  });
+
+  function prefill_review(review_desc){
+    $("#review_body").html(review_desc);
+  }
+
+  function filter_reviews_not_used(fil_type,movie_id){
+    if(fil_type == 'all'){
+      $("#all_notification").show();
+      $("#only_review").hide();
+      $("#lnk-review").removeClass("subtab_active");
+      $("#lnk-all").addClass("subtab_active");
+      $('div').remove('.arrow_div');
+      $("#lnk-all").parent().append("<div class='arrow_div'></div>");
+    }else{
+      $("#lnk-review").addClass("subtab_active");
+      $("#lnk-all").removeClass("subtab_active");
+      $('div').remove('.arrow_div');
+      $("#lnk-review").parent().append("<div class='arrow_div'></div>");
+      var only_rev = $("#only_review").html();
+      if(only_rev == ""){
+        var url = "/fetch_only_review";
+        $.post(url,{movie_id:movie_id},function(res){
+          $("#only_review").html(res);
+          $("#only_review").show();
+          $("#all_notification").hide();
+        });
+      }else{
+        $("#all_notification").hide();
+        $("#only_review").show();
+      }
+    }
+  }
+
+  $(function() {
+    $("#current_user_id").val("#{current_user ? current_user.id : ''}");
+    $(".btn_view_trailer_inside").live("click", function(){
+      var movie_name = "#{@movie.name}";
+      //$("#myModalLabel").html(movie_name+" Trailer");
+      videourl = $(this).attr('data-id');
+      if (videourl == "") {
+        return false;
+      }
+      $('#video_player').remove();
+      var $video = $('<a />', {
+        href: videourl,
+        id: 'video_player',
+        style: 'display:block;height:290px;width:610px;'
+      });
+      $('#myTrailer .modal-body').append($video);
+      flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+    });
+  });
+  //flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+#loginModal.modal.fade.hide{:style => 'width:365px;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    %h4#rateModalLabel
+      Login
+  .modal-body
+  .modal-footer
+
+
+#reviewModal.modal.fade.hide{:style => 'width:375px;'}
+  .modal-body{:id=>"review_body"}
+  .modal-footer
+    %button{:type => "button", "data-dismiss" => "modal" , "aria-hidden" => "true", :class=>"btn"}
+      Close
+
+-cur_userid = current_user ? current_user.id : ""
+
+.container-fluid
+  .row-fluid
+    .span12.well-small
+      .row-fluid
+        .media{:style => "margin-left: -14px; margin-top: -9px;"}
+          %a.pull-left{:href => "#", :style => "width:245px; height:375px"}
+            =image_tag(@movie.full_image, :style => "width:245px; height:375px;")
+
+          .media-body{:style=>"padding-left:15px;margin-top:15px;"}
+            %h5{:style => 'font-size:27px;margin-top:0px; width:450px;', :class => "left"}
+              = @movie.name
+
+            -unless current_user.blank?
+              .left
+                = link_to "<i class='icon-reorder' style='font-size:21px'></i>".html_safe, "#addtolist" , :class => "btn-add-list-profile tip_hint", :'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('add_to_list','movie'), "data-id"  => @movie.id
+
+                %div{:id => "show_user_list_#{@movie.id}", :class => "show_user_list", :style => "display:none; background-color: #FFFFFF; border: 1px solid #B1B1B1; line-height: 1.5em;  padding-left: 0px; padding-botom:5px; position: absolute; width: 250px; z-index:700;border-radius:6px;"}
+         
+                &nbsp; &nbsp; &nbsp; &nbsp; 
+                /=link_to "<i class='icon-user' style='font-size:22px'></i>".html_safe, "#fbModal" , :class => "btn-add-fb-profile tip_hint", :'data-toggle'=>"modal",:'data-original-title'=>generate_tooltip_block('invite_to_muvi','all'), "data-id"  => @movie.id, :onclick => "fetch_fb_contacts();"
+                =link_to "<i class='icon-user' style='font-size:22px'></i>".html_safe, "#" , :class => "btn-add-fb-profile_1 tip_hint", :'data-toggle'=>"modal",:'data-original-title'=>generate_tooltip_block('recom_movie_friend','movie'), "data-id"  => @movie.id, :onclick => "FacebookInviteFriends();"
+
+
+            -else
+              = link_to "<i class='icon-reorder'></i>".html_safe, "#addtolist" , :class => "btn-add-list-login tip_hint", :'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('add_to_list','all'), "data-id"  => @movie.id
+
+            .clear
+            %div{:style => 'font-size:15px;margin-top:5px;color:#a4a4a4;font-weight:bold;'}
+              = @movie.release_date.strftime("%d %b %Y") if @movie.release_date
+              &nbsp; &nbsp; &nbsp; &nbsp;
+              -begin
+                = @movie.genre.is_a?(String) ? @movie.genre.camelize : @movie.genre.to_sentence if @movie.genre
+              -rescue
+
+            .clear{:style => "height:20px"}
+            -if video_url != ""
+              /= link_to "<i class='icon-play-circle'></i> View Trailer".html_safe, "#myModal" , :class => 'btn btn_view_trailer', "data-toggle" => "modal", "role" => "button", "data-id" => "#{video_url}"
+              .left{:style => "width: 30px"}
+                =image_tag("play_icon.png")
+              .left
+                -if @movie.permalink == "its-a-wonderful-life"
+                  =link_to "Watch the movie", "#myTrailer" , :style => 'font-size:25px; text-decoration:none;', "data-toggle" => "modal", "role" => "button", :class => 'btn_view_trailer_inside', "data-id" => "#{video_url}"
+                -else
+                  =link_to "Watch the trailer", "#myTrailer" , :style => 'font-size:25px; text-decoration:none;', "data-toggle" => "modal", "role" => "button", :class => 'btn_view_trailer_inside', "data-id" => "#{video_url}" 
+            -else
+              .clear{:style => "height:25px"}
+              /.left{:style => "width: 30px"}
+              /  =image_tag("play_icon.png")
+              /.left
+              /  -if @movie.permalink == "its-a-wonderful-life"
+              /    =link_to "Watch the movie","javascript:void(0)" , :style => 'font-size:25px; text-decoration:none;', :class => 'btn_view_trailer'
+              /  -else
+              /    =link_to "Watch the trailer","javascript:void(0)" , :style => 'font-size:25px; text-decoration:none;', :class => 'btn_view_trailer'
+
+            .clear{:style => "height:20px"}
+
+            .left{:style => "height: 90px;"}
+              = @movie.story.slice!(0, 350) if @movie.story
+            .clear{:style => "height:7px"}
+            -if !@movie.additional_info.blank?
+              .left{:style => "height: 70px; background-color: #F7F7F7;padding:5px;"}
+                = @movie.additional_info.slice!(0, 250) 
+            -else
+              .left{:style => "height: 70px;padding:5px;"}
+                &nbsp;
+
+            .clear
+            .left
+              /20 Seen, 12 Wanna See, 3 Lists
+              
+            .clear{:style => "height:20px"}
+
+            .left{:style => "margin-top:3px;"}
+              /= render :partial => "reviews/form", :locals => { :from => from, :movie => @movie, :review => ((from == 'movies')? false : true) }              
+              = render :partial => "reviews/new_form", :locals => { :from => from, :movie => @movie, :review => ((from == 'movies')? false : true) }
+            .left{:style => "margin-top: 17px; margin-left: 10px; font-weight: bold; color: #494949;"}
+              -@ms = MuviStatistic.find_by_movie_id(@movie.id)
+              -unless @ms.blank?
+                %a{:href => "#list_modal", 'data-toggle' => "modal", :style => "color: #494949;"}
+                  =@ms.list_count
+                  Lists
+                -@modal_header = "#{@movie.name}'s Lists"
+                =render "/user_movie_lists/show_list_count", :locales =>{:ms => @ms, :modal_header => @modal_header}
+
+        .clear{:style => "height:10px"} 
+        .row-fluid{:style => "margin-left:-14px"}
+          .span12.well-small
+            %div
+              %div{:class=>"heading",:style=>"float:left;"}
+                CAST &amp; CREW
+                
+              %div{:style=>"float:left;border-bottom:1px solid #ececec;width:697px;margin-left:20px;height:10px;"}
+
+          .span12.well-small
+            -@cast_crew.each do |cast|
+              -if cast && cast.celebrity
+                .left{:style => "width:200px; font-size:12px; margin-bottom:10px;"}
+                  .left{:style => "margin-right: 5px"}
+                    /{:style => "width: 40px; padding-left: 5px; border: 1px solid #E3E5DA;margin-right:3px;background-color:#F3EFE4;"}
+                    =link_to image_tag(cast.celebrity.thumb_image, :style => "width:35px; height:35px;"), star_path(cast.celebrity)
+  
+                  .left{:style => "width:150px"}
+                    %span{:class => "movie_block_title", :style => "font-size:12px"}
+                      =link_to(cast.celebrity.name, star_path(cast.celebrity), :style => "color:#3F3F3F; font-family:verdana")
+                      -if cast.cast_type != "actor"
+                        .clear
+                        %span{:style => "color: #A6A6A6; font-size:11px;"}
+                          =cast.cast_type
+
+          .clear{:style => "height:10px"}
+          =link_to "","#",:name=>"reviews"
+          .row-fluid
+            .span12.well-small
+              .left
+                %div{:class=>"heading",:style=>"float:left; width:70px; "}
+                  ACTIVITY
+                %div{:style => "float:left"}
+                  .pull-left
+                    %span{:class=>"sub_tab", :id => 'lnk-all'}
+                      = link_to "All", "javascript:filter_reviews('all','#{@movie.id}')"
+                    .arrow_div
+                  .pull-left
+                    %span{:class=>"sub_tab", :id => 'lnk-review'}
+                      = link_to "Reviews", "javascript:void(0);", :onclick=>"filter_reviews('reviews','#{@movie.id}')"
+                      /"javascript:showMe('reviews')"
+
+                %div{:style=>"float:left;border-bottom:1px solid #ececec;width:600px;margin-left:20px;height:10px;"}
+
+        .clear
+          %div{:id=>"all_notification"}
+            = render :partial => "shared/movie_notifications"
+          %div{:id=>"only_review",:style=>"display:none;"}

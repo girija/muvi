@@ -1,0 +1,103 @@
+:javascript
+  $(document).ready(function() {
+    if("#{request.env["HTTP_REFERER"]}".indexOf("users/password/edit?reset_password_token") != -1){
+      registration();
+      $.get('/user/sign_in', function(data){
+        $("#registration").html(data);
+      });
+  
+    }
+  });
+ 
+.footer
+  .col.left
+    %span{:style => "margin-right:15px"}
+      -if params[:msn_embed] == "msn_embed"
+        = link_to "About Us", find_page_msn('what-is-muvi')
+      -else
+        = link_to "About Us", find_page('what-is-muvi')
+
+    %span{:style => "margin-right:15px"}
+      -if params[:msn_embed] == "msn_embed"
+        = link_to "Career", find_page_msn('careers')
+      -else
+        = link_to "Career", find_page('careers')
+
+    %span{:style => "margin-right:15px;"}
+      =link_to "Press","http://www.muvi.com/press"
+
+    %span{:style => "margin-right:15px"}
+      /=link_to "Muvi API", "http://www.muvi.com/api", :style => "color:#989898;", :target => "_blank"
+      =link_to "Partners", "http://www.muvi.com/partners"
+
+    %span{:style => "margin-right:15px"}
+      %a{:href => "http://www.muvi.com/faq", :target => "_blank"}
+        FAQs
+
+    %span{:style => "margin-right:15px"}
+      %a{:href => "http://www.studio.muvi.com", :target => "_blank"}
+        Content Partners
+
+    %span{:style => "margin-right:15px"}
+      =link_to "Blogs", "http://www.muvi.com/blog",:target=>"_blank"
+
+    %span{:style => "margin-right:15px"}
+      =link_to "Contact Us", contact_us_path
+
+
+  .col.right{:style=>"padding-right:10px;"}
+    .left{:style => "color:#989898;"}
+      Connect with us:
+    .left
+      %div{:class=>"tweet_footer", :onclick=>"javascript:window.open('http://www.twitter.com/muvi','_blank')"}
+
+      %div{:class=>"fb_footer", :onclick=>"javascript:window.open('http://www.facebook.com/muvidotcom','_blank')"}
+      %div{:class=>"gplus_footer", :onclick=>"javascript:window.open('https://plus.google.com/110880828882082462357/','_blank')"}
+
+
+  .clear
+  /-chat = Chat.find(:first)
+
+  .left{:style=>"color:#494949;"}
+    &copy; Muvi.com #{Time.now.strftime('%Y')}
+
+:javascript
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23408239-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+  var _qevents = _qevents || [];
+
+  (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+  })();
+
+  _qevents.push({
+    qacct:"p-9feU-6eJro75E"
+  });
+
+  /*if(("#{params[:msn_embed]}") != "msn_embed"){
+    var uvOptions = {};
+    (function() {
+      var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+      uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/nFdbmZB0XcoPBYkJ9Q.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+    })();
+  }*/
+
+
+
+%noscript
+  %div{:display => "none"}
+    %img{:alt => "Quantcast", :border => "0", :height => "1", :src => "//pixel.quantserve.com/pixel/p-9feU-6eJro75E.gif", :width => "1"}

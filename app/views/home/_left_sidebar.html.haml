@@ -1,0 +1,66 @@
+%div{:class=>"activity_pannel", :style => "width:100%"}
+  -unless current_user.blank?
+    =image_tag("loading.gif", :id => "activity_loader")
+    =show_feed_sidebar("#{current_user.id}")
+
+    :javascript
+      $(document).ready(function(){
+
+        if("#{current_user.sign_in_count}" == '' || "#{current_user.sign_in_count}" == 0 || "#{current_user.sign_in_count}" == 1){
+          //$.post('/admin_feed_for_new_user', function(data) {
+          //});
+        }
+      });
+
+
+  -else
+    .clear{:style => "height:50px"}
+    .left{:style => "margin-left: 20%; margin-right: 20%; width: 60%;"}
+      %center
+        %div{:style => "font-size:16px;"}
+          Join Muvi to see what your friends are watching and want to watch 
+
+          %input{:type => "button", :name => "join", :style => "background:url(/images/join_btn.png) no-repeat; border:none; width:220px; height:35px; margin:15px 0 0 -22px; padding:0; cursor:pointer;", :class => "btn-fb-join-popup"}
+
+          %p{:style => "margin:5px 0 0 -20px; color:#333333;"}
+            Or, 
+            %a{:href => "#", :style => "color:#00aced; text-decoration:none; font-weight:bold", :class => "btn-email-join"}
+              Join with email
+          .clear{:style => "height:25px"}
+
+          Already have an account?
+          .clear
+          %input{:type => "submit", :value => "Login", :name => "commit", :class => "btn btn-success bold_class btn-feed-login", :style => "border: medium none; cursor: pointer; height: 35px; margin: 15px 0px 0px -22px; padding: 0px; width: 220px; font-size: 25px; font-weight: normal;"}
+        
+
+#seen_wanna_see_container{:style => "display:none"}
+  -unless current_user.blank?
+    =image_tag("loading.gif")
+  -else
+    .clear{:style => "height:50px"}
+    .left{:style => "margin-left: 20%; margin-right: 20%; width: 60%;"}
+      %center
+        %div{:style => "font-size:16px;"}
+          Join Muvi to see what your friends are watching and what to watch
+
+          %input{:type => "button", :name => "join", :style => "background:url(/images/join_btn.png) no-repeat; border:none; width:220px; height:35px; margin:15px 0 0 -22px; padding:0; cursor:pointer;", :class => "btn-fb-join"}
+
+          %p{:style => "margin:5px 0 0 -20px; color:#333333;"}
+            Or,
+            %a{:href => "#", :style => "color:#00aced; text-decoration:none; font-weight:bold", :class => "btn-email-join"}
+              Join with email
+          .clear{:style => "height:25px"}
+
+          Already have an account?
+          .clear
+          %input{:type => "submit", :value => "Login", :name => "commit", :class => "btn btn-success bold_class btn-feed-login", :style => "border: medium none; cursor: pointer; height: 35px; margin: 15px 0px 0px -22px; padding: 0px; width: 220px; font-size: 25px; font-weight: normal;"}
+
+
+#movies_from_lists_container{:style => "display:none"}
+  
+
+:javascript
+  $(document).ready(function(){
+    $('.scroll-pane').jScrollPane();
+  });
+

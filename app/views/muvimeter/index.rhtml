@@ -1,0 +1,8 @@
+(function(){
+document.write('<div class="customCSSclass" id="appName-widget">');
+ 
+<% @movie.each do |movie| -%>
+    document.write('<a href="<%= movie_path(movie) %>"><%=h movie.name %></a><br />')
+<% end -%>
+ 
+document.write('</div>') })()

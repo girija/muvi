@@ -1,0 +1,200 @@
+-unless @total_block.blank?
+  -@total_block.each do |res|
+    /-begin
+    =display_homepage_block(res[0])
+    /-rescue
+
+
+:javascript
+
+  var serviceUrl = "http://192.168.2.5:3020";
+
+  $(document).ready(function($) {
+    $('container').masonry({
+      itemSelector : '.home_item'
+    });
+  });
+
+  function show_div(id,show_div, hide_div){
+    $("#"+show_div).show();
+    $("#"+hide_div).hide();
+    $("#review_"+id).hide();
+  }
+
+  function hide_dropdown(id){
+    //$("#like_div_"+id).hide();
+  }
+
+  function set_value(id, v, rate){
+    $("#rating_flag_"+id).val(v);
+    $("#rating_type_"+id).val(rate);
+  }
+  
+  
+  function play_video(movie_id, video_id, path){
+     $.fancybox({
+       'showCloseButton': false,
+       'autoScale' : true,
+       'padding' : 0,
+       'transitionIn': 'elastic',
+       'transitionOut': 'elastic',
+       'href': "/"+path+"/movie/"+movie_id+"/"+video_id
+    });
+  }
+
+  function set_review_comment(movie_id, user_id){
+    var action = "";
+    if($("#rating_flag_"+movie_id).val() == 1){
+      action = "1";
+    }
+    else{
+      action = "0";
+    }
+    var review = $("#review_"+movie_id).val();
+    var xmlhttp;
+    if (window.XMLHttpRequest){
+      xmlhttp=new XMLHttpRequest();
+    }else{
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange=function(){
+      //if (xmlhttp.readyState==4 && xmlhttp.status==200)
+      if (xmlhttp.readyState==4){
+      }
+    }
+    xmlhttp.open("POST", serviceUrl+"/muvi/movie/"+movie_id+"/comment/"+user_id+".json",true);
+    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    xmlhttp.send("comment="+review+"&status="+action);
+  }
+
+
+
+  function like_dislike(movie_id, user_id, method_name, active_btn, inactive_btn){
+    //set_value(movie_id, 1, method_name);
+    $("#"+active_btn).addClass("active");
+    $("#"+inactive_btn).removeClass("active");
+
+    $("#rating_area_"+movie_id).show();
+
+    var action = "";
+    if($("#rating_flag_"+movie_id).val() == 1){
+      action = "1";
+    }
+    else{
+      action = "0";
+    }
+
+    var xmlhttp;
+    if (window.XMLHttpRequest){
+      xmlhttp=new XMLHttpRequest();
+    }else{
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange=function(){
+      //if (xmlhttp.readyState==4 && xmlhttp.status==200)
+      if (xmlhttp.readyState==4){
+        //alert("Success");
+        set_value(movie_id, 1, method_name);
+      }
+    } 
+    xmlhttp.open("POST", serviceUrl+"/muvi/movies/"+movie_id+"/"+method_name+"/"+user_id+".json",true);
+    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    xmlhttp.send("status="+action);
+  }
+
+  
+  function want_and_not_want(movie_id, user_id, method_name, active_btn, inactive_btn){
+    $("#"+active_btn).addClass("active");
+    $("#"+inactive_btn).removeClass("active");
+
+    var xmlhttp;
+    if (window.XMLHttpRequest){
+      xmlhttp=new XMLHttpRequest();
+    }else{
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange=function(){
+      if (xmlhttp.readyState==4){
+        alert("Success");
+      }
+    }
+    xmlhttp.open("POST", serviceUrl+"/muvi/movie/"+movie_id+"/"+method_name+"/"+user_id+".json",true);
+    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    xmlhttp.send();
+  }
+
+
+  function fan_unfan(star_id, user_id, method_name, active_btn, inactive_btn){
+    $("#"+active_btn).addClass("active");
+    $("#"+inactive_btn).removeClass("active");
+
+    var xmlhttp;
+    if (window.XMLHttpRequest){
+      xmlhttp=new XMLHttpRequest();
+    }else{
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange=function(){
+      if (xmlhttp.readyState==4){
+        alert("Success");
+      }
+    }
+    xmlhttp.open("POST", serviceUrl+"/muvi/stars/"+star_id+"/"+method_name+"/"+user_id+".json",true);
+    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    //xmlhttp.send("fname=Henry&lname=Ford");
+    xmlhttp.send();
+  } 
+
+  function like_dislike_except_movie(id, user_id, type, method_name){
+    var xmlhttp;
+    if (window.XMLHttpRequest){
+      xmlhttp=new XMLHttpRequest();
+    }else{
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange=function(){
+      if (xmlhttp.readyState==4){
+        alert("Success");
+      }
+    }
+    xmlhttp.open("POST", serviceUrl+"/muvi/"+type+"/"+id+"/"+method_name+"/"+user_id+".json",true);
+    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    xmlhttp.send();
+  }
+
+  function show_video_comment(hide_id, show_id){
+    $("#"+hide_id).hide();
+    $("#"+show_id).show();
+  }
+
+  function show_video_btn(video_id, user_id, hide_id, show_id){  
+    if(e.keyCode == 13){
+      var comment = $("#"+hide_id).val();
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+      {
+        xmlhttp=new XMLHttpRequest();
+      }
+      else
+      {
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+      }
+      xmlhttp.onreadystatechange=function()
+      {
+        //if (xmlhttp.readyState==4 && xmlhttp.status==200)
+        if (xmlhttp.readyState==4) 
+        {
+          alert("Success");
+        }
+      }
+ 
+      xmlhttp.open("POST", serviceUrl+"/muvi/video/"+video_id+"/comment/"+user_id+".json",true);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send("comment="+comment);
+
+      $("#"+hide_id).hide();
+      $("#"+show_id).show();
+    }
+  }
+
+        

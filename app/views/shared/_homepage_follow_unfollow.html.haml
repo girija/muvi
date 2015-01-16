@@ -1,0 +1,20 @@
+-unless current_user.blank?
+  -if current_user.id != @user_profile.user_id
+    -unless @count_follow.blank?
+      =render '/shared/follow_form'
+    -else
+      = form_for "connections",:url => "/connections/follow", :html => {:id => "follow_form"},  :remote => true do |f|
+        = f.hidden_field :user_id, :value => @user_profile.user_id
+        %div{:style => 'width:45%;float:left',:id => "follow_div"}
+          .actions.left
+            .orange-gradient-input-button.ui-corner-all
+              .orange-gradient-input-button.ui-corner-all
+                %input{:type => "submit", :value => "Follow", :name => "homepage_commit", :id => "comment_submit", :class => "label"}
+
+        .clear
+-else
+  %a{:href => new_user_session_path(:login => 'fan'), :onclick => "enableLoginError(registration(), 'You need to login');", "data-remote" => "true",:class=>"orange-gradient-input-button ui-corner-all"}
+    .orange-gradient-input-button.ui-corner-all
+      %span{:class => "label"}
+        Follow
+

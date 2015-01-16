@@ -1,0 +1,64 @@
+%h2
+  %span Featured
+  Movie
+.clear
+-unless @featured_movie.blank?
+  -begin
+    -movie = Movie.find_by_id(@featured_movie.subject_id)
+  -rescue
+  
+  -unless movie.blank?
+    .left{:style => "width:112px; height:175px;padding:2px;border:1px solid #dddddd; margin-right:10px"}
+      = link_to image_tag(movie.banner_image, :width => "112px", :height => "175px") , movie_path(movie)
+      =link_to movie.name, movie_path(movie)
+      .clear
+    .left
+      -unless movie.review_summary.blank?
+        =movie.review_summary
+
+      .clear
+  
+      -actors = get_actor_name(movie)
+      -actor_name = ""
+      - unless actors.blank?
+        -i=0
+        - actors.each do |actor|
+          -if i == 2
+            -break
+          -unless actor.celebrity.blank?
+            - unless actor.celebrity.name.blank?
+              -if actor_name.blank?
+                -actor_name = (link_to actor.celebrity.name,star_path(actor.celebrity.permalink),:class => "small_orange_font", :style => "font-weight:normal")
+              -else
+                -actor_name = actor_name + ", "+ (link_to actor.celebrity.name,star_path(actor.celebrity.permalink),:class => "small_orange_font", :style => "font-weight:normal")
+              -i = i + 1
+
+        %span{:class => "small_orange_font"}
+          =actor_name
+     
+      .clear
+      =movie.release_date.strftime('%B %d, %Y') unless movie.release_date.blank?
+      .clear
+
+      -if !movie.release_date.nil? and !movie.release_date.blank? and movie.release_date <= Date.today or !movie.critics_reviews.blank?
+        .home_page_rating{:style => "margin-top:110px; width:160px"}
+          = link_to "Muvimeter", movie_path(movie, :anchor => "critics"),:style => "color:#4F4F4F"
+          .clear
+          .home_rating_bar.left
+            = ratingbar(movie.muvimeter)
+          -if !movie.muvimeter.blank? and movie.muvimeter != 0
+            .home_ratingvalue.left
+              = "#{movie.muvimeter || 0}%"
+      -else
+        .home_page_rating{:style => "margin-top:110px; width:160px"}
+          = link_to "Tweeter Buzz", movie_path(movie, :anchor => "users"),:style => "color:#4F4F4F"
+          .clear
+          .home_rating_bar.left
+            = ratingbar(movie.tweet_percent)
+          -if !movie.tweet_percent.blank? and movie.tweet_percent != 0
+            .home_ratingvalue.left
+              = "#{movie.tweet_percent || 0}%"
+      
+
+
+

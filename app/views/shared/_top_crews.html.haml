@@ -1,0 +1,37 @@
+=sidebar_content(:heading => "Top Crew", :class => "GrayHeaderBox")
+-count = 1
+-@top_crews.each do |cs|
+  -@celeb = Celebrity.find_by_id(cs.celebrity_id)
+  -movies = get_movie_name_of_celeb(@celeb, @celebrity)
+  -movie_name = ""
+  -movie_link = ""
+  -unless movies.blank?
+    -i=0
+    -movies.each do |mov|
+      - unless mov.name.blank?
+        -if i == 2
+          -break
+        - else
+          - i = i + 1
+        -if movie_name.blank?
+          -movie_name = mov.name
+          -movie_link = movie_path(mov.permalink)
+        -else
+          -movie_name = movie_name + ","+ mov.name
+          -movie_link = movie_link + "," + movie_path(mov.permalink)
+  -movie_cnt =  "Together in #{movies.count} movies "
+  -cnt_link = ""
+  
+  -unless @celeb.blank?
+    -cnt_link = "/stars/#{@celebrity.permalink}/#{@celeb.permalink}/together"
+  -if count == @top_crews.size
+    -unless @celeb.blank?
+      =sidebar_detail("#{@celeb.thumb_image}", :name => @celeb.name, :link_on_name => star_path(@celeb), :width => 42, :height => 42,:subtexts => movie_cnt, :sublink => cnt_link, :end => 1)
+    -else
+      =sidebar_detail("", :name => "", :link_on_name => "",:width => 42, :height => 42,:subtexts => "", :sublink => "", :end => 1)
+  -else
+    -unless @celeb.blank?
+      -count = count + 1
+      =sidebar_detail("#{@celeb.thumb_image}", :name => @celeb.name, :link_on_name => star_path(@celeb), :width => 42, :height => 42,:subtexts => movie_cnt, :sublink =>cnt_link)
+    -else
+      =sidebar_detail("", :name => "", :link_on_name => "",:width => 42, :height => 42,:subtexts => "", :sublink => "", :end => 1)

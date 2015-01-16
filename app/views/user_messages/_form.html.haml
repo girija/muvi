@@ -1,0 +1,53 @@
+= form_for(@user_message || UserMessage.new) do |f|
+  -if f.object.errors.any?
+    #errorExplanation{:style=>"color:red;"}
+      %h5= "Sorry. Message could not be sent due to following reasons."
+      %ul.errors
+        - f.object.errors.full_messages.each do |msg|
+          %li= msg
+  %div{:style=>"padding-top:20px;float:left;width:545px;"}
+    .fields
+      %div{:style=>"float:left;width:150px;"}
+        ="Email <span style='color:red;'>*</span>".html_safe
+      = f.text_field :email, :style=>"width:300px;"
+    .fields
+      %div{:style=>"float:left;width:150px;"}
+        Phone number
+      = f.text_field :phone_no, :style=>"width:300px;"
+
+
+    .fields
+      %div{:style=>"float:left;width:150px;"}
+        ="Message <span style='color:red;'>*</span>".html_safe
+      = f.text_area :message, :rows => '6', :style=>"width:380px;"
+
+    %br
+    .pull-right
+      %input{:type=>"submit",:value=>"Send",:class=>"btn btn-primary bold_class"}
+  %div{:style=>"float:right;width:200px;"}
+    %div{:style=>"font-size:20px;font-weight:bold;color:#b1b1b1;cursor:pointer;",:id=>"investors_show",:onclick=>"display_email('investors')"}
+      ="<div style='float: left; padding-top: 2px; width: 25px;font-size:15px;'><i id='marker132' class='icon-chevron-down'></i></div>For Investors".html_safe
+    .clear
+    %div{:style=>"font-size:20px;font-weight:bold;color:#494949;display:none;cursor:pointer;",:id=>"investors_hide",:onclick=>"display_email('investors')"}
+      ="<div style='float: left; padding-top: 2px; width: 25px;font-size:15px;'><i id='marker132' class='icon-chevron-up'></i></div>For Investors".html_safe
+      =link_to "investors@muvi.com","mailto:investors@muvi.com",:style=>"font-size:14px;font-weight:normal;" 
+    .clear{:style=>"height:20px;"}
+    %div{:style=>"font-size:20px;font-weight:bold;color:#b1b1b1;cursor:pointer;",:id=>"partners_show",:onclick=>"display_email('partners')"}
+      ="<div style='float: left; padding-top: 2px; width: 25px;font-size:15px;'><i id='marker132' class='icon-chevron-down'></i></div>For Partners".html_safe
+    .clear
+    %div{:style=>"font-size:20px;font-weight:bold;color:#494949;display:none;cursor:pointer;",:id=>"partners_hide",:onclick=>"display_email('partners')"}
+      ="<div style='float: left; padding-top: 2px; width: 25px;font-size:15px;'><i id='marker132' class='icon-chevron-up'></i></div>For Partners".html_safe
+      =link_to "partners@muvi.com","mailto:partners@muvi.com",:style=>"font-size:14px;font-weight:normal;"
+    .clear{:style=>"height:20px;"}
+    %div{:style=>"font-size:20px;font-weight:bold;color:#b1b1b1;cursor:pointer;",:id=>"others_show",:onclick=>"display_email('others')"}
+      ="<div style='float: left; padding-top: 2px; width: 25px;font-size:15px;'><i id='marker132' class='icon-chevron-down'></i></div>For Others".html_safe
+    .clear
+    %div{:style=>"font-size:20px;font-weight:bold;color:#494949;display:none;cursor:pointer;",:id=>"others_hide",:onclick=>"display_email('others')"}
+      ="<div style='float: left; padding-top: 2px; width: 25px;font-size:15px;'><i id='marker132' class='icon-chevron-up'></i></div>For Others".html_safe
+      =link_to "info@muvi.com","mailto:others@muvi.com",:style=>"font-size:14px;font-weight:normal;"
+
+:javascript
+  function display_email(blk_name){
+    $("#"+blk_name+"_show").toggle();
+    $("#"+blk_name+"_hide").toggle();
+  }

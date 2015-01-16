@@ -1,0 +1,7 @@
+$('<div class="gradient_class" style="padding:5px; font-size:12px; background-color: #FFFFFF"><a class="pull-left" href="/movies/<%= @movie.permalink %>"><img src="<%= POSTER_URL %><%= @movie.banner_image %>" alt="<%= @movie.name %>" class="image_class"></a><div class="media-body" style="min-height:90px;"><h5 class="media-heading"><a href="/movies/<%= @movie.permalink %>"><%= @movie.name %></a></h5><%= @movie.get_first_two_actors_link_gray.html_safe %> <div class="clear"></div> <div class="right" style="margin-top:18px;"> <div id="rate_<%= @movie.id %>"><a role="button" onclick="populate_data(\'<%= @movie.name %>\', \'<%= @movie.id %>\', \'<%= @movie.permalink%>\');" data-toggle="modal" class="btn btn-primary" href="#rateModal"><i class="icon-star"></i> Rate</a></div></div></div></div>').hide().prependTo(".seen_pannel .media .items .jspContainer .jspPane").css({opacity:0}).slideDown("slow").animate({opacity:1},"slow");
+
+if($(".seen_pannel").is(":visible") == false){
+    $("#seen_icon").css({color: '#333333'});
+    setTimeout(function(){$("#seen_icon").css({color: '#CCCCCC'})}, "1000");
+}
+

@@ -1,0 +1,293 @@
+:javascript
+  $(document).ready(function($) {
+    setTimeout("set_critics_review()",3000);
+    var engage = "#{params[:engage]}";
+    if(engage=="true"){
+      $("#engage_btn").click();
+    }
+    if("#{params[:autoplay]}" == "video"){
+      $("#video#{params[:video_id]}").click();
+    }
+    if("#{params[:autoplay]}" == "poster"){
+      $("#poster#{params[:video_id]}").click();
+    }
+  });
+  function set_critics_review(){
+    $('#mas_container').masonry({
+      itemSelector : '.mas_item'
+    });
+    $('#mas_container_tweets').masonry({
+      itemSelector : '.mas_item'
+    });
+  }
+#trailer.hidden
+  - is_upcoming = true
+  - if !@movie.release_date.nil? and !@movie.release_date.blank? and @movie.release_date <= Date.today or !@movie.critics_reviews.blank?
+    - is_upcoming = false
+  -default_video = get_default_video(@movie)
+  -if default_video != false
+    %a#player{:href => "#{default_video.trailer.url.to_s}", :style => "display:block;width:520px;height:330px"}
+    %script
+      flowplayer("player", "#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", { key: '#$8fe04ea70c52430ec72',logo: {url: '/images/flowplayerLogo.png',fullscreenOnly: false, top: 278, right: 2, opacity: 0.5  },clip: {autoPlay: false, autoBuffering: false  }  });
+  -else
+    -default_trailer = get_default_trailer(@movie.id)
+    -if default_trailer != false
+      -video = Video.find_by_id(default_trailer,:conditions => ["rank = 1"])
+      -begin
+        -if video.video_remote_url == ""
+          %a#player{:href => "#{video.trailer.url.to_s}", :style => "display:block;width:520px;height:330px"}
+          %script
+            flowplayer("player", "#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", { key: '#$8fe04ea70c52430ec72',logo: {url: '/images/flowplayerLogo.png',fullscreenOnly: false, top: 278, right: 2, opacity: 0.5  },clip: {autoPlay: false, autoBuffering: false  }  });
+        -else
+          %iframe{:width => "560", :height => "315", :src => "", :frameborder => "0", :style => "display:none", :id => "player"}
+          %div{:class => "video_player_overlay"}
+      -rescue
+
+.containerIn.borderDiv
+  .left{:style => "border:1px solid #d2d6d9"}
+    .moviBanner.left
+      .moviImage
+        = image_tag @movie.banner_image, :size => "152x232"
+      .clear
+  #first_block  
+    .moviDetail.left
+      .detail.panes
+        .top_name_bar{:style => 'background:none;width:818px'}
+          %h1{:style=>"font-size:17px;"}
+            = @movie.name
+        .clear
+
+        #muvi_detail
+          -if params[:news].nil?
+            .moviRatingBox.left
+              -if is_upcoming == false
+                =render :partial => "/shared/display_muvimeter"
+              -else
+                =render :partial => "/shared/display_tweeter_buzz"
+            .clear    
+            .friendsLink.left{ :style => "height:auto;border:0px;width:300px" }
+              = render :partial => "reviews/form", :locals => { :from => from, :movie => @movie, :review => ((from == 'movies')? false : true) }
+            -if !@movie.release_date.nil? and !@movie.release_date.blank? and @movie.release_date <= Date.today 
+              - if true
+                %div{:style=>"height:45px;float:right;"}
+                  .left{:style=>"width:160px;"}
+                    - review_count = @movie.like_votes.count + @movie.dislike_votes.count
+                    %div{:style=>"cursor: pointer;", :onclick =>"show_likes_popup('#{@movie.id}','#{@movie.class.to_s}','like_dislike','#{review_count}','550','movie_popup_#{@movie.id}');"}
+                      - show_dislike = true
+                      - if !@liked_reviews.blank?
+                        .left
+                          - @liked_reviews.each_with_index do |review,i|
+                            - if i < 2 and !review.user.blank?
+                              = image_tag(review.user.user_image,:alt =>review.user.display_name,:title =>review.user.display_name, :style=>"width:25px;height:27px;border: 1px solid #EEEEEE;")
+                          - show_dislike = false
+
+                      - if !@disliked_reviews.blank? and show_dislike == true
+                        .left
+                          - @disliked_reviews.each_with_index do |review,i|
+                            - if i < 2 and !review.user.blank?
+                              = image_tag(review.user.user_image,:alt =>review.user.display_name,:title =>review.user.display_name, :style=>"width:25px;height:27px;border: 1px solid #EEEEEE;")
+
+                      .left
+                        - if !@liked_reviews.blank?
+                          %span{:style=>"padding-left: 5px;font-size:10px;font-weight:normal;"}
+                            ="<span class='small_light_gray'>#{@liked_reviews.count} liked</span>".html_safe
+                        - if !@disliked_reviews.blank?
+                          %div{:style=>"padding-left: 5px;font-size:10px;font-weight:normal;"}
+                            ="<span class='small_light_gray'>#{@disliked_reviews.count} didn\'t</span>".html_safe
+                    %div{:id => "movie_likes_#{@movie.id}", :style=>"display:none;padding:5px;max-height:320px;"}
+                  .left
+                    -want_see = @want_to_see_movies.count + @not_want_to_see_movies.count
+                    %div{:style=>"cursor: pointer;", :onclick =>"show_likes_popup('#{@movie.id}','#{@movie.class.to_s}','want_to_see','#{want_see}','550','movie_popup_#{@movie.id}');"}
+                      - show_not_want = true
+                      - if !@want_to_see_movies.blank?
+                        .left
+                          - @want_to_see_movies.each_with_index do |want_movie,i|
+                            - if i < 2 and !want_movie.user.blank?
+                              = image_tag(want_movie.user.user_image,:alt =>want_movie.user.display_name,:title =>want_movie.user.display_name, :style=>"width:25px;height:27px;border: 1px solid #EEEEEE;")
+                        - show_not_want = false
+  
+                      - if !@not_want_to_see_movies.blank? and show_not_want == true
+                        .left
+                          - @not_want_to_see_movies.each_with_index do |want_movie,i|
+                            - if i < 2 and !want_movie.user.blank?
+                              = image_tag(want_movie.user.user_image,:alt =>want_movie.user.display_name,:title =>want_movie.user.display_name, :style=>"width:25px;height:27px;border: 1px solid #EEEEEE;")
+                      .left
+                        - if !@want_to_see_movies.blank?
+                          %span{:style=>"padding-left: 5px;font-size:10px;font-weight:normal;"}
+                            ="<span class='small_light_gray'>#{@want_to_see_movies.count} want to see</span".html_safe
+                        - if !@not_want_to_see_movies.blank?
+                          %div{:style=>"padding-left: 5px;font-size:10px;font-weight:normal;"}
+                            ="<span class='small_light_gray'>#{@not_want_to_see_movies.count} didn\'t</span>".html_safe
+            -else
+              -if true
+                %div{:style=>"height:45px;float:right;"}
+                  .left{:style=>"width:160px;"}
+                    -want_see = @want_to_see_movies.count + @not_want_to_see_movies.count
+                    %div{:style=>"cursor: pointer;", :onclick=>"show_likes_popup('#{@movie.id}','#{@movie.class.to_s}','want_to_see','#{want_see}','550','movie_popup_#{@movie.id}');"}
+                      - show_not_want = true
+                      - if !@want_to_see_movies.blank?
+                        .left
+                          - @want_to_see_movies.each_with_index do |want_movie,i|
+                            - if i < 2 and !want_movie.user.blank?
+                              = image_tag(want_movie.user.user_image,:alt =>want_movie.user.display_name,:title =>want_movie.user.display_name, :style=>"width:25px;height:27px;border: 1px solid #EEEEEE;")
+                        - show_not_want = false
+                      - if !@not_want_to_see_movies.blank? and show_not_want == true
+                        .left
+                          - @not_want_to_see_movies.each_with_index do |want_movie,i|
+                            - if i < 2 and !want_movie.user.blank?
+                              = image_tag(want_movie.user.user_image,:alt =>want_movie.user.display_name,:title =>want_movie.user.display_name, :style=>"width:25px;height:27px;border: 1px solid #EEEEEE;")
+                      .left
+                        - if !@want_to_see_movies.blank?
+                          %span{:style=>"padding-left: 5px;font-size:10px;font-weight:normal;"}
+                            ="<span class='small_light_gray'>#{@want_to_see_movies.count} want to see</span>".html_safe
+                        - if !@not_want_to_see_movies.blank?
+                          %div{:style=>"padding-left: 5px;font-size:10px;font-weight:normal;"}
+                            ="<span class='small_light_gray'>#{@not_want_to_see_movies.count} didn\'t</span>".html_safe
+            %div{:id => "movie_popup_#{@movie.id}", :style=>"display:none;padding:5px;max-height:320px;"}
+            .clear
+            %h3{:style=>"width:657px;margin-bottom:5px;"}
+            %div
+              -if !@movie.story.blank?
+                %span{:style=>"font-weight:bold;"}
+                  Story:
+                =@movie.story.truncate(240) if @movie.story
+                .clear{:style=>"height:10px;"}
+              %span{:style=>"font-weight:bold;"}
+                Cast:
+              =@movie.get_first_two_actors_link
+              %span{:style=>"font-weight:bold;padding-left:60px;"}
+                Director: 
+              =link_to @director.first.celebrity.name,"/stars/#{@director.first.celebrity.permalink}",:style=>"font-weight:normal;" if @director.first
+              %span{:style=>"font-weight:bold;padding-left:60px;"}
+                Release date:
+              =@movie.release_date.strftime("%d-%m-%Y") if @movie.release_date
+              .clear{:style=>"height:10px;"}
+              -discussion = @movie.discussions.order("created_at desc").first
+              -if discussion
+                %div{:style=>"height:37px;width:670px;background-color:#F3F3F3;"}
+                  %div{:class=>'image left',:style=>"height:25px;width:22px;padding:6px;border: 1px solid #EEEEEE;"}
+                    =link_to image_tag(discussion.user.user_image,:alt =>discussion.user.display_name, :style=>"width:20px;height:22px;border: 1px solid #EEEEEE;"), "/profile/#{discussion.user.id}/#{discussion.user.display_name}"
+                  %div{:style=>"margin-left:42px;padding-top:6px;"}
+                    = "<span style='font-weight:normal;'>#{discussion.question.truncate(100)}</span><br/><span style='font-weight:normal' class = 'small_light_gray'> #{discussion.user.display_name} &nbsp;&nbsp;".html_safe + distance_of_time_in_words(Time.now,discussion.created_at) + " ago</span>".html_safe
+                    %span{:style=>"margin-top:-14px;float:right;"}
+                      = link_to "Engage","javascript:void(0);", :onclick => "muvi_engage_page('#{@movie.permalink}')",:class=>"engage_button", :style=>"text-align: center;"
+  #muvi_other_info{:style=>"clear:both;padding-top:10px;"}
+    = render "/shared/show_video_posters", :object_type => 'movie'
+    .detail{:style=>"width:836px;"}
+      = render '/shared/movie_information'
+
+    -if params[:news].nil? || params[:news] == "news"
+      %a{:href => "#", :name => "news"}  
+      -unless @news.blank?
+        .detail{:style=>"width:836px;"}
+          %div{:id => "latest_news"}
+            -if params[:news] == "news"
+              %h3{:style=>"width:836px;"}
+                %span All News
+            -else
+              %h3{:style=>"width:836px;"}
+                %span Latest
+                News
+                %span{:style=>"float:right;"}
+                  =link_to "See All", "javascript:void(0);", :onclick => "show_all_news('#{@movie.permalink}','movie');", :style => "font-weight:normal;text-transform:capitalize;"
+            .clear{:style => "height:10px"}
+            -check = []
+            -@news.each do |n|
+              -if !check.include?n.taggable_id
+                -check << n.taggable_id
+                -feed = Feed.get_news_feed(n.taggable_id)
+                -unless feed.blank?
+                  %h1{:style => "font-size:13px"}= link_to feed.entry_title.html_safe, "/news/movies/#{@movie.permalink}/#{n.id}", :style => "color:#4F4F4F;"
+                  %i
+                    =feed.source
+                    =feed.created_at.strftime('%B %d, %Y')
+
+                  .clear
+                  =feed.summary.html_safe unless feed.summary.blank?
+                  =link_to "More", "/news/movies/#{@movie.name}/#{n.id}", :class => "right"
+                  .clear{:style => "height:20px"}
+      %div{:id => "all_news"}
+  #engage{:style=>"width:642px;display:none;float:left;padding-left:10px;"}
+    %div{:align=>"center",:style=>"padding-top:150px;"}
+      =image_tag "/images/loader.gif"
+  .clear
+  -if  params[:news].nil?
+    %a{:href => "#", :name => "review"}
+    %a{:href=>'#', :id=>'hidden_reply_login', :class=>'gradient-button2 left', :href=>"#{new_user_session_path}?movie_param=#{@movie.permalink}", "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' ,:style=>"width:60px;display:none;"}
+    #reviews{:style=>"width:845px;"}
+      %ul
+        -if from == 'movies' and (!@movie.release_date.nil? and !@movie.release_date.blank? and @movie.release_date <= Date.today or !@movie.critics_reviews.blank?)
+          %li= link_to "Critics", "#critics"
+        %li= link_to "Tweets<span>&nbsp;</span>".html_safe, tweets_path(:id => @movie.id)
+        %li= link_to "Users<span>&nbsp;</span>".html_safe, tweets_path(:id => @movie.id, :user => "review")
+        %li= link_to "Friends <span>&nbsp;</span>".html_safe, facebook_posts_path(:id => @movie.id)
+
+      -if !@movie.release_date.nil? and !@movie.release_date.blank? and @movie.release_date <= Date.today or !@movie.critics_reviews.blank?
+        #critics
+          #critics_reviews
+            = render '/shared/critics_reviews'
+          .clear
+    %br
+    - unless current_user.blank?
+      /= render '/comments/form', {:movie => @movie}
+      #recommendations{:style => 'display:none;'}
+        = render "/recommendations/form", {:movie => @movie }
+    %br
+  /#comments
+  /  -@movie.comments.to_level.includes(:user).each do |comment|
+  /    = render '/shared/comment', { :comment => comment }
+#other_like_content{:class=>"other_content", :style=>"display:none"}
+  %a{:title => "Close",:class => "modalCloseImg simplemodal-close"}
+  %div{:class=>"inner_modal"}
+    -if !@liked_reviews.blank?
+      -@liked_reviews.each_with_index do |review,i|
+        %div{:class=>"other_div left"}
+          %div{:class=>"other_icon left"}
+            =link_to image_tag(review.user.user_image,:alt =>review.user.display_name, :style=>"width:35px;height:35px;border: 1px solid #EEEEEE;"), "/profile/#{review.user.id}/#{review.user.display_name}"
+          %div{:class=>"other_name right"}
+            = link_to review.user.display_name,"/profile/#{review.user.id}/#{review.user.display_name}"
+#other_dislike_content{:class=>"other_content", :style=>"display:none"}
+  %a{:title => "Close",:class => "modalCloseImg simplemodal-close"}
+  %div{:class=>"inner_modal"}
+    -if !@disliked_reviews.blank?
+      -@disliked_reviews.each_with_index do |review,i|
+        %div{:class=>"other_div left"}
+          %div{:class=>"other_icon left"}
+            =link_to image_tag(review.user.user_image,:alt =>review.user.display_name, :style=>"width:35px;height:35px;border: 1px solid #EEEEEE;"), "/profile/#{review.user.id}/#{review.user.display_name}"
+          %div{:class=>"other_name right"}
+            = link_to review.user.display_name,"/profile/#{review.user.id}/#{review.user.display_name}"
+#other_want_to_see_content{:class=>"other_content", :style=>"display:none"}
+  %a{:title => "Close",:class => "modalCloseImg simplemodal-close"}
+  %div{:class=>"inner_modal"}
+    -if !@want_to_see_movies.blank?
+      -@want_to_see_movies.each_with_index do |want_movie,i|
+        -if !want_movie.user.blank?
+          %div{:class=>"other_div left"}
+            %div{:class=>"other_icon left"}
+              =link_to image_tag(want_movie.user.user_image,:alt =>want_movie.user.display_name, :style=>"width:35px;height:35px;border: 1px solid #EEEEEE;"), "/profile/#{want_movie.user.id}/#{want_movie.user.display_name}"
+            %div{:class=>"other_name right"}
+              = link_to want_movie.user.display_name,"/profile/#{want_movie.user.id}/#{want_movie.user.display_name}"
+#other_not_want_to_see_content{:class=>"other_content", :style=>"display:none"}
+  %a{:title => "Close",:class => "modalCloseImg simplemodal-close"}
+  %div{:class=>"inner_modal"}
+    -if !@not_want_to_see_movies.blank?
+      -@not_want_to_see_movies.each_with_index do |want_movie,i|
+        -if !want_movie.user.blank?
+          %div{:class=>"other_div left"}
+            %div{:class=>"other_icon left"}
+              =link_to image_tag(want_movie.user.user_image,:alt =>want_movie.user.display_name, :style=>"width:35px;height:35px;border: 1px solid #EEEEEE;"), "/profile/#{want_movie.user.id}/#{want_movie.user.display_name}"
+            %div{:class=>"other_name right"}
+              = link_to want_movie.user.display_name,"/profile/#{want_movie.user.id}/#{want_movie.user.display_name}"
+
+:javascript
+  $(document).ready(function($) {
+    var from = '#{from}';
+    var _index = -1;
+    if(from == 'movies')
+        _index = 1;
+    else
+        _index = 0;
+    if(getUrlAnchor() == "users") go_to_tab(_index);
+    if(getUrlAnchor() == "tweets") go_to_tab(0);
+  });
+

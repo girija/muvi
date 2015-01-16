@@ -1,0 +1,36 @@
+.left{float:left;}	
+.right{float:right;}
+.clear{clear:both;}
+
+.home_item{
+	background-color: #FFFFFF;
+    border: 1px solid #CDCDCD;
+    border-radius: 5px 5px 5px 5px;
+    box-shadow: 2px 2px 7px #A3A3A3;
+    margin: 3px 8px 10px 0px;
+	width:223px;
+}
+
+.box_class{
+  border:1px solid #CDCDCD;
+  margin:3px 10px 10px 3px;
+  border-radius:0px  0px 8px 8px;
+  box-shadow: 1px 1px 1px 1px #333;
+}
+.bottom_overlay{
+  margin-top:-55px;
+  position:absolute;
+  background:url("/public/images/overlay.png") repeat scroll 0 0 transparent;
+  width:212px; 
+  margin-left:5px;	
+  text-transform:capitalize;
+  font-size:12px;
+}
+
+.v_list{
+  position: absolute; 
+  margin-top: -248px; 
+  left: 160px;
+  width:60px;
+  height:237px;
+}

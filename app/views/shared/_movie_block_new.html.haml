@@ -1,0 +1,97 @@
+-if defined?(movie).nil?
+  -movie = @movie
+-if !defined?(@list_type)
+  -id = "movie_block_#{movie.id}_#{@list.id}"
+  -class_name = "movie_block_#{movie.id}_#{@list.id}"
+-else
+  -id = "movie_block_#{movie.id}"
+  -class_name = "movie_block_#{movie.id}"
+
+-if movie.release_date.blank? or movie.release_date > Date.today
+  -upcoming = true
+-else
+  -upcoming = false
+-if movie.story == ""
+  -is_story = "false"
+-else
+  -is_story = "true"
+-if movie.reviews.blank?
+  - show_story = "true"
+-else
+  - show_story = "false"
+.row-fluid{:id => "#{id}", :class => "#{class_name}"}
+  -trailer = Movie.get_default_trailer(movie)
+  .media-body{:class => 'movie_block',:style=>"background-color:#fff;border-top:0px;height:auto;"}
+    - if !defined?(@list_type) && !current_user.blank? && current_user.id == @list.user_id && @list.class.to_s == "UserMovieList"
+      .close_btn_movie_list{:onclick=>"remove_movie_fromlist('#{movie.id}','#{@list.id}')"}
+        <i class='icon-remove'></i>
+
+    .media{:style => 'margin-top:10px;'}
+      .pull-left{:style=>"width:70px;"}
+        = link_to image_tag("#{POSTER_URL}#{movie.banner_image_medium}", :class => 'movie_list_poster' ) , "/movies/#{movie.permalink}"
+        -if trailer != false
+          -video_url = "#{VIDEO_URL}/system/trailers/#{trailer.id}/original/#{trailer.trailer_file_name.to_s}"
+          =image_tag("new_play.png",:onclick=>"play_trailer('#{video_url}','#{movie.name}')",:style=>"margin-left:-50px;z-index:500;cursor:pointer;")
+          /=link_to image_tag("new_play.png",:style=>"margin-left:-50px;z-index:500;cursor:pointer;"), "#myTrailer" , :style => 'font-size:25px; text-decoration:none;', "data-toggle" => "modal", "role" => "button", :class => 'btn_view_trailer_inside', "data-id" => "#{video_url}"
+      .media-body
+        = link_to "#{movie.name}", "/movies/#{movie.permalink}",:class=>"movie_block_title"
+        %div{:class => 'movie_block_cast'}
+          = "#{movie.get_first_two_actors_link}&nbsp;".html_safe
+        -if !@review_text.nil? && !@review_text.blank?
+          .clear{:style => 'padding-top:5px;'}
+          %div{:style => "height:auto;"}
+            =@review_text
+        -if is_story == "true" && show_story == "true"
+          .clear{:style => 'padding-top:5px;'}
+          %div{:id => "#{movie.id}_story", :style => "height:auto;"}
+            -unless movie.story.blank?
+              =movie.story.truncate(150)
+        .clear{:style => 'padding-top:10px;'}
+          - if !current_user.blank?
+            - if current_user.id != params[:user_id].to_i
+              - @disable_wanna_see = true
+              - if @my_seen_movies.include? (movie.id) 
+                - @disable_wanna_see = true
+                - if @my_rated_movies.include? (movie.id)
+                  = link_to "<i class='icon-ok'></i> Rated".html_safe, "#rated" , :class => 'btn btn-success', :style => 'border-radius:2px 2px 2px 2px'
+                - else
+                  .div.rate-block{:style => 'display:inline-block'}
+                    = render "/shared/movie_rating", movie_name: movie.name, movie_image: "#{POSTER_URL}#{movie.banner_image_medium}", movie_id: movie.id, :button => 'small'
+              - else
+                - if upcoming
+                  - @disable_wanna_see = false
+                  = link_to "<i class='icon-ok'></i> Have Seen".html_safe, "#seen" , :class => 'btn btn-seen-profile disabled', "data-id" => movie.id, :style => 'border-radius:2px 2px 2px 2px'
+                - else
+                  - @disable_wanna_see = false
+                  .div.rate-block{:style => 'display:none'}
+                    = render "/shared/movie_rating", movie_name: movie.name, movie_image: "#{POSTER_URL}#{movie.banner_image_medium}", movie_id: movie.id, :button => 'small'
+                  = link_to "<i class='icon-ok'></i> Have Seen".html_safe, "#seen" , :class => 'btn btn-seen-profile btn-primary tip_hint', "data-id" => movie.id, :style => 'border-radius:2px 2px 2px 2px',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('seen','all')
+              - if @my_wanna_see_movies.include? (movie.id)
+                - if @disable_wanna_see == true
+                  = link_to "<i class='icon-plus'></i> Wanna see".html_safe, "#wannasee" , :class => 'btn btn-wanna-see-profile disabled', "data-id"  => movie.id, :style => 'border-radius:2px 2px 2px 2px'
+                - else
+                  = link_to "<i class='icon-plus'></i> Wanna see".html_safe, "#wannasee" , :class => 'btn btn-wanna-see-profile btn-success', "data-id"  => movie.id, :style => 'border-radius:2px 2px 2px 2px'
+              -else
+                - if @disable_wanna_see == true
+                  = link_to "<i class='icon-plus'></i> Wanna see".html_safe, "#wannasee" , :class => 'btn btn-wanna-see-profile disabled', "data-id"  => movie.id, :style => 'border-radius:2px 2px 2px 2px'
+                - else
+                  = link_to "<i class='icon-plus'></i> Wanna see".html_safe, "#wannasee" , :class => 'btn btn-wanna-see-profile btn-primary tip_hint', "data-id"  => movie.id, :style => 'border-radius:2px 2px 2px 2px',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('wanna_see','all')
+            -if !movie.movie_stream.nil? && (!movie.movie_stream.youtube.blank? || !movie.movie_stream.full_movie.blank?)
+              = link_to "<i class='icon-play'></i> Play".html_safe, "/play_fullmovie/#{movie.id}" , :class => 'btn btn-primary tip_hint',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('play','all')
+          - else
+            - if upcoming
+              = link_to "<i class='icon-ok'></i> Have Seen".html_safe, "#seen" , :class => 'btn btn-seen-login disabled', "data-id" => movie.id, :style => 'border-radius:2px 2px 2px 2px'
+            -else
+              = link_to "<i class='icon-ok'></i> Have Seen".html_safe, "#seen" , :class => 'btn btn-seen-login btn-primary tip_hint', "data-id" => movie.id, :style => 'border-radius:2px 2px 2px 2px',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('seen','all')
+            = link_to "<i class='icon-plus'></i> Wanna see".html_safe, "#wannasee" , :class => 'btn btn-wanna-see-login btn-primary tip_hint', "data-id"  => movie.id, :style => 'border-radius:2px 2px 2px 2px',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('wanna_see','all')
+
+
+    %input{:type => "hidden", :value => @page, :id => "hid_page_#{@page}"}
+:javascript
+  $(document).ready(function($) {
+    $(".tip_hint").tooltip({
+      placement: "bottom",
+      html: true
+    });
+  });
+

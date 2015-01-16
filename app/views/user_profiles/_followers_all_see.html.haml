@@ -1,0 +1,17 @@
+- ctr = 0
+- @tagged.followers.each do |follower|
+  - user_profile = follower.user_profile
+  -if !user_profile.profile_image_file_name.blank?
+    = link_to image_tag("/system/profile_images/#{user_profile.id}/thumb/#{user_profile.profile_image_file_name.gsub(' ', '%20')}", :style => "width:25px;height:25px", :alt => user_profile.display_name), "/profile/#{follower.id}/#{follower.display_name}"
+  - else
+    - unless follower.facebook_id.blank?
+      = link_to image_tag("http://graph.facebook.com/#{follower.facebook_id}/picture?type=normal",:style => "height:25px;width:25px;"),"/profile/#{user_profile.user_id}/#{user_profile.display_name}"
+    - else
+      = link_to image_tag("/images/no-profile.png",:style => "height:25px;width:25px;"),"/profile/#{user_profile.user_id}/#{user_profile.display_name}"
+
+  - ctr = ctr + 1
+  - if ctr == 2
+    - break
+%span{:style => 'font-size:12px;'}
+  = "#{@tagged.followers_count > 2 ? @tagged.followers_count - 2  : @tagged.followers_count} following"
+

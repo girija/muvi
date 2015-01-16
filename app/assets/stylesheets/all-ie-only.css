@@ -1,0 +1,70 @@
+.boring{
+  background: url("/images/rating_emotions.png");
+  background-position: -0px -54px;
+  background-repeat: repeat;
+  border: medium none;
+  height: 53px;
+  width: 55px;
+}
+.boring:hover{
+  background: url("/images/rating_emotions.png");
+  background-repeat: repeat;
+  border: medium none;
+  height: 53px;
+  width: 55px;
+}
+.boring_active{
+  background: url("/images/rating_emotions.png");
+  background-repeat: repeat;
+  border: medium none;
+  height: 53px;
+  width: 55px;
+}
+.ok{
+  background: url("/images/rating_emotions.png");
+  background-position: -60px -162px;
+  background-repeat: repeat;
+  border: medium none;
+  height: 53px;
+  width: 55px;
+}
+.ok:hover{
+  background: url("/images/rating_emotions.png");
+  background-position: -60px -108px;
+  background-repeat: repeat;
+  border: medium none;
+  height: 53px;
+  width:55px;
+}
+.ok_active{
+  background: url("/images/rating_emotions.png");
+  background-position: -60px -108px;
+  background-repeat: repeat;
+  border: medium none;
+  height: 53px;
+  width: 55px;
+}
+.good{
+  background: url("/images/rating_emotions.png");
+  background-position: -120px -162px;
+  background-repeat: repeat;
+  border: medium none;
+  height: 53px;
+  width: 55px;
+}
+.good:hover{
+  background: url("/images/rating_emotions.png");
+  background-position: -120px -108px;
+  background-repeat: repeat;
+  border: medium none;
+  height: 53px;
+  width: 55px;
+}
+.good_active{
+  background: url("/images/rating_emotions.png");
+  background-position: -120px -108px;
+  background-repeat: repeat;
+  border: medium none;
+  height: 53px;
+  width: 55px;
+}

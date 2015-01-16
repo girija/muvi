@@ -1,0 +1,108 @@
+#main-wrap
+  #logo-wrapper
+    - if (request.fullpath==root_path)
+      = link_to image_tag('muvi-logo-active.png'), root_path
+    - else
+      = link_to image_tag('muvi-logo-inactive.png'), root_path
+  #menu-wrapper
+    %ul#top_menu{:style=>'width:280px'}
+      /- if (current_user && !current_user.is_critic) or !current_user
+      /  %li{:class => ('active' if (request.fullpath =~ /\/released/ or (request.fullpath == '/upcoming')))}
+      /    = link_to raw("Movies"), "/released"
+
+      /- if current_user && current_user.is_critic
+      /  %li{:class => ('active' if request.fullpath =~ /my_reviews/)}
+      /    = link_to raw("My Reviews"), my_reviews_path
+
+      /- if (current_user && !current_user.is_critic) or !current_user
+      /  %li{:class => ('active' if request.fullpath =~ /trailers/)}
+      /    = link_to raw("Trailers"), "/trailers"
+      /  %li{:class => ('active' if request.fullpath =~ /pictures/)}
+      /    = link_to raw("Pictures"), "/pictures"
+
+      /%li{:class => ('active' if request.fullpath =~ /top_ten/)}
+      /  = link_to raw("Top 10"), top_ten_path
+
+      /%li{:class => ('active' if request.fullpath =~ /news/)}
+      /  = link_to raw("News"), '/news'
+
+      /  /%li{:class => ('active' if request.fullpath =~ /connections/)}
+      /  /  = link_to raw("Connections"), connections_path
+    
+  #search-wrapper
+    = form_tag(search_path, :method => "get", :id => "search_muvi", :onsubmit => "return validate_blank('q');") do |f|
+      .searchBox
+        = text_field_tag 'q', (params[:q] rescue ''), :placeholder => "Enter Movie or Star Name" ,:class => 'searchTxtBox', :style => "border:none"
+        %input{:type => "submit", :value => "", :class => "search_btn"}
+  #profile-wrapper
+    #top_bar
+      .register_login_link
+        %ul.links.right
+          - unless current_user
+            %li
+              /= link_to (image_tag 'join_fb_btn.png'), new_user_registration_path, :remote => true, :onclick => "registration('fauth');"
+              = image_tag 'join_btn.png', :onclick => "check_reg();", :style => "cursor:pointer"
+
+            %li.last
+              /= link_to (image_tag 'login_btn.png'), new_user_session_path, :remote => true, :onclick => "registration();"
+              =image_tag 'login_btn.png', :onclick => "check_login();", :style => "cursor:pointer"
+
+          - else
+            %li{:class => "parent", :style => "padding-left:5px"}
+              -unless current_user.display_name.blank?
+                = link_to current_user.display_name, "#"
+              -else
+                = link_to "Profile", "#"
+              %ul{:class => "children"}
+                %li= link_to "Settings", edit_user_registration_path
+                %li= link_to 'Logout', destroy_user_session_path
+
+            %li.last= link_to "My Profile", "/profile/#{current_user.id}/#{User.convert_to_seo_url(current_user.display_name)}"
+
+        #login.hidden
+        #registration.hidden
+      
+
+
+  =render :partial => "/shared/show_language"
+  /Join Hint starts
+  -if !current_user
+    #join_hint{:style => "display:none"}
+      .join_hint
+        /%a{:style => "cursor:pointer; color: #F86108", :onclick => "check_reg_widget()"}
+        /  Win FREE Movie Tickets!
+        %b
+          Discover movies, trailers and pictures
+        %br
+        %span{:style => "font-weight:normal; font-size:16px"}
+          liked by movie lovers around the world
+      .hint_image
+        =image_tag "/images/hint_arrow.png"
+
+  /Show language hint starts
+  #language_hint{:class => "right language_hint"}
+    .right{:style => "width: 37px; background: url('/images/triangle.png') no-repeat; height: 16px; margin-top:-26px; margin-right: 30px;"}
+    %div{:style => "line-height:1.5em; font-weight:normal"}
+      Discover movies from different countries  
+    .clear
+    .right
+      %input{:type => "button", :style => "background:url('/images/ok.png') no-repeat; width:50px; height:22px; border:0px; padding: 0px; cursor:pointer;", :onclick => "close_language_hint();", :value => ""}
+    .clear{:style => "height: 5px;"}
+
+
+
+
+:javascript
+  if (navigator.appName == 'Microsoft Internet Explorer'){
+    var ua = navigator.userAgent;
+    var re  = new RegExp('MSIE ([0-9]{1,}[\.0-9]{0,})');
+    if (re.exec(ua) != null){
+      rv = parseFloat( RegExp.$1 );
+      if (rv  != 7.0){
+        $("#search-wrapper").css("margin-right", "105px");
+      }
+    }
+  }else{
+    $("#search-wrapper").css("margin-right", "80px");
+  }
+

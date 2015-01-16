@@ -1,0 +1,29 @@
+%table.listing
+  %tr
+    %th Celebrity Name
+    %td
+      /= image_tag(@celebrity.profile_picture.url(:thumb))
+      %img{:src => "#{POSTER_URL}/system/profile_pictures/#{@celebrity.id}/thumb/#{@celebrity.profile_picture_file_name}"}
+      = @celebrity.name
+  %tr
+    %th Type
+    %td= @celebrity.celebrity_type
+  %tr
+    %th Birthdate
+    %td= @celebrity.birthdate
+  %tr
+    %th Birthplace
+    %td= @celebrity.birthplace
+  %tr
+    %th TwitterID
+    %td= @celebrity.twitterid
+  %tr
+    %th Summary
+    %td= @celebrity.summary
+
+= link_to "Back", admin_celebrities_path
+|
+= link_to "Edit", edit_admin_celebrity_path(@celebrity)
+|
+= link_to "Delete", admin_celebrity_path(@celebrity) , :confirm => 'Are you sure?', :method => :delete
+

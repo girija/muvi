@@ -1,0 +1,150 @@
+#registration.containerIn.borderDiv{:style => "background:#ffffff;padding:15px;"}
+  .top_name_bar{:style => "padding:10px 0px 15px;font-size:25px;font-weight:bold;color:#494949;"}
+    Edit Settings
+    .clear
+  #error_block{:style=>"color:#D10000;font-size:15px;display:none;"}
+    Full name  Cann't be blank!
+  .form
+    = form_for(resource, :as => resource_name, :url => "update_profile", :html => { :multipart => true, :method => :get , :onsubmit=>"return check_validation();"}) do |f|
+      = devise_error_messages!
+      %div{:style => 'font-size:20px;font-weight:bold;border-top: 1px solid #f0f0f0;line-height:2em;color:#494949;'}
+        Account Settings
+      .clear{:style=>"height:10px;"} 
+        /=f.select "language",options_for_select(["English","Hindi","Telugu","Tamil"],sel_lang),:html_options=>{:multiple=>"true"}
+      .fields
+        %div{:class=>"edit_label"}
+          Email Address
+        = f.text_field :email
+        = f.hidden_field :id
+      .fields
+        %div{:class=>"edit_label"}
+          Password
+        = f.password_field :password
+        %div{:style=>"padding-left:150px;"}
+          Type new password if you would like to change
+      .clear{:style => "height:10px"}
+      - if resource.is_critic
+        - resource.build_film_critic if resource.film_critic.blank?
+        = f.fields_for :film_critic do |ff|
+          .fields
+            %div{:class=>"edit_label"}
+              Full name
+            = ff.text_field :name
+          .fields
+            %div{:class=>"edit_label"}
+              Organization
+            = ff.text_field :organization
+          .fields.profile_image
+            %div{:class=>"edit_label"}
+              Profile image
+            = image_tag(ff.object.thumbnail_image.url(:thumb)) unless ff.object.thumbnail_image_file_name.blank?
+            %br
+            = ff.file_field :thumbnail_image
+      -else
+        - resource.build_user_profile if resource.user_profile.blank?
+        = f.fields_for :user_profile do |ff|
+          .fields
+            %div{:class=>"edit_label"}
+              Full Name
+            = ff.text_field :display_name
+          .clear{:style => 'height:15px;'}
+      .clear{:style => "height:10px"}
+
+      %div{:style => 'font-size:20px;font-weight:bold;border-top: 1px solid #f0f0f0;line-height:2em;color:#494949;'}
+        Muvi Plus
+      .clear
+      #success
+      .clear{:style=>"height:10px;"}
+      %div{:style => "position:absolute; padding-left:20%; top:68%"}
+        %img{:src => "/images/loading.gif", :id => "loading_icon", :style => "display:none"}
+
+      %div{:style => 'font-size:22px;'}
+        %a{:href => "#", :onclick => "update_creditcard_info(#{current_user.id})"}
+          Update credit card info
+        .clear{:style => "height:5px"}
+
+        -@subscription = UserSubscriptions.find(:first, :conditions => ["user_id = #{current_user.id} AND agent = 'muvi' AND end_date > '#{Date.today}'"])
+        -unless @subscription.blank?
+          %a{:href => "#", :onclick => "remove_subscription(#{current_user.id})", :id => "cancel_subs"}
+            Cancel Subscription  
+      /%div{:style => 'font-size:20px;font-weight:bold;border-top: 1px solid #f0f0f0;line-height:2em;color:#494949;'}
+      /  Muvicoins
+      /.clear{:style=>"height:10px;"}
+      /%div{:style => 'font-size:16px;'}
+      /  Use Muvicoins to watch movies advertisement-free
+      /.clear{:style=>"height:10px;"}
+      /.fields
+      /  #payment_suc{:style => "color:green;font-size:16px"}
+      /  .clear{:style=>"height:10px;"}
+      /  %div{:style=>"float:left;width:500px;"}
+      /    %div{:style=>"font-weight:bold;height:30px;", :id =>"avail_coins"}
+      /      ="Available : #{current_user.user_profile.movie_coins}"
+      /    %div{:style=>"font-weight:bold;"}
+      /      Buy More
+      /    .clear{:style=>"height:10px;"}
+      /    %div{:style=>"width:280px;"}
+      /      %div{:class=>"edit_label", :style=>"float:left;width:200px"}
+      /        10 muvicoins for $1 (RS 60)
+      /      %div{:style=>"float:right;"}
+      /        =link_to "Buy","javascript:void(0);",:class => "btn btn-primary",:onclick => "card_detail('1','10')"
+      /    .clear{:style=>"height:10px;"}
+      /    %div{:style=>"width:280px;"}
+      /      %div{:class=>"edit_label", :style=>"float:left;width:200px;"}
+      /        55 muvicoins for $5 (RS 300)
+      /      %div{:style=>"float:right;"}
+      /        =link_to "Buy","javascript:void(0);",:class => "btn btn-primary",:onclick => "card_detail('5','55')"
+      /    .clear{:style=>"height:10px;"}
+      /    /%div{:style=>"width:200px;"}
+      /    /  %div{:style=>"float:left;",:class=>"edit_label"}
+      /    /  %div{:style=>"float:right;"}
+      /    /    =link_to "Buy","javascript:void(0);",:class => "btn btn-primary",:onclick => "card_detail('20','210')"
+      /    /.clear{:style=>"height:10px;"}
+      /    %div{:id=>"card_detail"}
+      /  %div{:style=>"float:left;"}
+      /    =image_tag "/images/muvicoins.png"
+      .clear{:style => "height:10px"}
+      %div{:style => 'font-size:20px;font-weight:bold;border-top: 1px solid #f0f0f0;line-height:2em;color:#494949;'}
+        Preferences
+      .clear{:style=>"height:10px;"}
+      .fields
+        -if cookies[:language].nil? || cookies[:language].blank?
+          -cookies[:language] = "English&"
+        -sel_lang = cookies[:language].split("&")
+        -lang = ["English","Hindi","Telugu","Tamil","Kannada", "Marathi", "Gujarati", "Malayalam", "Bhojpuri", "Punjabi", "Bengali"]
+        %div{:class=>"edit_label", :style => "float:left; width:20%;"}
+          Region
+
+        %div{:style => "float:left; width:80%;"}
+          -lang.each do |l|
+            %div{:style => "float:left; width:120px;"}
+              - if resource.language && resource.language.include?("#{l}")
+                = f.check_box :language, {:checked=> true,:name => "language[]",:style=>"margin:0;"},"#{l}"
+              -else
+                = f.check_box :language, {:name => "language[]",:style=>"margin:0;"},"#{l}"
+              %span{:style=>"padding-left:5px;;padding-right:30px;"}
+                = l
+      .clear{:style=>"height:15px;"}
+      .fields
+        %div{:class=>"edit_label"}
+          Get Muvi notifications on email
+        = f.check_box :subscribe_notification
+      .clear{:style => 'height:15px;'}
+      .fields
+        %div{:class=>"edit_label"}
+          Get Muvi newsletter on email
+        = f.check_box :subscribe_newsletter
+      .clear{:style => 'height:15px;'}
+      %br
+        .actions
+          .right
+            %a{:href=>'#', :id=>'#profile_save', :onclick=>'$("#edit_user").submit();',:class=>"btn btn-primary bold_class"}
+              Update
+      .clear
+:javascript
+  /*function card_detail(amt){
+    var url = "/payment/"+amt;
+    $.get(url,function(res){
+      $("#card_detail").html(res);
+      $("#amount").val(amt);
+    });
+  }*/

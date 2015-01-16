@@ -1,0 +1,7 @@
+$("#coming_soon").html("<div class='homeContainerIn homeborderDiv'><%= escape_javascript(render("/coming_soon_movies/movies"))%><div class='right'> <%= escape_javascript(will_paginate(@movies)) %> </div><div class='clear'></div></div>");
+if($.browser.msie){
+//  $('.MovieTrailerLink').html('<img src="images/viewTrailerBtn.png">');
+  $('.MovieTrailerLink').removeClass('gradient-button2');
+}
+//var t=setTimeout("addMovieTrailerClickEvent();", 5000);
+addMovieTrailerClickEvent();

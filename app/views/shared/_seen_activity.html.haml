@@ -1,0 +1,60 @@
+#seen_activity.well.well-small{:style => 'height:800px;padding:0px;'}
+  .media{:style => "background-color:#D8D8D8"}
+    %p.lead.p_class.dark_gradient_class.main_seen_block
+      =heading
+    .items.scroll-pane.gradient_class{:style => "overflow:auto;height:766px;"}
+    
+      -unless all_activity.blank?
+        -all_activity.each do |activity|
+          %script
+            if(document.getElementById('seen_#{activity["user_id"]}_#{activity["movie_id"]}')) {
+            //$('#seen_#{activity["user_id"]}_#{activity["movie_id"]}').remove();
+            }
+
+          -not_show = 0
+          -if activity["action"] == "asked"
+            -if activity["target"]["id"].to_i != current_user.id.to_i
+              -not_show = 1
+            -else
+              -not_show = 0
+
+
+          -if not_show == 0
+            .activity{:data => {:time => 1}, :id => "seen_#{activity["user_id"]}_#{activity["movie_id"]}", :class => "activity_list gradient_class"}
+              = link_to image_tag("#{activity["object"]["image"]["url"]}", :class => 'media-object', :style => 'height: 140px; width:90px; '), "#{activity["object"]["url"]}" , :class => 'pull-left'
+              .media-body{:style => "min-height:140px;"}
+                %h5.media-heading
+                  =link_to(activity["object"]["displayName"], activity["object"]["url"], :style => "color: #333333")
+
+                %a{:href => "#{activity["actor"]["url"]}"}
+                  =activity["actor"]["displayName"]
+
+                =activity["action"]
+
+                =activity["object"]["displayName"]
+
+                %br
+                /-if activity["verb"] == "want to see" or activity["verb"] == "asked" or activity["action"] == "want to see" or activity["action"] == "wants to see"
+                -if activity["verb"] == "asked"
+                  Do you want to recommend?
+                  .btn-group
+                    = link_to "<i class='icon-thumbs-up'></i> &nbsp; Yes".html_safe , "#", :class => "btn btn-warning bold_class", :onclick => "javascript:remove_block('seen_#{activity["user_id"]}_#{activity["movie_id"]}', '#{activity["activity_id"]}', #{activity["cur_user_id"]}, #{activity["user_id"]}, '#{activity["movie_id"]}', 'has recommended');"
+                    = link_to "<i class='icon-thumbs-down'></i> &nbsp; No".html_safe , "#", :class => "btn btn-warning bold_class", :onclick => "javascript:remove_block('seen_#{activity["user_id"]}_#{activity["movie_id"]}', '#{activity["activity_id"]}', #{activity["cur_user_id"]}, #{activity["user_id"]}, '#{activity["movie_id"]}', 'has not recommended');"
+                -elsif activity["verb"] == "seen"
+                  Ask for recommendation
+                  .btn-group
+                    = link_to "Ask" , "#", :class => "btn btn-success"
+              /%hr{:class => "hr_class"}
+
+=subscribe_to "/home/index"
+:javascript
+  $(function() {
+    var faye = new Faye.Client("#{FAYE_URL}/faye");
+    faye.subscribe("/home/index/#{current_user.id}", function(res) {
+      parse_data(res);
+    });
+
+  });
+
+
+

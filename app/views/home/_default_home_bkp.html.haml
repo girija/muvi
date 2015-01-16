@@ -1,0 +1,151 @@
+.container-fluid
+  .row-fluid
+    .span12
+      #errors{:style => "text-align: right; color: red; position: absolute; width: 80%;"}
+
+  .row-fluid
+    .span8
+      .span12.well-small{:style => "border: none; background: none; padding-top: 24px;"}
+        /=image_tag("static_image.png")
+        /=image_tag("discover.png")
+        %span{:style => "color:#5F5F5F; font-size:40px;"}
+          Discover
+        %span{:style => "color:#FE7E26; font-size:40px;"}
+          Awesome Movies
+        .clear{:style => "height:10px"}
+
+        .left{:style => "font-size:17px"}
+          Stop browsing through ratings. Find good movies personalized for you, instantly! 
+
+    .span4
+      %center
+        =image_tag("loading.gif", :style => "position: absolute; z-index: 2000; display: none;", :id => "loading_div")
+
+      .span12.well-small{:style => "border: none; background: none;"}
+        %div{:style => "min-height:120px;"}
+        /  %h3
+        /    Discover awesome movies!
+        /  No more wasting time in watching crappy movies.
+      
+
+        #homepage-signin{:style => "float:left; height:180px; z-index:1000"}
+          
+          .email-buffer-signin
+            %a{:class => "email-signin-button buffer", :id => "form"}
+              %i
+              %span
+                Request for Invitation
+
+            #email_reg_form
+              %form{:action => "/user_invitation", "data-remote" => "true", :id => "my_form"}
+
+                .row
+                  %label{:style => 'width:100px'}
+                    Email
+                  %input{:type => "text", :name => "email", :id => "email"}
+
+                .span6ubmit-actions
+                  %input{:class=>"simple", :type=>"submit", :value=>"Get Invitation", :id => "email_submit"}
+
+          .buffer-signin{:style => "z-index:1000"}
+            %a{:class => "signin-button buffer", :id => "signin", :style => "width:100%"}
+              %i
+              %span
+                Login
+
+            %div{:id => "login_div"}
+              - resource = User.new
+              - resource_name = 'user'
+              =form_for(resource, :as => resource_name, :url => session_path(resource_name), :remote => true, :html => {:onsubmit => "return disable_btn('user_submit');"}) do |f|
+                =hidden_field_tag "act_refer_type","",:value=> "home"
+                .row
+                  =f.label :email, 'Email Address', :style => 'width:100px'
+                  =f.email_field :email 
+
+                .row
+                  = f.label :password, 'Password', :style => 'width:100px'
+                  = f.password_field :password 
+
+                .span6ubmit-actions
+                  = f.submit 'Login', :class => "simple"  
+                  %br
+                  = link_to "Forgot password?", "/forgot_password" , :style=>"color: #FFFFFF; font-size: 11px !important; font-weight: normal; text-shadow: none; text-decoration: underline;", "target" => "_blank"
+
+
+
+        /#errors{:style => "float:left; min-height:50px;"}
+
+  .row-fluid
+    .span12
+      .span4
+        .left
+          /=image_tag("h1.png")
+          %i{:class => "icon-list", :style => "font-size:30px"}
+        .left{:style => "font-size:20px; color:#666; font-weight:bold; margin-left:25px"}
+          Create &amp; Share Lists
+
+        .clear
+        .left{:style => "margin-top:7px;"}
+          Create a list of your movies and share with your friends. Follow other lists to discover awesome movies.
+
+      .span4{:style => "margin-top:-7px"}
+        .left
+          %i{:class => "icon-thumbs-up", :style => "font-size:32px"}
+        .left{:style => "font-size:20px; color:#666; font-weight:bold; margin-left:25px"}
+          Ask &amp; Recommend
+
+        .clear
+        .left{:style => "margin-top:7px;"}
+          Recommend movies you liked and ask about the ones you want to see. Connect with movie lovers around the world.
+
+      .span4{:style => "margin-top:-13px; width: 29%;"}        
+        .left
+          %i{:class => "icon-star", :style => "font-size:33px"}
+        .left{:style => "font-size:20px; color:#666; font-weight:bold; margin-left:25px"}
+          Discover Awesome Movies
+       
+        .clear
+        .left{:style => "margin-top:7px;"}
+          No more browsing through critics/user ratings. Discover awesome movies that you will like personally. It works like magic!
+
+  .clear{:style => "height:30px"}
+  =render "bottom_tabs"
+
+:javascript
+  var f = 0;
+  var f1 = 0;
+  var timerId = 0;
+
+  $("#user_new").submit(function(){
+    $("#user_password").val(Base64.encode($("#user_password").val()));
+  });
+
+  $('#my_form').submit(validate_email_invite);
+  function validate_email_invite(event){
+    var err_msg = "";
+      if($("#email").val() == ""){
+        err_msg += "Please enter email address <br>";
+      } else if(!validateEmail($("#email").val())){
+        err_msg += "Oops! seems an invalid email! <br>";
+      }
+      if(err_msg != ""){
+        $("#errors").show();
+        $("#errors").html(err_msg);
+        $('#errors').css("float", "none");
+        $('#errors').css("color", "red");
+        $('#errors').css("background", "none");
+        $('#errors').css("display", "inline");
+        $('#errors').css("font-weight", "bold");
+        $('#errors').css("font-size", "12px");
+
+        $(".email-buffer-signin").show('shake', 55);
+        return false;
+      }else{
+        disable_btn("email_submit");
+        $("#errors").hide();
+        _gaq.push(['_trackEvent', 'Home', 'Invitation', 'Clicked on "Get Invitation"']);
+      }
+  }
+
+
+

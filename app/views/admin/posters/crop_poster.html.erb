@@ -1,0 +1,92 @@
+<%= stylesheet_link_tag "jquery.Jcrop.css" %>
+<%= javascript_include_tag "jquery.Jcrop.js" %>
+<script type="text/javascript" charset="utf-8">
+$(function() {
+  var square_size = ""
+  var w = <%= @poster.poster_geometry(:original).width %>
+  var h = <%= @poster.poster_geometry(:original).height %>
+  if(w < h){
+    square_size = w
+  }else if(h < w){
+    square_size = h
+  }else{
+    square_size = w
+  }
+
+  $('#cropbox').Jcrop({
+    onChange: update_crop,
+    onSelect: update_crop,
+    setSelect: [0, 0, 500, 500],
+    aspectRatio: 1
+  });
+});
+
+function update_crop(coords) {
+  var square_size = ""
+  var w = <%= @poster.poster_geometry(:original).width %>
+  var h = <%= @poster.poster_geometry(:original).height %>
+  if(w < h){
+    square_size = w
+  }else if(h < w){
+    square_size = h
+  }else{
+    square_size = w
+  }
+
+  var rx = 100/coords.w;
+  var ry = 100/coords.h;
+  $('#preview').css({
+    width: Math.round(rx * <%= @poster.poster_geometry(:original).width %>) + 'px',
+    height: Math.round(ry * <%= @poster.poster_geometry(:original).height %>) + 'px',
+    marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+    marginTop: '-' + Math.round(ry * coords.y) + 'px'
+  });
+
+  var ratio = <%= @poster.poster_geometry(:original).width %> / <%= @poster.poster_geometry(:medium).width %>;
+
+
+  $("#crop_x").val(Math.round(coords.x));
+  $("#crop_y").val(Math.round(coords.y));
+  $("#crop_w").val(square_size);
+  $("#crop_h").val(square_size);
+}
+</script>
+
+
+<div class="row-fluid">
+  <div class="span12" style="background-color:#FFFFFF">
+    <% if params[:referer_url] =~ /\/admin/ %>
+    <% else %>
+      <div class="span3">
+        <%= render :partial => "/home/left_sidebar" %>
+      </div>
+    <% end %>
+
+    <div class="span9" style="border-left: 4px solid #DFDFDF; margin-left: -2px;">
+      <div class="main_content">
+        <div style="padding-top:20px; padding-left:20px">
+          <%= image_tag("/system/posters/#{@poster.id}/original/#{@poster.poster_file_name}", :id => "cropbox") %>
+
+          <h4>Preview:</h4>
+          <div style="width:100px; height:100px; overflow:hidden">
+            <%= image_tag("/system/posters/#{@poster.id}/original/#{@poster.poster_file_name}", :id => "preview") %>
+          </div>
+
+          <%= form_for @poster, :url => "/admin/posters/update_crop_page" do |f| %>
+            <input type="hidden" name="poster_id" value="<%=@poster.id%>">
+            <input type="hidden" name="movie_id" value="<%= params[:movie_id]%>">
+            <input type="hidden" name="referer_url" value="<%= params[:referer_url]%>">
+
+            <% for attribute in [:crop_x, :crop_y, :crop_w, :crop_h] %>
+              <%= f.hidden_field attribute, :id => attribute %>
+            <% end %>
+   
+            <div class="clear" style="height:20px"></div>
+
+            <p><%= f.submit "Crop", :class => "btn btn-primary btn-large bold_class" %></p>
+          <% end %>
+      </div>
+    </div>
+  </div>
+
+

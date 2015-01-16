@@ -1,0 +1,36 @@
+= content_for :heading do
+  Add/Remix a top 10
+
+/= content_for :breadcrumb do
+/  %span
+/    = link_to "Home &#187;".html_safe, root_path
+/    = link_to "Top 10s &#187;".html_safe, root_path
+/    Add/Remix a top 10 
+
+.clear
+.containerIn.borderDiv{:id =>  @list_type}
+  .form{:style => "width:450px"}
+    = form_tag("/top_ten/update/#{@list_type}", :id => 'topten') do
+      %div
+        = hidden_field_tag "topten_type" , @list_type == 'movies' ? 0 : 1, :name => 'topten_type'
+        = label_tag :list_type, 'List type:'
+        - if @list_type == 'movies'
+          Movies
+        - else
+          Celebrities
+        .clear
+        = label_tag :name
+        = text_field_tag :name , @name, :placeholder => 'My top movies or celebries', :style => 'width:340px'
+      .items
+        - ctr = 0
+        - @movies_array.each do |movie|
+          = render :partial => 'item_form', :locals => { :n => ctr, :movie => movie, :movies_note => '' ,:list_type => @list_type, :style => 'display:block'}
+          - ctr = ctr + 1
+
+      .clear 
+      .actions
+        .right{:style => "margin-right:60px"}
+          %a{:href=>'#top', :id=>'#topten_save', :class=>'gradient-button2', :onclick=>'$("#topten").submit();'}
+            .gradient-button2
+              .label Save
+      .clear

@@ -1,0 +1,83 @@
+#main-wrap
+  #logo-wrapper
+    - if (request.fullpath == /\/msn_embed\/home/)
+      = link_to image_tag('muvi-logo-active.png'), '/msn_embed/home'
+    - else
+      = link_to image_tag('muvi-logo-inactive.png'), '/msn_embed/home'
+  #msn-menu-wrapper
+    %ul#top_menu{:style => 'margin:-8px auto auto'}
+      %li{:class => ('active' if (request.fullpath =~ /\/released/ or (request.fullpath =~ /\/upcoming/)))}
+        = link_to raw("Movies"), "/released"
+
+      - if current_user && current_user.is_critic
+        %li{:class => ('active' if request.fullpath =~ /my_reviews/)}
+          = link_to raw("My Reviews"), my_reviews_path
+
+      %li{:class => ('active' if request.fullpath =~ /stars/)}
+        = link_to raw("Stars"), stars_path
+
+      %li{:class => ('active' if request.fullpath =~ /trailers/)}
+        = link_to raw("Trailers"), "/trailers"
+
+      /%li{:class => ('active' if request.fullpath =~ /top_ten/)}
+      /  = link_to raw("Top 10"), top_ten_path
+
+      /%li{:class => ('active' if request.fullpath =~ /news/)}
+      /  = link_to raw("News"), '/news'
+  #search-wrapper
+    = form_tag(search_path, :method => "get", :id => "search_muvi", :onsubmit => "return validate_blank('q');") do |f|
+      .searchBox
+        = text_field_tag 'q1', (params[:q1] rescue ''), :placeholder => "Enter Movie or Star Name" ,:class => 'searchTxtBox', :style => "border:none;width:180px;"
+        %input{:type => "submit", :value => "", :class => "search_btn"}
+  #msn-profile-wrapper
+    #top_bar{:style => 'width:254px'}
+      .register_login_link
+        %ul.links.right
+          - unless current_user
+            %li
+              /= link_to (image_tag 'join_fb_btn.png'), new_user_registration_path, :remote => true, :onclick => "registration('fauth');"
+              = image_tag 'join_btn.png', :onclick => "check_reg();", :style => "cursor:pointer"
+
+            %li.last
+              /= link_to (image_tag 'login_btn.png'), new_user_session_path, :remote => true, :onclick => "registration();"
+              =image_tag 'login_btn.png', :onclick => "check_login();", :style => "cursor:pointer"
+
+          - else
+            %li{:class => "parent_1", :style => "padding-left:5px"}
+              -unless current_user.display_name.blank?
+                = link_to current_user.display_name, "#"
+              -else
+                = link_to "Profile", "#"
+              %ul{:class => "children_1", :style => "position:relative"}
+                %li= link_to "Settings", edit_user_registration_path
+                %li= link_to 'Logout', destroy_user_session_path
+
+            %li.last= link_to "My Profile", "/profile/#{current_user.id}/#{User.convert_to_seo_url(current_user.display_name)}"
+
+        #login.hidden
+        #registration.hidden
+     
+  =render :partial => "/shared/show_language"
+
+  /Join Hint starts
+  -if !current_user
+    #join_hint{:style => "display:none"}
+      .msn_join_hint
+        %b
+          Discover movies, trailers and pictures
+        %br
+        %span{:style => "font-weight:normal; font-size:16px"}
+          liked by movie lovers around the world
+      .msn_hint_image
+        =image_tag "/images/hint_arrow.png"
+
+  /Show language hint starts
+  #language_hint{:class => "right msn_language_hint"}
+    .right{:style => "width: 37px; background: url('/images/triangle.png') no-repeat; height: 16px; margin-top:-26px; margin-right: 30px;"}
+    %div{:style => "line-height:1.5em; font-weight:normal"}
+      Discover movies from different countries
+    .clear
+    .right
+      %input{:type => "button", :style => "background:url('/images/ok.png') no-repeat; width:50px; height:22px; border:0px; padding: 0px; cursor:pointer;", :onclick => "close_language_hint()", :value => ""}
+    .clear{:style => "height: 5px;"}
+

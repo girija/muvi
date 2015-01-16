@@ -1,0 +1,48 @@
+<script>
+ $(function() {
+        FB.init({
+            appId           : <%= FACEBOOK_APPID %>, // App ID
+            status          : true, // check login status
+            cookie          : true, // enable cookies to allow the server to access the session
+            oauth           : true,
+            xfbml           : true
+        });
+	FB.getLoginStatus(function (response) {
+             if (response.authResponse) {    // if the user is authorized...
+                  var accessToken = response.authResponse.accessToken
+                  var fbid = response.authResponse.userID;
+                  var tokenUrl = "https://graph.facebook.com/" + fbid;
+		  FB.api('/me', function(fbUser) {
+		    $("#user_user_tokens_attributes_0_uid").val(fbid);
+		    $("#user_user_tokens_attributes_0_token").val(accessToken);
+                    $("#user_user_profile_attributes_display_name").val(fbUser.name);
+                    $("#fb_user_email").val(fbUser.email);
+                  });
+             }
+        });
+ });
+</script>
+
+
+<% if current_user.blank? and current_user.nil? %>
+<div id="fb_join_div" style="background-color:#273747; text-align:center; padding-top:15px">	
+  <!-- #errors -->
+  <span id="fb_err_message" style="visibility:hidden"></span>
+  <form data-remote="" id="fb_form_join" onsubmit="return validate_fb_form_join();">
+    <input type="hidden" name="from" value="fb_join">
+    <input type="hidden" id="user_user_tokens_attributes_0_provider" name="user_user_tokens_attributes_0_provider" value="facebook">
+    <input type="hidden" id="user_user_tokens_attributes_0_uid" name="user_user_tokens_attributes_0_uid">
+    <input type="hidden" id="user_user_tokens_attributes_0_token" name="user_user_tokens_attributes_0_token">
+    <input type="hidden" id="user_user_tokens_attributes_0_secret" name="user_user_tokens_attributes_0_secret">
+    <input type="text" class="reg_txtbox" id="user_user_profile_attributes_display_name" name="user_user_profile_attributes_display_name" placeholder="First and Last Name">
+    <input type="text" class="reg_txtbox" id="fb_user_email" name="fb_user_email" placeholder="Email Address">
+    <input type="password" class="reg_txtbox" id="fb_password" placeholder="Password" required>
+    <input type="hidden" class="reg_txtbox" id="hid_fb_password" name="hid_fb_password">
+    <input type="submit" class="md-trigger join_btn btn btn-success bold_class" data-modal="modal-91" name="fb_join" style="width:110px; border-radius:5px; height:31px; margin-top:-8px;" value="Join">
+    <span class="load_div" style="width:110px; display:none">
+      <img height="40px" width="50px" src="/images/loading.gif" style="margin-top:-20px;">
+    </span>
+  </form>
+<% end %>
+											
+</div>

@@ -1,0 +1,96 @@
+#trailer.hidden
+  -if @movie.video
+    %a#player{:href => "#{@movie.video.trailer.url.to_s}", :style => "display:block;width:520px;height:330px"}
+    %script
+      flowplayer("player", "/flash/flowplayer.commercial-3.2.7.swf", { key: '#$8fe04ea70c52430ec72',logo: {url: '/images/flowplayerLogo.png',fullscreenOnly: false, top: 278, right: 2, opacity: 0.5  },clip: {autoPlay: false, autoBuffering: false  }  });
+
+.containerIn.borderDiv
+  .moviBanner.left
+    .moviImage
+      = image_tag @movie.banner_image, :size => "125x200"
+    -if @movie.video
+      %a{:href => "#", :class => 'trailerLink'}
+        %img{:src => "/images/viewTrailerBtn.png"}
+    .clear
+    %center
+      - if current_user
+        = link_to "Add Comment", '#comments' , :id => 'comment_count'
+      -else
+        = link_to "Add Comment", new_user_session_path(:login => 'comment'), :remote => true, :onclick => "login();"
+
+    /= link_to image_tag("followbutton.jpg"), '#'
+  .moviDetail.left
+    .detail
+      %h3 Movie
+      %div{ :style => "margin-top:12px;", :class => "moviRatingBox left"}
+        -if from == 'movies'
+          .rating
+            = link_to "Critics rating", '#critics', :onclick => "go_to_tab(0);"
+            .ratingBar.left
+              = ratingbar(@movie.critics_percent)
+            .ratingvalue.left
+              = "#{@movie.critics_percent || 0}%"
+            .clear
+            = "<h4>Average of #{@movie.critics_reviews.count} critics </h4>".html_safe
+        .rating
+          - if(from == 'movies')
+            = link_to 'Twitter rating', '#users', :onclick => "go_to_tab(1);"
+          -else
+            = link_to 'Twitter buzz', '#users', :onclick => "go_to_tab(0);"
+          .ratingBar.left
+            = ratingbar(@movie.user_percent)
+          .ratingvalue.left
+            = "#{@movie.user_percent || 0}%"
+          .clear
+          %h4
+            -if from == 'movies'
+              = "Average of #{@movie.tweets_count.to_i} ratings"
+            -else
+              = "Average of #{@movie.tweets_count.to_i + @movie.reviews_count.to_i} users"
+      .friendsLink.right
+        %h4= (from == 'movies')? 'Friends Liked' : 'Friends who are interested'
+        .friends_image
+          - if current_user && current_user.facebook_omniauth.blank?
+            %br
+            &nbsp;&nbsp;
+            = link_to image_tag("facebook_64.png",  :alt => "facebook"), "/auth/facebook"
+            &nbsp;&nbsp;to see your friends' activities
+          - elsif current_user && current_user.facebook_omniauth
+            -@movie.friend_likes(current_user).each do |like|
+              .images.left
+                = image_tag("https://graph.facebook.com/#{like.fbid}/picture")
+          -else
+            %p= "#{link_to 'Login', new_user_session_path, :remote => true, :onclick => "login();"} to see who liked this movie.".html_safe
+
+        %br
+        = render :partial => 'shared/rate', :locals => { :from => from }
+        - unless current_user.blank?
+          %br
+          /= link_to image_tag('recomendbutton.jpg'), '#recommendations'
+      .clear
+    .detail
+      = render '/shared/movie_information'
+  .clear
+  #reviews
+    %ul
+      -if from == 'movies'
+        %li= link_to "Critics", "#critics"
+      %li= link_to "Tweets<span>&nbsp;</span>".html_safe, tweets_path(:id => @movie.id)
+      %li= link_to "Friends <span>&nbsp;</span>".html_safe, facebook_posts_path(:id => @movie.id)
+    -if from == 'movies'
+      #critics
+        #critics_reviews
+          = render '/shared/critics_reviews'
+        .clear
+  %br
+  - unless current_user.blank?
+    = render '/comments/form', {:movie => @movie}
+    #recommendations{:style => 'display:none;'}
+      = render "/recommendations/form", {:movie => @movie }
+  %br
+  #comments
+    -@movie.comments.to_level.includes(:user).each do |comment|
+      = render '/shared/comment', { :comment => comment }
+#rate_movie{:style => 'display:none;'}
+  = render :partial => "reviews/form", :locals => { :movie => @movie, :review => ((from == 'movies')? false : true) }
+

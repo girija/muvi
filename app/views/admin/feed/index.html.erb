@@ -1,0 +1,148 @@
+<style>
+  input[type=text]{
+    width:200px;
+  }
+ 
+  select{
+    width:300px;
+    height:30px;
+    font-size:16px;
+  }
+</style>
+
+<form action="/save_admin_feed" "data-remote"="true" method="post" onsubmit="return validate_form();">
+
+  <span style="color:red; font-weight:bold">
+    Please choose correct activity type from the dropdown. <br>
+    Please fill the "object" node in the following activity json.
+  </span>
+  <div class="clear" style="height:10px"></div>
+
+  Activity Type: 
+  <!--input type="text" name="activity_type" id="activity_type"-->
+  <select name="activity_type" id="activity_type">
+    <option value="follow celeb filmography">Follow Celebrity Filmography Feed</option>
+    <option value="follow this list">Follow List Feed</option>
+    <option value="released movie">Movie Feed</option>
+  </select>
+
+  <div class="clear" style="height:10px"></div>
+
+  Activity in json: <textarea style="height:250px; font-size:18px; " name="activity" id="activity">
+{"published":"<%= Date.today %>",
+
+"actor":{"url":"","objectType":"","id":"","image":{"url":"#","width":"", "height": ""},"displayName":""},"verb":"",
+
+"object":{"url":"","objectType":"","id":"","image":{"url":"","width":250,"height":250},"displayName":"", "destination_url":""},
+
+"target":""}
+  </textarea>
+
+  <div class="clear" style="height:20px"></div>
+  <input type="submit" value="Save">
+</form>
+
+<!--form action='/generate_json' "data-remote"="true">
+  <table>
+    <tr>
+      <td width="150px"> users profile url:</td>
+      <td>
+         <input type="text" name="user_profile_url"> 
+      </td>
+    </tr>
+
+    <tr>
+      <td> Activity type: </td>
+      <td>
+         <select name="activity_type"> 
+                    <option value="asked">asked</option>
+                    <option value="has recommended">has recommended</option>
+                    <option value="follow">follow</option>
+                    <option value="invited">invited</option>
+                    <option value="saw">saw</option>
+                    <option value="follow filmography">follow filmography</option>
+                  </select>
+
+      </td>
+    </tr>
+
+    <tr>
+      <td> Verb: </td>
+      <td>
+         <select name="verb">
+                    <option value="asked">asked</option>
+                    <option value="has recommended">has recommended</option>
+                    <option value="follow">follow</option>
+                    <option value="invited">invited</option>
+                    <option value="saw">saw</option>
+                    <option value="follow filmography">follow filmography</option>
+                  </select>
+
+      </td>
+    </tr>
+
+    <tr>
+      <td> Object Type: </td>
+      <td>
+            <select name="object_type" onchange="show_hide(this.value);"> 
+                <option value="movie">Movie</option>
+                <option value="list">List</option>
+              </select>
+      </td>
+    </tr>
+
+    <tr id="movie_url_div">
+      <td> Movie url</td>
+
+      <td><input type="text" name="movie_url"></td>
+    </tr>
+
+    <tr id="list_url_div" style="display:none">
+      <td> List url</td>
+
+      <td><input type="text" name="list_url"></td>
+    </tr>
+
+
+    <tr>
+      <td> Target User profile url:</td>
+      <td> <input type="text" name="target_user_profile_url"> </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+        <input type="submit" value="Send notification">
+      </td>
+    </tr>
+  <table>
+
+</form-->
+
+
+<script>
+  /*function show_hide(opt){
+    if(opt == "movie"){
+      $("#movie_url_div").show();
+      $("#list_url_div").hide();
+    }else if(opt == "list"){
+      $("#list_url_div").show();
+      $("#movie_url_div").hide();
+    }
+  }*/
+
+  function validate_form(){
+    if($("#activity_type").val() == ""){
+      alert("Please enter activity type");
+      return false;
+    }
+    else if($("#activity").val() == ""){
+      alert("Please enter activity json string");
+      return false;
+    }
+    else{
+      return true;
+    }
+
+  }
+</script>
+

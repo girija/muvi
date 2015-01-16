@@ -1,0 +1,22 @@
+<div itemscope itemtype="http://schema.org/Person" style="display:block">
+  <span itemprop="name"><%= @celebrity.name %></span>
+  <%= image_tag @celebrity.image  ,:itemprop=>"image" %>
+  <% celeb_type = ""
+     if @celebrity.celebrity_type.kind_of?(Array) == true
+        profession_type=""
+        @celebrity.celebrity_type.each do |prof_type|
+          profession_type += prof_type.capitalize+", "
+          unless profession_type.blank?
+            celeb_type = profession_type.chop.chop
+          else
+            celeb_type = @celebrity.celebrity_type
+          end
+        end
+     else
+        celeb_type = @celebrity.celebrity_type
+     end
+  %>
+  <span itemprop="jobTitle"><%= celeb_type %></span>
+  <%= @celebrity.name%>
+  <a href="/stars/<%= @celebrity.permalink %>" itemprop="url"><%= "http://#{request.env['HTTP_HOST']}/stars/#{@celebrity.permalink}" %></a>
+</div>

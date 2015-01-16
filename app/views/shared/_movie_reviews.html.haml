@@ -1,0 +1,7 @@
+-if @movie_user_reviews.blank?
+  %h4 User reviews are  not present for this movie.
+-else
+  %div{:id=>"mas_container_u_reviews"}
+    =render '/shared/movie_reviews_page'
+  .clear
+

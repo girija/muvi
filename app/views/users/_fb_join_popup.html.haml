@@ -1,0 +1,96 @@
+:javascript
+  //$("#fb_form").hide();
+  //$("#loader_div").show();
+
+/#errors
+
+%div{:id => "loader_div", :style => "display:none; top:30%;"}
+  =image_tag("/images/loading.gif")
+
+%form{"data-remote" => true, :id => "fb_form", :onsubmit=>"return validate_fb_form();"}
+  %input{:type => "hidden", :name => "from", :value => "new_layout"}
+  %input{:type => "hidden", :id => "user_user_tokens_attributes_0_provider", :name => "user_user_tokens_attributes_0_provider"}
+  %input{:type => "hidden", :id => "user_user_tokens_attributes_0_uid", :name => "user_user_tokens_attributes_0_uid"}
+  %input{:type => "hidden", :id => "user_user_tokens_attributes_0_token", :name => "user_user_tokens_attributes_0_token"}
+  %input{:type => "hidden", :id => "user_user_tokens_attributes_0_secret", :name => "user_user_tokens_attributes_0_secret"}
+
+  %input{:type => "text", :readonly => true, :placeholder => "First and Last Name", :class => "reg_txtbox", :name => "user_user_profile_attributes_display_name", :id => "user_user_profile_attributes_display_name"}
+  %input{:type => "text", :readonly => true, :placeholder => "Email Address", :class => "reg_txtbox", :name => "fb_user_email", :id => "fb_user_email"}
+  %input{:type => "password", :placeholder => "Password", :class => "reg_txtbox", :id => "fb_password"}
+  %input{:type => "hidden", :class => "reg_txtbox", :name => "hid_fb_password", :id => "hid_fb_password"}
+
+  .clear
+  %input{:class => "md-trigger join_btn btn btn-primary bold_class", "data-modal" => "modal-91", :style => "width:110px; border-radius:5px;", :type => "submit", :name => "fb_join", :value => "Join"}
+
+  %span{:class => "load_div", :style => "width:110px; display:none"}
+    %img{:src => "images/loading.gif", :width => "50px", :height => "40px", :style => "margin-top:-20px;"}
+
+  %span{:id => "fb_err_message"}
+
+:javascript
+  //var int = self.setInterval("hide_reg()", 1000);
+
+  //var int1 = self.setInterval("show_reg()", 1000);
+
+  function hide_reg(){
+    if($("#joinModal").css("display") == "block" && $("#user_user_tokens_attributes_0_provider").val() == ""){
+      $("#joinModal").hide();
+      $(".modal-backdrop").hide();
+      window.clearInterval(int)
+    }
+  }
+
+  function show_reg(){
+    if($("#user_user_tokens_attributes_0_provider").val() != ""){
+      //$("#fb_form").show();
+      $("#loader_div").hide();     
+      $(".modal-backdrop").show();
+      $("#joinModal").show();
+      window.clearInterval(int1)
+    }
+  }
+
+
+  function validate_fb_form(){
+     if($("#user_user_tokens_attributes_0_provider").val() == ""){
+      $("#fb_err_message").show();
+      $("#fb_err_message").html("Please complete the Facebook Join page.");
+      $('#fb_err_message').css("float", "none");
+      $('#fb_err_message').css("color", "red");
+      $('#fb_err_message').css("background", "none");
+      $('#fb_err_message').css("display", "inline");
+      return false;
+    }
+
+    else if($("#fb_password").val() == ""){
+      $("#fb_err_message").show();
+      $("#fb_err_message").html("Please enter password");
+      $('#fb_err_message').css("float", "none");
+      $('#fb_err_message').css("color", "red");
+      $('#fb_err_message').css("background", "none");
+      $('#fb_err_message').css("display", "inline");
+      return false;
+    }else if($("#fb_password").val().length < 6){
+      $("#fb_err_message").show();
+      $("#fb_err_message").html("Please enter atleast 6 characters for password");
+      $('#fb_err_message').css("float", "none");
+      $('#fb_err_message').css("color", "red");
+      $('#fb_err_message').css("background", "none");
+      $('#fb_err_message').css("display", "inline");
+      return false;
+
+    }else{
+      var hid_fb_pw = base64_encode($("#fb_password").val());
+      $("#hid_fb_password").val(hid_fb_pw);
+      $("#fb_err_message").hide();
+      $("#fb_form").attr('action', '/fb_register');
+      $("#fb_form").submit();
+      $(".join_btn").hide();
+      $(".load_div").show();
+     
+      //$("#fb_form").submit();
+      return true;
+    }
+  }
+
+

@@ -1,0 +1,19 @@
+%form{:action => "save_admin_lists", :method => "post"}
+  -total_list = 5
+
+  -unless @all_list.blank?
+    -@all_list.each do |al|
+      %input{:type => "hidden",:style => "width:100px", :name => "list_id[]", :value => "#{al.list_id}"}
+      %input{:type=>"text",:name=>"listName[]",:id=>"name",:class=>"listname ui-autocomplete-input txtbox", :autocomplete=>"off", :role=>"textbox", "aria-autocomplete"=>"list", "aria-haspopup"=>"true", :style => "width:250px; height:30px; margin-right:10px; margin-bottom:10px;", :value => "#{al.list_name}"}
+    -remaining = total_list.to_i - @all_list.size.to_i
+  -else
+    -remaining = total_list
+
+  -for i in 0..remaining
+    %input{:type => "hidden",:style => "width:100px", :name => "list_id[]"}
+    %input{:type=>"text",:name=>"listName[]",:id=>"name",:class=>"listname ui-autocomplete-input txtbox", :autocomplete=>"off", :role=>"textbox", "aria-autocomplete"=>"list", "aria-haspopup"=>"true", :style => "width:250px; height:30px; margin-right:10px; margin-bottom:10px;"}
+
+  .clear{:style => "height:10px"}
+  .actions
+    %input{:type => "submit", :value => "Save"}
+

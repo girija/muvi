@@ -1,0 +1,67 @@
+#muviform
+  .payment-errors{:style => "color:red;font-size:12px"}
+  - if current_user
+    %form{:action => "", :method => "POST", :id => "paymentform"}
+      %div
+        %div{:style=>"font-weight:bold;height:30px;"}
+          Payment information
+        .field
+          %div{:class => 'edit_label'}
+            Name
+          %input{:type => 'text' , :name => 'name_card', :id => 'name_card', :class => 'card-name', :value => "#{current_user.display_name}"}
+        .field
+          %div{:class => 'edit_label'}
+            Credit card number
+          %input{:type => 'text' , :name => 'pay_to_credit_card', :id => 'pay_to_credit_card', :class => 'card-number', :maxlength=>"16"}
+          %input{:type => 'hidden' , :name => 'amount', :id => 'amount'}
+          %input{:type => 'hidden' , :name => 'movie_coins', :id => 'movie_coins'}
+        .field
+          %div{:class => 'edit_label'}
+            Security CVV2
+          %input{:type => 'text' , :name => 'pay_to_security_cvv2', :id => 'pay_to_security_cvv2', :class => 'card-cvc', :maxlength=>"4"}
+        .field
+          %div{:class => 'edit_label'}
+            Expiration (MM/YY)
+          %input{:type => 'text' , :name => 'pay_to_expiration_mm', :id => 'pay_to_expiration_mm', :style => 'width:90px', :class => 'card-expiry-month', :maxlength=>"2"}
+          %input{:type => 'text' , :name => 'pay_to_expiration_yyyy', :id => 'pay_to_expiration_yyyy', :style => 'width:100px', :class => 'card-expiry-year', :maxlength=>"2"}
+      .clear{:style => 'height:10px;'}
+      %div{:style => 'text-align:right'}
+        %input{:type => 'button', :value=>"Pay", :class => 'btn btn-primary', :id => 'btn_submit'}
+:javascript
+  function stripeResponseHandler(status, response) {
+    if (response.error) {
+        // show the errors on the form
+        $(".payment-errors").text(response.error.message);
+        $("#btn_submit").removeAttr("disabled");
+    } else {
+        var form$ = $("#paymentform");
+        // token contains id, last4, and card type
+        var token = response['id'];
+        // insert the token into the form so it gets submitted to the server
+        form$.append("<input type='hidden' name='stripeToken' value='" + token + "'/>");
+        var url = "/after_payment";
+        var amount = $("#amount").val();
+        var coins = $("#movie_coins").val();
+        var name_card = $("#name_card").val();
+        $.post(url,{data:response,amount:amount,movie_coins:coins,name_card:name_card},function(res){
+        });
+        // and submit
+        //form$.get(0).submit();
+    }
+  }
+  $(document).ready(function() {
+    //$('#btn_submit').attr("disabled", "disabled");
+    var cur_yr = new Date().getFullYear();
+    var two_digit_yr = String(cur_yr).substring(0,2);
+    $("#btn_submit").click(function(event) {
+      Stripe.createToken({
+        number: $('.card-number').val(),
+        cvc: $('.card-cvc').val(),
+        exp_month: $('.card-expiry-month').val(),
+        exp_year: two_digit_yr+$('.card-expiry-year').val()
+      }, stripeResponseHandler);
+
+      // prevent the form from submitting with the default action
+      return false;
+    });
+  });

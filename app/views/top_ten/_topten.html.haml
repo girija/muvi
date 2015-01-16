@@ -1,0 +1,22 @@
+.box.left
+  .moviBox.left
+    - @movie_image = Movie.find(@top_one)
+    = image_tag(@movie_image.banner_image)
+  .title.left
+    = link_to "Top 10s", "/top_ten/default/#{Time.new.year}/all"
+    .clear
+
+- unless @topten.blank?
+  - @topten.each do |tt|
+    .box.left
+      .moviBox.left
+        - tt_json = ActiveSupport::JSON.decode(tt.items)
+        - @movie_image = Movie.find(tt_json['items'][0]['id'])
+        = image_tag("/system/posters/#{tt_json['items'][0]['id']}/medium/#{@movie_image.poster_file_name}") unless @movie_image.poster_file_name.blank?
+      .title.left
+        = link_to tt.name, "/top_ten/#{tt.id}/#{tt.name}"
+        .clear
+        %h4.gray_11px
+          Created on:
+          = Time.parse(tt.created_at.to_s).strftime('%d %b %Y').to_s
+  .clear

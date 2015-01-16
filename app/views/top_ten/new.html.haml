@@ -1,0 +1,144 @@
+= render 'shared/meta_title_and_keywords', { :key => 'home'}
+= content_for :heading do
+  Add/Remix a top 10
+
+= content_for :breadcrumb do
+  %span
+    = link_to "Home &#187;".html_safe, root_path
+    = link_to "Top 10s &#187;".html_safe, root_path
+    Add/Remix a top 10 
+
+.clear
+
+.containerIn.borderDiv{:id =>  @list_type}
+  .form
+    = form_tag({:controller => "top_ten", :action => "create"}, :id => 'topten') do
+        
+      .items
+        .row 
+          #img_item_1.image.left{:style => 'margin-right:5px;'}
+            = image_tag("/images/no-image.png", :size => "45x45")
+          .name
+            = label_tag :item_1, '#1'
+            = text_field_tag :item_1
+            = hidden_field_tag :id_item_1 , 0
+            .clear
+            = label_tag :note_1 , 'Add a note', :style => 'vertical-align:super'
+            %textarea{:id => "note_1",:name => "note_1", :rows => 1, :cols => 40, :style => "height:20px"}
+          .clear
+        
+      .row.item
+        #img_item_2.image.left{:style => 'margin-right:5px;'}
+          = image_tag("/images/no-image.png", :size => "45x45")
+        .name
+          = label_tag :item_2, '#2'
+          = text_field_tag :item_2
+          = hidden_field_tag :id_item_2 , 0
+          .clear
+          = label_tag :note_2 , 'Add a note', :style => 'vertical-align:super'
+          %textarea{:id => "note_2",:name => "note_2", :rows => 1, :cols => 40, :style => "height:20px"}
+        .clear
+        
+      .row
+        #img_item_3.image.left{:style => 'margin-right:5px;'}
+          = image_tag("/images/no-image.png", :size => "45x45")
+        .name
+          = label_tag :item_3, '#3'
+          = text_field_tag :item_3
+          = hidden_field_tag :id_item_3 , 0
+          .clear
+          = label_tag :note_3 , 'Add a note', :style => 'vertical-align:super'
+          %textarea{:id => "note_3",:name => "note_3", :rows => 1, :cols => 40, :style => "height:20px"}
+        .clear
+        
+      .row
+        #img_item_4.image.left{:style => 'margin-right:5px;'}
+          = image_tag("/images/no-image.png", :size => "45x45")
+        .name
+          = label_tag :item_4, '#4'
+          = text_field_tag :item_4
+          = hidden_field_tag :id_item_4 , 0
+          .clear
+          = label_tag :note_4 , 'Add a note', :style => 'vertical-align:super'
+          %textarea{:id => "note_4",:name => "note_4", :rows => 1, :cols => 40, :style => "height:20px"}
+        .clear
+        
+      .row
+        #img_item_5.image.left{:style => 'margin-right:5px;'}
+          = image_tag("/images/no-image.png", :size => "45x45")
+        .name
+          = label_tag :item_5, '#5'
+          = text_field_tag :item_5
+          = hidden_field_tag :id_item_5 , 0
+          .clear
+          = label_tag :note_5 , 'Add a note', :style => 'vertical-align:super'
+          %textarea{:id => "note_5",:name => "note_5", :rows => 1, :cols => 40, :style => "height:20px"}
+        .clear
+        
+      .row
+        #img_item_6.image.left{:style => 'margin-right:5px;'}
+          = image_tag("/images/no-image.png", :size => "45x45")
+        .name
+          = label_tag :item_6, '#6'
+          = text_field_tag :item_6
+          = hidden_field_tag :id_item_6 , 0
+          .clear
+          = label_tag :note_6 , 'Add a note', :style => 'vertical-align:super'
+          %textarea{:id => "note_6",:name => "note_6", :rows => 1, :cols => 40, :style => "height:20px"}
+        .clear
+        
+      .row
+        #img_item_7.image.left{:style => 'margin-right:5px;'}
+          = image_tag("/images/no-image.png", :size => "45x45")
+        .name
+          = label_tag :item_7, '#7'
+          = text_field_tag :item_7
+          = hidden_field_tag :id_item_7 , 0
+          .clear
+          = label_tag :note_7 , 'Add a note', :style => 'vertical-align:super'
+          %textarea{:id => "note_7",:name => "note_7", :rows => 1, :cols => 40, :style => "height:20px"}
+        .clear
+        
+      .row
+        #img_item_8.image.left{:style => 'margin-right:5px;'}
+          = image_tag("/images/no-image.png", :size => "45x45")
+        .name
+          = label_tag :item_8, '#8'
+          = text_field_tag :item_8
+          = hidden_field_tag :id_item_8 , 0
+          .clear
+          = label_tag :note_8 , 'Add a note', :style => 'vertical-align:super'
+          %textarea{:id => "note_8",:name => "note_8", :rows => 1, :cols => 40, :style => "height:20px"}
+        .clear
+        
+      .row
+        #img_item_9.image.left{:style => 'margin-right:5px;'}
+          = image_tag("/images/no-image.png", :size => "45x45")
+        .name
+          = label_tag :item_9, '#9'
+          = text_field_tag :item_9
+          = hidden_field_tag :id_item_9 , 0
+          .clear
+          = label_tag :note_9 , 'Add a note', :style => 'vertical-align:super'
+          %textarea{:id => "note_9",:name => "note_9", :rows => 1, :cols => 40, :style => "height:20px"}
+        .clear
+        
+      .row
+        #img_item_10.image.left{:style => 'margin-right:5px;'}
+          = image_tag("/images/no-image.png", :size => "45x45")
+        .name
+          = label_tag :item_10, '#10'
+          = text_field_tag :item_10
+          = hidden_field_tag :id_item_10 , 0
+          .clear
+          = label_tag :note_10 , 'Add a note', :style => 'vertical-align:super'
+          %textarea{:id => "note_10",:name => "note_10", :rows => 1, :cols => 40, :style => "height:20px"}
+        .clear
+        
+        
+      .actions
+        .right
+          %a{:href=>'#top', :id=>'#topten_save', :class=>'gradient-button2', :onclick=>'$("#topten").submit();'}
+            .gradient-button2
+              .label Save
+      .clear

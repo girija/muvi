@@ -1,0 +1,14 @@
+- width = 300
+-if review.like_votes.count > 0 && review.dislike_votes.count > 0
+  -width = 550
+-like_popup_id = "info_item_likes_#{review.id}"
+- if params[:engage] == "true"
+  -like_popup_id = "engage_item_likes_#{review.id}"
+<a href="/critics_reviews/vote_review/#{review.id}/like?cls=#{review.class.to_s}" data-remote='true' onclick = "check_like_login('#{review.id}','#{review.class}');"  id="cr_review_like_link_#{review.id}" style="font-weight:normal;color:#8b8484;">Like</a>
+%span{:id => "cnt_like_span_#{review.id}", :style=>"font-weight:normal;color:#8b8484;"}
+  (<a href='javascript:void(0);' data-remote='true' onclick = "show_likes_popup('#{review.id}','#{review.class.to_s}','like_dislike','#{review.like_votes.count}','#{width}','#{like_popup_id}');" ><span id='like_cnt_#{review.id}' style='font-weight:normal;color:#8b8484;'>#{review.like_votes.count}</span></a>)
+<a href="/critics_reviews/vote_review/#{review.id}/dislike?cls=#{review.class.to_s}" data-remote='true' onclick = "check_like_login('#{review.id}','#{review.class}');"  id="cr_review_dislike_link_#{review.id}" style="padding-left:20px;font-weight:normal;color:#8b8484;">Dislike</a>
+%span{:id => "cnt_dislike_span_#{review.id}", :style=>"font-weight:normal;color:#8b8484;"}
+  (<a href='javascript:void(0);' data-remote='true' onclick = "show_likes_popup('#{review.id}','#{review.class.to_s}','like_dislike','#{review.dislike_votes.count}','#{width}','#{like_popup_id}');" ><span id='dislike_cnt_#{review.id}' style='font-weight:normal;color:#8b8484;'>#{review.dislike_votes.count}</span></a>)
+
+

@@ -1,0 +1,38 @@
+-unless @celebrity.blank?
+  .containerIn.borderDiv
+    .left
+      .left{:style => "border:1px solid #d2d6d9;margin-left:12px;height:289px;width:192px;"}
+        %div{:style=>"padding:2px;"}
+          = link_to image_tag(@celebrity.image, :width => "188", :height => "285"),star_path(@celebrity)
+      .clear{:style => "height:25px;"}
+      .left{:style => "border:1px solid #d2d6d9;margin-left:12px;height:289px;width:192px;"}
+        %div{:style=>"padding:2px;"}
+          = link_to image_tag(@costar.image, :width => "188", :height => "285"),star_path(@costar)
+    .moviDetail.left
+      - @costar_movies = get_movie_name_of_celeb(@costar, @celebrity)
+      - unless @costar_movies.blank?
+        .detail
+          %h3
+            %span Muvis Together
+          .clear
+          - count = 0
+          - @costar_movies.each do |movie|
+            /-movie = movie_cast.movie
+            -actors = get_actor_name(movie)
+            -actor_name = ""
+            -actor_link = ""
+            -unless actors.blank?
+              -i=0
+              -actors.each do |act|
+                - unless act.celebrity.blank?
+                  -if i == 2
+                    -break
+                  -if actor_name.blank?
+                    -actor_name = act.celebrity.name
+                    -actor_link = "/stars/#{act.celebrity.permalink}"
+                  -else
+                    -actor_name = actor_name + ","+ act.celebrity.name
+                    -actor_link = actor_link + "," + "/stars/#{act.celebrity.permalink}"
+                  -i=i+1
+            =muvilayout_detail(movie.banner_image_thumb, :name => movie.name, :link_on_name => movie_path(movie), :width => 45, :height => 45, :subtexts => actor_name, :sublink => actor_link)
+

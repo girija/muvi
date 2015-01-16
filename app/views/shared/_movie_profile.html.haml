@@ -1,0 +1,21 @@
+%div{ :style => "margin-top:12px;width:100%", :class => "moviRatingBox left"}
+  /-@activities.each do |activity|
+  /  .names
+  /    =raw(activity.action)
+  /.clear
+
+  .form
+    = form_for "user_profiles",:url => "/user_profiles/add_bio", :html => {:id => "bio_form"},  :remote => true do |f|
+      = f.hidden_field :user_id, :value => current_user.id
+      .fields
+        .auto-height-div
+          = f.text_area :bio, :rows => 1,:id=>"bio_area", :style => "border:1px solid #BBBBBB", :value => "#{@user_profile.bio}", :style => "height:50px; width:400px"
+
+      .clear{:style => "height:5px"}
+      %div{:style => 'float:left;',:id => "bio_div"}
+        .actions.left
+          .gradient-input-button.ui-corner-all
+            .gradient-input-button.ui-corner-all
+              %input{:type => "submit", :value => "Update", :name => "commit", :id => "comment_submit", :class => "label"}
+  
+  .clear

@@ -1,0 +1,155 @@
+:javascript
+  function show_email_form(type){
+    var html = "";
+    html = "<form data-remote='true' action='fetch_contact' method='post' onsubmit=\"$('#loader').show();\">"+
+             "<input type='hidden' name='type' value='"+type+"'>" +
+             "<input type='text' placeholder='Enter email' name='email' id='email'> <br>"+
+             "<input type='password' placeholder='Enter "+type+" password' name='password' id='password'> <br>"+
+             "<input type='submit' value='Get "+type+" Contacts' class='btn btn-primary'>"+
+           "</form>";
+                 
+    html += "<div class='right'><img src='images/loading.gif' id='loader' style='display:none'></div>";
+
+    $("#rateModalLabel").html("Invite friends from "+type); 
+    $(".modal-body.rating").html("");
+    $(".modal-body.rating").html(html);
+  }
+
+  function set_language(lang){
+    //$.cookie(lang, 'yes');
+    $.cookie('language', lang);
+    show('add_movie_div');
+  }
+
+#inviteModal.modal.fade.hide{:style => 'width:620px;'}
+  .modal-header
+    %button.close{:type => "button", "data-dismiss" => "modal" , "aria-hidden" => "true"}
+      x
+    %h4#rateModalLabel
+      Invite your friends!
+  .modal-body.rating
+
+.left{:style => "background-color: #FFFFFF; height: 600px; padding: 40px; width: 92%;"}
+  %div{:style => "width:80%; margin-left:25%"}
+    /.left{:id => "invite_tab"}
+    /  =image_tag("invite_friend_hover.png")
+    .left{:id => "language_tab", :style => "margin-left:-10px;"}
+      =image_tag("select_regions_hover.png")
+    .left{:id => "add_movie_tab", :style => "margin-left:-10px; opacity:0.5"}
+      =image_tag("add_some_movie_hover.png")
+  .clear{:style => "height:20px"} 
+
+  /.left{:id => "invite_div", :style => "width:90%"}
+  /  %center
+  /    %div{:style => "text-align:center; width:455px;"}  
+  /      %h4
+  /        Muvi is better with others. Why not take a moment to invite your friends...
+  /    .clear{:style => "height:20px"}
+  /    .icon_div{:style => "width:550px"}
+  /      .left{:class => "icon_image"}
+  /        =link_to image_tag("gmail.png"), "#inviteModal", "data-toggle" => "modal", :onclick => "show_email_form('gmail');"
+  /      .clear
+  /      .left{:style => "margin-left:20px; font-weight:bold;"}
+  /        = link_to "GMail", "#inviteModal", "data-toggle" => "modal", :onclick => "show_email_form('gmail');", :style => "color:#333333"
+
+  /    .clear{:style => "height:20px"}
+  /    %h4
+  /      Or, you can
+  /      =link_to "email your own", "#", :onclick => "$('#email_invitation').show();"
+
+  /    #email_invitation{:style => "display:none"}
+  /      %form{:action => "/user_invitation", "data-remote" => "true", :id => "my_form"}
+  /        .row
+  /          %label{:style => 'width:100px'}
+  /            Email
+  /          %input{:type => "text", :name => "email", :id => "email"}
+  /          %input{:type => "hidden", :name => "from", :value => 1}
+
+  /        .span6ubmit-actions
+  /          %input{:class=>"simple", :type=>"submit", :value=>"Send Invitation", :id => "email_submit"}
+
+  /    .clear{:style => "height:30px"}
+
+  /    .right
+  /      %input{:type => "button", :class => "btn btn-primary", :onclick => "show('language_div');", :value => "Next"}
+  /  .clear{:style => "height:150px"}
+
+
+
+  =render :partial => "/shared/js_function"
+  .left{:id => "language_div", :style => "display:block; width:90%"}
+    %center
+      %div{:style => "text-align:center; width:455px;"}
+        %h4
+          Select the regions you are interested in...
+      .clear{:style => "height:40px"}
+    
+      .div{:style => "width:550px"}
+        .left{:style => "width:25%"}
+          %input{:type => "checkbox", :checked => "true", :value => 'English', :onclick => "setLanguage(this)", :id => "chkenglish"}
+          .clear
+          %h5 Hollywood
+
+        .left{:style => "width:25%"}
+          %input{:type => "checkbox", :value => 'Hindi', :onclick => "setLanguage(this)", :id => "chkhindi"}
+          .clear
+          %h5 Bollywood
+
+        .left{:style => "width:25%"}
+          %input{:type => "checkbox", :value => 'Tamil', :onclick => "setLanguage(this)", :id => "chktamil"}
+          .clear
+          %h5 Tamil
+
+        .left{:style => "width:25%"}
+          %input{:type => "checkbox", :value => 'Telugu', :onclick => "setLanguage(this)", :id => "chktelugu"}
+          .clear
+          %h5 Telugu      
+
+        .clear{:style => "height:50px"}
+      .right
+        /%input{:type => "button", :class => "btn", :onclick => "show('invite_div');", :value => "Back"}
+
+        %input{:type => "button", :class => "btn btn-primary", :onclick => "show('add_movie_div');", :value => "Next"}
+
+
+
+
+  .left{:id => "add_movie_div", :style => "display:none; width:90%; margin-left:10%"}
+    %center
+      %div{:style => "text-align:center; width:530px; margin-left:-100px;"}
+        %h4
+          Mark 'Have Seen' or 'Wanna See' on a few movies to get your discovery engine going.
+
+    .clear{:style => "height:50px"}
+    %div
+      #first_movie_div 
+
+      .clear{:style => "height:50px"}
+      .right
+        /%input{:type => "button", :class => "btn", :onclick => "show('language_div');", :value => "Back"}      
+                                  
+        %input{:type => "button", :class => "btn btn-primary", :onclick => "window.location.href='/';", :value => "Finish"}
+
+-loc = DisplayHelper.get_location(request.remote_ip)
+:javascript
+  $(document).ready(function(){
+    $.cookie('english', 'yes', { expires: 365, path : "/"});
+    $('#chkenglish').attr('checked', 'checked');
+
+    $.cookie("hindi", null, {path : "/"});
+    $.cookie("telugu", null, {path : "/"});
+    $.cookie("tamil", null, {path : "/"});
+
+    $('#chkhindi').removeAttr('checked');
+    $('#chktelugu').removeAttr('checked');
+    $('#chktamil').removeAttr('checked');
+
+    $.cookie('muvi_language_selected', 'yes', { expires: 365, path : "/"});
+
+    var loc_language = "#{loc}";
+
+    $.cookie(loc_language, 'yes');
+    $('#chk'+loc_language).attr('checked', 'checked');
+
+  });
+

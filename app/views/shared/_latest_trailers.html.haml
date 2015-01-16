@@ -1,0 +1,31 @@
+=sidebar_content(:heading => "Latest Trailers", :class => "GrayHeaderBox")
+-count = 1
+-total_block = 4
+
+-@latest_trailers.each do |lt|
+  -if @latest_trailers.size > total_block
+    -last_item = total_block
+  -else
+    -last_item = @latest_trailers.size
+  -actor_name = ""
+  -actor_link = ""
+  -actors = get_actor_name(lt)
+  -unless actors.blank?
+    -i=0
+    -actors.each do |act|
+      - unless act.celebrity.blank?
+        -if i == 2
+          -break
+        -if actor_name.blank?
+          -actor_name = act.celebrity.name
+          -actor_link = star_path(act.celebrity.permalink)
+        -else
+          -actor_name = actor_name + ","+ act.celebrity.name
+          -actor_link = actor_link + "," + star_path(act.celebrity.permalink)
+        -i=i+1 
+  -if count == last_item
+    =sidebar_detail(lt.banner_image_thumb, :name => lt.name, :link_on_name => "/movies/#{lt.permalink}#video", :width => 42, :height => 42,:subtexts => actor_name, :sublink => actor_link, :end => 1)
+    -break
+  -else
+    -count = count + 1
+    =sidebar_detail(lt.banner_image_thumb, :name => lt.name, :link_on_name => "/movies/#{lt.permalink}#video", :width => 42, :height => 42,:subtexts => actor_name, :sublink => actor_link)

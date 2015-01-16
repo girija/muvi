@@ -1,0 +1,26 @@
+.left{:style => "width:418px;border:0px solid #dddddd;padding:5px 0px 5px 5px;"}
+  /.left{:style => "margin-right:10px; font-size:14px; font-weight:bold"}
+  /  Next Week
+  %h2
+    %span Next
+    Week
+
+  .clear
+
+  -unless @celeb_nextweek.blank?
+    -@celeb_nextweek.each do |celeb_nextweek|
+      -celeb = Celebrity.find_by_id(celeb_nextweek.subject_id)
+      -unless celeb.blank?
+        .row.left{:style => "width:190px; margin-top:-8px; margin-bottom:5px"}
+          .image.left{:style => "margin-right:10px"}
+            = link_to image_tag(celeb.thumb_image, :width => "45px", :height => "45px"), star_path(celeb)
+          %h4
+            =link_to celeb.name, star_path(celeb)
+            %br
+            -top_rated_movies = top_rated_movies(celeb)
+            -unless top_rated_movies.blank?
+              %span{:class => "small_light_gray"}
+                Top Movie:&nbsp;
+                =link_to top_rated_movies.first.name, movie_path(top_rated_movies.first), :class => "small_orange_font"
+            .clear
+

@@ -1,0 +1,15 @@
+
+$.ajax({
+  url: "http://54.165.82.244/site/logout",
+  dataType: "jsonp",
+  success: function(){
+alert("ss11");
+             window.location = "/";
+   
+           }
+});
+
+
+function jsonpcallback(data){
+                alert(data);
+        }

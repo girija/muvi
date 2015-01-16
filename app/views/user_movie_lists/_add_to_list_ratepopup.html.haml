@@ -1,0 +1,27 @@
+.left{:style => "width:100%;"}
+  %ul{:style => "list-style-type: none; margin: 0px; color:#FFFFFF; font-weight:bold; height: 25px; padding:7px 7px 7px 10px; background-color:#389ED8; cursor:pointer; ", :onclick => "add_new_list_ratepopup('#{current_user.id}', '#{params[:movie_id]}', this)"}
+    %li{:style => "float:left"}
+      %div{:id => "new_list_#{params[:movie_id]}"}
+      %span{:href => "#", :id => "new_list_btn_#{params[:movie_id]}", :style => "cursor:pointer;"}
+        /, :onclick => "add_new_list_ratepopup('#{current_user.id}', '#{params[:movie_id]}')"}
+        Create a new List
+
+  -unless @list.blank?
+    .left{:style => "width:100%; height:175px; overflow:auto;", :id => "user_list_#{params[:movie_id]}", :class => "user_list"}
+      %ul{:style => "margin-left:0px"}
+        -@list.each do |l|
+          -movie_id_arr = ActiveSupport::JSON.decode(l.movie_id)
+
+          %li
+            -if movie_id_arr.include?(params[:movie_id])
+              -checked = 'checked:true; disabled:true'
+              %input{:type => "checkbox", :checked => true, :disabled => true, :class => "left"}
+            -else
+              %input{:type => "checkbox", :name => "list_arr[]", :class => "left chk_bok", :value => "#{l.tag}"}
+
+            .left{:style => "margin-left:4px"}
+              =l.tag
+            .clear
+    .clear
+  .clear{:style => "height:10px"}
+

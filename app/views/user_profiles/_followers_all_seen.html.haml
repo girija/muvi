@@ -1,0 +1,26 @@
+-first_name = @user_profile.display_name.split(" ")
+-modal_header ="Users following #{first_name[0]}s list"
+=render "shared/user_following_modal", :modal_header => modal_header
+
+- ctr = 0
+- @tagged.followers.each do |follower|
+  - user_profile = follower.user_profile
+  -if !user_profile.profile_image_file_name.blank?
+    = link_to image_tag("/system/profile_images/#{user_profile.id}/small/#{user_profile.profile_image_file_name.gsub(' ', '%20')}", :class=>"img-circle", :style => "width:25px;height:25px", :alt => user_profile.display_name), "/#{user_profile.permalink}"
+  - else
+    - unless follower.facebook_id.blank?
+      = link_to image_tag("http://graph.facebook.com/#{follower.facebook_id}/picture?type=normal",:style => "height:25px;width:25px;", :class=>"img-circle"),"/#{user_profile.permalink}"
+    - else
+      = link_to image_tag("/images/no-profile.png",:style => "height:25px;width:25px;", :class=>"img-circle"),"/#{user_profile.permalink}"
+
+  - ctr = ctr + 1
+  - if ctr == 2
+    - break
+%span{:style => 'font-size:15px;'}
+  -if @tagged.followers_count > 0
+    =link_to @tagged.followers_count,"#user_follow_#{@tagged.id}" , "data-toggle" => "modal",:style => "color:#494949;"
+  -else
+    =link_to @tagged.followers_count,"javascript:void(0)"
+  %span{:style=>'color:#a4a4a4;'}
+    Followers
+

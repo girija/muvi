@@ -1,0 +1,114 @@
+%script
+  var video_id_arr = new Array;
+
+%div{:style => "width:670px"}
+  #video_div{:style => "display:none;"}
+
+    -video_list = Video.get_video(@celebrity.id, "Celebrity", "Video")
+    - unless video_list.blank?
+      - video_list.each do |video|
+        .left{:id => "video_player_#{video.id}", :style => "display:none;"}
+          %a{:href => video.trailer.url.to_s, :id => "video_link_#{video.id}", :style => "display:block;width:540px;height:315px"}
+          %script
+            video_id_arr.push("#{video.id}");
+            flowplayer("video_link_#{video.id}", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{ key: '#$8fe04ea70c52430ec72',logo: {url: '#{URL}/images/flowplayerLogo.png',fullscreenOnly: false, top: 278, right: 2, opacity: 0.5  },clip: {autoPlay: false, autoBuffering: false  }  });
+
+    %iframe{:width => "540", :height => "315", :frameborder => "0", :id => "external_video"}
+    .video_player_overlay
+    .clear
+
+    =render "/shared/show_like_dislike_celeb"
+
+    %script
+      if("#{video_list.size}" == 0){
+      $("#display_celebrity_video").hide();
+      }
+     
+
+  #video_list.left
+    - unless video_list.blank?
+      - video_list.each do |video|
+        
+        -unless video.video_remote_url.blank?
+          -video_id_arr = video.video_remote_url.split("/")
+          -video_id = video_id_arr[video_id_arr.size.to_i - 1]
+          %div{:id => "video_image_#{video.id}", :class => "video_list"}
+            %div{:style => "background:url('http://img.youtube.com/vi/#{video_id}/1.jpg'); height:90px;width:120px;cursor:pointer;", :onclick => "javascript:show_video('#{video_id}', #{video.id});"}
+
+              %img{:onclick => "javascript:show_video('#{video_id}', #{video.id});", :src => "#{URL}/images/play_button.png", :style => "cursor:pointer;padding-left:95px;padding-top:65px"}
+            .clear          
+            %h4
+              =truncate(video.name.html_safe, :length => 40) unless video.name.blank?
+        -else
+          %div{:id => "video_image_#{video.id}", :class => "video_list"}
+            %div{:style => "background:url('#{URL}/system/trailer_thumbnails/#{video.id}/1.jpg'); height:90px;width:120px;cursor:pointer;", :onclick => "javascript:show_muvi_video('#{video.id}');"}
+
+              %img{:border => "1", :onclick => "javascript:show_muvi_video('#{video.id}');", :src => "#{URL}/images/play_button.png", :style => " cursor:pointer;padding-left:95px;padding-top:65px"}
+            .clear
+            %h4
+              =truncate(video.name.html_safe, :length => 40) unless video.name.blank?
+
+    
+
+
+:javascript
+  function show_video(video_id, video){
+    $("#like_video_id").val(video);
+    $("#dislike_video_id").val(video);
+
+    $("#display_celebrity_video").css("height","390px");
+
+    $("iframe").hide();
+    $(".video_player_overlay").hide();
+    $("#video_div").show();
+
+    $("#external_video").attr("src","http://www.youtube.com/embed/"+video_id+"?wmode=opaque&autoplay=1&modestbranding=1")
+    $("#external_video").show();
+    $(".video_player_overlay").show();
+
+
+    $("#video_list").addClass("right_side_video");
+    for(var i = 0; i < video_id_arr.length; i++){
+      $("#video_image_"+video_id_arr[i]).removeClass("video_list");
+      $("#video_image_"+video_id_arr[i]).addClass("video_thumbnail");
+      $("#video_player_"+video_id_arr[i]).hide();
+    }
+  }
+  function show_muvi_video(id){
+    $("#like_video_id").val(id);
+    $("#dislike_video_id").val(id);
+
+    $("#video_div").show();
+    $(".video_player_overlay").hide();
+
+    vote();
+    $("#display_celebrity_video").css("height","390px")
+
+    for(var i = 0; i < video_id_arr.length; i++){
+      $("#video_image_"+video_id_arr[i]).removeClass("video_list");
+      $("#video_image_"+video_id_arr[i]).addClass("video_thumbnail");
+
+      if(video_id_arr[i] == id){      
+        $("#video_player_"+id).show();
+        $f("video_link_"+id).play();
+      }
+      else{
+        $("#video_player_"+video_id_arr[i]).hide();
+      }
+    }
+
+
+    $("iframe").hide();
+    $("#video_list").addClass("right_side_video");
+
+  }
+%script
+  if(("#{params[:autoplay]}") != ""){
+  if("#{@video_type}" == "external"){
+  show_video("#{@video_id}", "#{params[:video_id]}");
+  }
+  if("#{@video_type}" == "internal"){
+  show_muvi_video("#{params[:video_id]}");
+  }
+  }
+

@@ -1,0 +1,89 @@
+/#home_page_container
+-unless current_user.blank?
+  -user = current_user.id
+-else
+  -user = ""
+-unless @result.blank?
+  -@result.each do |item|
+    -@type = item.subject_type
+    -@id = item.subject_id
+    -if @type == "Movie"
+      -type = "movie"
+    -if @type == "Celebrity"
+      -type = "star"
+    -if @type == "Video"
+      -type = "video"
+    -if @type == "Poster"
+      -type = "poster"
+    -if @type == "News"
+      -type = "news"
+    -if @type == "CelebTweet"
+      -type = "celebtweet"
+ 
+    -unless item.flag_detail.blank?
+      -flag_detail = item.flag_detail.gsub(" ", "%20")
+    -else
+      -flag_detail = ""
+    -begin
+      -@block = ActiveSupport::JSON.decode(RestClient.get "#{SERVICE_URL}/muvi/#{type}/#{@id}?flag=#{flag_detail}&current_user=#{user}", :content_type => :json)
+      =display_homepage_block(@block[0])
+    -rescue Exception => exc
+      /=exc.message  
+%a{:href=>'#', :id=>'hidden_reply_login_homepage', :class=>'gradient-button2 left', :href=>"#{new_user_session_path}", "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' ,:style=>"width:60px;display:none;"}
+
+%input{:type => "hidden", :id => "home_user_id"}
+%input{:type => "hidden", :id => "refer_type",:name=>"refer_type", :value => "home_page"}
+
+-begin
+  #pagination{:style => "display:none"}
+    = will_paginate(@result)
+-rescue
+
+
+:javascript
+  $(document).ready(function($) {
+    $(".container").css("background-color", '#EBEBEB');
+    $(".container").css("border", '0px');
+    //adjust_boxes();
+    $(".glow").FontEffect({outline:true});
+    $("#total_pages").val("#{@result.total_pages}");
+  });
+
+  $(window).load(function(){
+    if (navigator.appName == 'Microsoft Internet Explorer'){
+      var ua = navigator.userAgent;
+      var re  = new RegExp('MSIE ([0-9]{1,}[\.0-9]{0,})');
+      if (re.exec(ua) != null){
+        rv = parseFloat( RegExp.$1 );
+        if (rv  == 7.0){
+          $('#home_page_container').masonry({
+            itemSelector : '.home_box',
+            isAnimated: true,
+            animationOptions: {
+              duration: 750,
+              easing: 'linear',
+              queue: false
+            }
+          });
+        }else{
+          adjust_boxes();
+        }
+      }
+    }else{
+      adjust_boxes();
+    }
+  });
+
+  if ("#{params[:page]}" == ""){
+    $.post("/load_in_theater", function(data) {
+      $('#in_theater').html(data);
+    });
+
+    $.post("/load_upcoming", function(data) {
+      $('#upcoming').html(data);
+    });
+  }
+
+
+
+

@@ -1,0 +1,32 @@
+- unless @play_movies.blank?
+  - if !current_user.blank?
+    - @my_wanna_see_movies = []
+    - @my_seen_movies = []
+    - list = ListOfMovie.find_by_user_id(current_user.id)
+    - if list && !list.wanna_see_lists.blank?
+      - wannasee_list = ActiveSupport::JSON.decode(list.wanna_see_lists)
+      -if wannasee_list
+        - wannasee_list.each do |wanna_see|
+          - @my_wanna_see_movies << wanna_see["object"]["id"].to_i
+    - if list && !list.seen_lists.blank?
+      - seen_list = ActiveSupport::JSON.decode(list.seen_lists)
+      - seen_list.each do |seen|
+        - unless seen.blank?
+          - unless seen["object"].blank?
+            - unless seen["object"]["id"].blank?
+              - @my_seen_movies << seen["object"]["id"].to_i
+
+    - @my_rated_movies = []
+    - rated =  UserMovieList.where(:user_id => current_user.id)
+    - if rated
+      - rated.each do |rate|
+        - if !rate.movie_id.blank?
+          - rated_list = ActiveSupport::JSON.decode(rate.movie_id)
+          - rated_list.each do |movie|
+            - @my_rated_movies << movie.to_i
+    - @my_rated_movies.uniq!
+
+
+  - @play_movies.each do |movie|
+    = render "/shared/movie_block", :movie => movie
+

@@ -1,0 +1,9 @@
+//try{
+  $("#home_page_container").append("<%= escape_javascript(render 'load_language') %>");
+  $("#loading_div").fadeOut();
+  $("#total_pages").val("<%=@result.total_pages %>");
+  $("#home_page_container").masonry("reload");
+//}catch(E){}
+
+
+

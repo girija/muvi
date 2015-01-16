@@ -1,0 +1,30 @@
+.modal.fade.hide{:id => "user_follow_#{@tagged.id}", :style => 'width:525px;height:auto;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    #user_followLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+      =modal_header
+  .modal-body
+    - @tagged.followers.each do |follower|
+      - user_profile = follower.user_profile
+      .pull-left{:style=>"width:240px;margin-top:10px;"}
+        .pull-left
+          -if !user_profile.profile_image_file_name.blank?
+            = link_to image_tag("/system/profile_images/#{user_profile.id}/small/#{user_profile.profile_image_file_name.gsub(' ', '%20')}", :style => "width:45px;height:45px;border-radius:100px;", :alt => user_profile.display_name), "/profile/#{follower.id}/#{follower.display_name}"
+          - else
+            - unless follower.facebook_id.blank?
+              = link_to image_tag("http://graph.facebook.com/#{follower.facebook_id}/picture?type=normal",:style => "height:45px;width:45px;border-radius:100px;"),"/profile/#{user_profile.user_id}/#{user_profile.display_name}"
+            - else
+              = link_to image_tag("/images/no-profile.png",:style => "height:45px;width:45px;border-radius:100px;"),"/profile/#{user_profile.user_id}/#{user_profile.display_name}"
+        %div{:style => "float:left;padding-left:5px;"}
+          .movie_block_title{:style => "font-size:16px;float:left;"}
+            = user_profile.display_name
+          %div{:style=>"color:#5f5f5f;font-size:13px;"}
+            =user_profile.location
+
+
+  .modal-footer
+    %button.btn.btn-primary.bold_class{"data-dismiss" => "modal", "aria-hidden" => "true" }
+      Done
+
+

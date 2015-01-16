@@ -1,0 +1,35 @@
+%div{:style=>"padding-top:50px;"}
+  %center
+    -user = @user_profile.user
+    -if !defined?(@list_type)  
+      %div{:style=>"height:40px;"}
+        - unless current_user.blank?
+          - if current_user.id.to_i !=  @list.user_id.to_i
+            - if !@list.followed_by?(current_user)
+              = link_to "+ Follow List".html_safe, "#" , :class => 'btn btn-follow btn-primary btn-large tip_hint', "data-id" => @list.id, :id => "btn-follow-#{@list.id}", :style => 'border-radius:2px 2px 2px 2px;width:60px;width:170px;',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+            - else
+              = link_to "Following".html_safe, "#" , :class => 'btn btn-following btn-primary btn-large', "data-id" => @list.id, :id => "btn-follow-#{@list.id}", :style => 'border-radius:2px 2px 2px 2px;width:170px;'
+        - else
+          = link_to "+ Follow List".html_safe, "#" , :class => 'btn btn-follow-login btn-primary btn-large tip_hint', "data-id" => @list.id, :id => "btn-follow-#{@list.id}", :style => 'border-radius:2px 2px 2px 2px;width:170px;',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+      %div{:style=>"height:30px;padding-top:20px;"}
+        =image_tag("/images/share.png")
+      %div{:style=>"font-size:16px;color:#5f5f5f;height:30px;"}
+        Made By
+    %a{:href => "/profile/#{@user_profile.user_id}/#{@user_profile.display_name}"}
+      %div{:style => "cursor:pointer;padding:2px;"}
+        = image_tag("/system/profile_images/#{@user_profile.id}/small/#{@user_profile.profile_image_file_name.gsub(' ', '%20')}",:style => "height:130px;width:130px;", :class => 'media-object img-circle') unless @user_profile.profile_image_file_name.blank?
+        - user = User.find(@user_profile.user_id)
+        - if @user_profile.profile_image_file_name.blank?
+          - unless user.facebook_id.blank?
+            = image_tag("http://graph.facebook.com/#{user.facebook_id}/picture?type=normal",:style => "height:130px;width:130px;", :class => 'media-object img-circle')
+          - else
+            = image_tag("/images/no-profile.png",:style => "height:130px;width:130px;", :class => 'media-object img-circle')
+        -unless current_user.blank?
+          %input{:type => 'hidden', :name=> 'logged_in_user_id' , :id => 'logged_in_user_id', :value => current_user.id}
+    %div{:style=>"font-size:30px;color:#494949;height:40px;padding-top:20px;"}
+      = user.display_name
+    %div{:style=>"color:#a4a4a4;font-size:15px;font-weight:bold;height:30px;"}
+      = @user_profile.location if !@user_profile.location.nil?
+    %div{:style => "font-size:15px;padding-top:10px;"}
+      %span{:style=>"color:#494949;font-weight:bold;"}
+        ="Following #{link_to "#{user.following_by_type_count("UserMovieList")} lists", "#followsModal" , "data-toggle" => "modal"}".html_safe

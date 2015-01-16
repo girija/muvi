@@ -1,0 +1,32 @@
+- if @video.blank?
+  - @item = @poster
+  - text = 'poster'
+  - textDB = 'Poster'
+- else
+  - @item = @video
+  - text = 'video'
+  - textDB = 'Video'
+- coms = Comment.where('commentable_id = ? and commentable_type = ?',@item_id, textDB).limit(6)
+- comments = coms.reverse
+
+#comment_block{:style => "float:right;background: url('#{URL}/images/comment_bg.png') no-repeat top right;width:290px;height:400px;position:relative"}
+  %div{:style => 'color:#c0c0c0;font-size:18px;font-family:Arial, Helvetica, sans-serif;padding:10px;'}
+    = "#{comments.size} Comments"
+  %div{:style => 'position:absolute'}
+    .uiScrollableArea.rhcScroller.fade.contentAfter
+      .uiScrollableAreaWrap.scrollable{:style => 'height: 335px'}
+        .uiScrollableAreaBody{:style => 'width: 275px'}
+          #comment_data.uiScrollableAreaContent{:style => 'padding:10px;padding-top:0px'}
+            - comments.each do |comment|
+              = render 'shared/comment_format', {:comment => comment}
+    .uiScrollableAreaTrack{:style => 'opacity: 1;'}
+      .uiScrollableAreaGripper{:style => 'height: 335px; top: 0px'}
+
+%div{:style => 'float:right;clear:right'}
+  %div{:style => 'padding-left:5px;width:291px'}
+    = form_for([@item, Comment.new], :remote => true, :html => {:id => "comment_form_#{@item.id}"} )  do |f|
+      -user_id = current_user ? current_user.id : ""
+      %input{:type => "hidden", :id => "user_id",:name=>"user_id", :value => user_id}
+      %textarea{:id => "comment_#{@item.id}",:name => "#{text}_comment_#{@item.id}", :rows => 1, :cols => 78, :style => "width:250px;height:50px;font-size:14px;font-family:arial;", :placeholder => "Add a comment",:onkeypress => "return check_login_poster_video_comment(event,'#{@item.id}');"}
+      %input{:type => "hidden", :id => "parent_id_#{@item.id}",:name=>"#{text}_comment", :value => @item.id}
+      /= f.submit :value => '', :onclick=>"return check_login_poster_video_comment('#{@item.id}');", :style => "height:26px;width:76px;border:0px;background: url('#{URL}/images/pp_comment.png') no-repeat top left;float:right;margin-left:4px"

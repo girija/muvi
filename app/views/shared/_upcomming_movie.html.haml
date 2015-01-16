@@ -1,0 +1,32 @@
+- unless @upcoming_movies.blank?
+  %h4
+    &nbsp;
+  -count = 0
+  - @upcoming_movies.each do |movie|
+    -count = count + 1
+    -if count > 8 
+      -break
+
+    -begin
+      -actors = get_actor_name(movie)
+    -rescue
+
+    -actor_name = ""
+    -actor_link = ""
+    -unless actors.blank?
+      -i=0
+      -actors.each do |act|
+        -if i == 2
+          -break
+        - unless act.celebrity.blank?
+          -if actor_name.blank?
+            -actor_name = act.celebrity.name
+            -actor_link = act.celebrity.permalink
+          -else
+            -actor_name = actor_name + ","+ act.celebrity.name  
+            -actor_link = actor_link + "," + act.celebrity.permalink
+          -i = i + 1
+    =muvilayout_detail(movie.banner_image_thumb, :name => movie.name, :link_on_name => movie_path(movie), :width => 45, :height => 45, :subtexts => actor_name, :sublink => actor_link)
+   
+            
+

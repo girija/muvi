@@ -1,0 +1,12 @@
+-if current_user && current_user.facebook_omniauth.blank?
+  %br
+  &nbsp;&nbsp;
+  = link_to image_tag("facebook_64.png",  :alt => "facebook"), "/auth/facebook"
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to see your friends' activities
+-elsif current_user && current_user.facebook_omniauth
+  #facebook_posts
+    = render '/shared/facebook_friends'
+-else
+  #facebook_login
+    %p= "#{link_to 'Login', new_user_session_path, :remote => true, :onclick => "login();"} to see your friends posts.".html_safe
+

@@ -1,0 +1,127 @@
+%h3{:style=>"width:836px;"}
+  %span CAST &amp; CREW
+.clear{:style => "height:10px"}
+
+/-unless @movie.story.blank?
+/  %h5{:class => "cast"}
+/    STORY:&nbsp;
+/    %span.personal-info-cast-bio
+/      = @movie.story
+/  .clear{:style => "height:40px"}
+
+/.left
+/  %h5
+/    DIRECTOR
+/  .clear
+/.right
+/  RELEASE DATE
+/  .clear
+/.connectionborderDiv
+
+/.clear
+
+- unless @actors.blank?
+  %h5.cast
+    CAST
+    /= link_to "See More (#{@movie.actors.count})", '#'
+  .clear
+
+  .border{:style=>"width:900px;"}
+    - @actors.each do |actor|
+      -unless actor.celebrity.blank?
+        .moviCasts.left{:onmouseover => '$(this).css("background-color", "#F0F1F3");', :onmouseout => '$(this).css("background-color", "#FFFFFF");', :style => 'cursor:pointer', :onclick => "window.location.href='#{star_path(actor.celebrity.permalink)}'"}
+          .actress.left
+            -begin
+              /=link_to image_tag(actor.celebrity.profile_picture.url(:thumb)),celebrity_path(actor.celebrity.permalink)
+              =link_to image_tag(actor.celebrity.thumb_image),star_path(actor.celebrity.permalink)
+            -rescue
+          .actressNames.right
+            -unless actor.celebrity.blank?
+              %h4.large= link_to actor.celebrity.name,star_path(actor.celebrity.permalink)
+              %span{:class => "small_light_gray"}
+                as
+                = actor.role_name
+  .clear
+
+- if !@director.blank? or !@producer.blank? or !@writer.blank? or !@music.blank?
+  %h5
+    CREW
+.border{:style => "width:900px;"}
+  - if @director.size > 0
+    - @director.each do |director|
+      - unless director.celebrity.blank?
+        .moviCasts.left{:onmouseover => '$(this).css("background-color", "#F0F1F3");', :onmouseout => '$(this).css("background-color", "#FFFFFF");', :style => 'cursor:pointer', :onclick => "window.location.href='#{star_path(director.celebrity.permalink)}'"}
+          .actress.left
+            /= link_to image_tag(@director.celebrity.profile_picture.url(:thumb)),celebrity_path(@director.celebrity.permalink)
+            = link_to image_tag(director.celebrity.thumb_image),star_path(director.celebrity.permalink)
+          .actressNames.right
+            %h4.large= link_to director.celebrity.name,star_path(director.celebrity.permalink)
+            %span{:class => "small_light_gray"}
+              Director
+  
+  - if @producer.size > 0
+    - @producer.each do |producer| 
+      .moviCasts.left{:onmouseover => '$(this).css("background-color", "#F0F1F3");', :onmouseout => '$(this).css("background-color", "#FFFFFF");', :style => 'cursor:pointer', :onclick => "window.location.href='#{star_path(producer.celebrity.permalink)}'"}
+        .actress.left
+          /= link_to image_tag(@producer.celebrity.profile_picture.url(:thumb)),celebrity_path(@producer.celebrity.permalink)
+          = link_to image_tag(producer.celebrity.thumb_image),star_path(producer.celebrity.permalink)
+        .actressNames.right
+          %h4.large= link_to producer.celebrity.name,star_path(producer.celebrity.permalink)
+          %span{:class => "small_light_gray"}
+            Producer
+
+  - if @writer.size > 0
+    - @writer.each do |writer|
+      .moviCasts.left{:onmouseover => '$(this).css("background-color", "#F0F1F3");', :onmouseout => '$(this).css("background-color", "#FFFFFF");', :style => 'cursor:pointer', :onclick => "window.location.href='#{star_path(writer.celebrity.permalink)}'"}
+        .actress.left
+          /= link_to image_tag(@writer.celebrity.profile_picture.url(:thumb)),celebrity_path(@writer.celebrity.permalink)
+          = link_to image_tag(writer.celebrity.thumb_image),star_path(writer.celebrity.permalink)
+        .actressNames.right
+          %h4.large= link_to writer.celebrity.name,star_path(writer.celebrity.permalink)
+          %span{:class => "small_light_gray"}
+            Story
+ 
+  - if @music.size > 0
+    - @music.each do |music|
+      .moviCasts.left{:onmouseover => '$(this).css("background-color", "#F0F1F3");', :onmouseout => '$(this).css("background-color", "#FFFFFF");', :style => 'cursor:pointer', :onclick => "window.location.href='#{star_path(music.celebrity.permalink)}'"}
+        .actress.left
+          /= link_to image_tag(@music.celebrity.profile_picture.url(:thumb)),celebrity_path(@music.celebrity.permalink)
+          = link_to image_tag(music.celebrity.thumb_image),star_path(music.celebrity.permalink)
+
+        .actressNames.right
+          %h4.large= link_to music.celebrity.name,star_path(music.celebrity.permalink)
+          %span{:class => "small_light_gray"}
+            Music
+  .clear
+
+%h5
+  OTHER INFORMATION
+.border
+  .moviCasts.left
+    %h5
+      Release Date:
+      %span= Time.parse(@movie.release_date.to_s).strftime('%d %B %Y').to_s unless @movie.release_date.blank?
+    %h5
+      Budget:
+      %span
+        %img{:src => "#{URL}/images/rupee-icon.gif", :align => 'bottom'}
+        = @movie.estimated_budget
+
+  .moviCasts.left
+    %h5
+      Genre:
+      %span= @movie.genre.to_sentence rescue @movie.genre
+    %h5
+      Box office:
+      %span
+        %img{:src => "#{URL}/images/rupee-icon.gif", :align => 'bottom'}
+        = @movie.gross_revenue
+
+  .clear
+
+-unless @movie.story.blank?
+  %h5{:class => "cast"}
+    STORY
+    %span.personal-info-cast-bio
+      = @movie.story
+

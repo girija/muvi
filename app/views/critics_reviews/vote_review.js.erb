@@ -1,0 +1,11 @@
+$("#user_id").val("<%= current_user.id %>");
+<% if @vote %>
+  
+  <% if @vote.vote_flag%>
+    successMessage("You liked this review.");
+  <% else %>
+    successMessage("You disliked this review.");
+  <% end %>
+  $("#like_com_info_<%= @review.id%>").html("<%= escape_javascript(render 'shared/review_links', {:review => @review}) %>"); 
+  $("#list_like_<%= params[:id] %>").html("<%= escape_javascript(render 'shared/like_dislike', {:review=> @review, :type=>"all"}) %>");
+<% end %>

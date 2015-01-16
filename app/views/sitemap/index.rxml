@@ -1,0 +1,17 @@
+xml.instruct!
+
+xml.urlset "xmlns" => "http://www.sitemaps.org/schemas/sitemap/0.9" do
+  @movie.each do |movie|
+    xml.url do
+      xml.loc url_for(movie_path(movie))
+    end
+  end
+
+
+  @celebrity.each do |celeb|
+    xml.url do
+      xml.loc celebrity_path(celeb)
+    end
+  end
+
+end

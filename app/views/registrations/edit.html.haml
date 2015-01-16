@@ -1,0 +1,28 @@
+/:javascript
+/  function check_validation(){
+/    var user_name = $("#user_user_profile_attributes_display_name").val();
+/    if(user_name == "" ){
+/      $("#error_block").show();
+/      return false;
+/    }else{
+/      $("#error_block").hide();
+/      return true;
+/    }
+/  }
+/  function close_info(){
+/    $("#info").hide();
+/  }
+
+-if resource.user_profile.blank?
+  #info{:style=>"background-color:#FFE4AE;border:1px solid #4D4D4D;font-size:15px;height:35px;margin-top:-20px;width:1130px;"}
+    %div{:style=>"float:left;padding:10px;"}
+      Seems like you are using Muvi for the first time. Please change your Password and Full name, and Update settings.
+    %div{:style=>"float:right;padding-right:5px;",:onclick=>"close_info();"}
+      x
+.row-fluid
+  .span12{:style => "background-color:#FFFFFF"}
+    .span3
+      =render :partial => "/home/left_sidebar"
+    .span9{:style => "border-left: 4px solid #DFDFDF; margin-left: -2px;"}
+      %div{:class=>"main_content"}
+        = render '/registrations/edit'

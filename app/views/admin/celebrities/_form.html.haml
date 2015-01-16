@@ -1,0 +1,77 @@
+= form_for([:admin, @celebrity], :html => { :multipart => true }) do |f|
+  - if @celebrity.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@celebrity.errors.count, "error")
+        prohibited this page from being saved:
+      %ul
+        -@celebrity.errors.full_messages.each do |msg|
+          %li= msg
+
+  = f.label :name, "Name"
+  = f.text_field :name
+  .right.checkbox
+    Language
+    - if !@celebrity.language.blank?
+      -begin
+        - @lang = ActiveSupport::JSON.decode(@celebrity.language)
+      -rescue
+
+    - else
+      - @lang = ['Hindi']
+
+    = select_tag 'celebrity[language][]', options_for_select(['Hindi', 'Tamil', 'Telugu', 'English', 'Kannada', 'Marathi', 'Gujarati', 'Malayalam', 'Bhojpuri', 'Punjabi', 'Bengali'], @lang || 'Hindi'),{ :multiple => true, :size => "3"}
+
+    /= f.check_box :is_dictionary_word
+    /Dictionary Word
+  .clear
+  = f.label :celebrity_type, 'Type'
+  /= f.text_field :celebrity_type
+  = select_tag 'celebrity[celebrity_type][]', options_for_select(option_for_cast_type, @celebrity.celebrity_type || 'actor'),{ :multiple => true, :size => "3"}
+  .clear
+  = f.label :birthdate, 'Birthdate'
+  = f.text_field :birthdate
+  .clear
+  /= f.label :birthplace, 'Birth Place'
+  /= f.text_field :birthplace
+  /.clear
+  /  = f.label :wiki_link, 'Wikipedia Page'
+  /  = f.text_field :wiki_link ,:class => 'large'
+  .clear
+  = f.label :profile_picture, 'Profile Picture'
+  = image_tag(@celebrity.profile_picture.url(:thumb)) unless @celebrity.new_record?
+  = f.file_field :profile_picture
+  .clear
+  = f.label :summary, 'Summary'
+  = f.text_area :summary, :rows => 5
+  /.clear
+  /= f.label :twitterid, 'TwitterID'
+  /= f.text_field :twitterid
+  .clear
+  %hr
+  
+  #meta_detail
+    = f.label :meta_title
+    = f.text_field :meta_title
+    .clear
+    = f.label :meta_keywords
+    = f.text_area :meta_keywords, :rows => 5
+    .clear
+    = f.label :meta_description
+    = f.text_area :meta_description, :rows => 5
+
+  .clear
+  -if request.env["REQUEST_URI"] =~ /edit/
+    /= label_tag "Difference Score"
+    /= text_field_tag :diff_score,"", :value => (@celebrity.score - @celebrity.history_score)
+    .clear
+    /= label_tag "Add Score"
+    /= text_field_tag :add_score
+    .clear
+    /= label_tag "Set Flag"
+    /=select_tag :flag, options_for_select([["Select One", ""], "In Theater", "Happy Birthday","Promoted"],"#{@celebrity.flag}")
+  .actions
+    = f.submit 'Save'
+    \- or -
+    = link_to 'Cancel', admin_celebrities_path
+

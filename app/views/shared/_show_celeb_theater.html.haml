@@ -1,0 +1,41 @@
+.left{:style => "border:0px solid #dddddd; margin-right:10px;padding:5px 0px 5px 10px;margin-top:-15px"}
+  /.left{:style => "margin-right:10px; font-size:14px; font-weight:bold"}
+  /  In Theaters This Week
+  %h2
+    %span In Theaters
+    This Weekend
+
+  .clear{:style => "height:5px"}
+
+  -count_celeb = 0
+  -unless @celeb_theater.blank?
+    -@celeb_theater.each do |celeb_theater|
+      -celeb = Celebrity.find_by_id(celeb_theater.subject_id)
+      -unless celeb.blank?
+        -count_celeb = count_celeb + 1
+        .left{:style => "margin-right:10px", :id => "celeb_image_#{count_celeb}"}
+          = link_to image_tag(celeb.image, :width => "107px", :height => "157px"), star_path(celeb)
+
+          -top_rated_movies = top_rated_movies(celeb)
+
+          .small_overlay{:id => "celeb_movie_name_#{count_celeb}", :style => "height:30px; margin-top:-36px;"}
+            .gray_bold.left
+              =link_to truncate(celeb.name, :length => 20), star_path(celeb), :style => "color:#FFFFFF;font-weight:10px;"
+              %br
+              -unless top_rated_movies.blank?
+                %span{:style => "color:#FFFFFF; font-size:9px;display:none; text-transform:capitalize", :id => "span_#{count_celeb}"}
+                  Top Movie:&nbsp;
+                  =link_to top_rated_movies.first.name, movie_path(top_rated_movies.first), :style => "color:#FFFFFF;font-weight:8px;"
+
+              :javascript
+                $("#celeb_image_#{count_celeb}").hover(function() {
+                  $("#celeb_movie_name_#{count_celeb}").stop().animate({ height: "60px", "margin-top": "-66px"}, 500);
+                  $("#span_#{count_celeb}").show();
+                }, function() {
+                  $("#celeb_movie_name_#{count_celeb}").stop().animate({ height: "30px", "margin-top": "-36px" }, 500);
+                  $("#span_#{count_celeb}").hide(500);
+                });
+
+.clear{:style => "height:10px"}
+
+

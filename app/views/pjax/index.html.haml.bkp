@@ -1,0 +1,10 @@
+=link_to 'Click', "/pjax"
+%hr
+
+%div{:style => "border:1px solid pink; width:300px; float:left;"}
+  = Time.now
+
+
+%div{:style => "border:1px solid aqua; width:300px; float:left;", :'data-pjax-container' => true}
+  = Time.now
+

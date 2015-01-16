@@ -1,0 +1,25 @@
+11
+#login
+  .wrapper{:style => "padding-left:10px; padding-top:10px"}
+    #message
+      %h2 Change your password
+    .clear
+
+    = form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => {:remote => true, :method => :put }) do |f|
+      = f.hidden_field :reset_password_token
+      #errors
+      %fieldset.registration
+        .field
+          = f.label :password, "New password"
+          /%br
+          = f.password_field :password
+        .actions
+          %br
+          = f.submit "Change my password", :class => "login_link"
+          %span{:style => "color:#4F4F4F"}
+            \- or -
+          = link_to 'Cancel', root_path, :class => "login_link"
+
+
+/= render :partial => "devise/shared/links"
+

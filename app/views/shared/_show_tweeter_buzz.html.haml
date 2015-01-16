@@ -1,0 +1,15 @@
+.home_page_rating.left{:style => "margin-top:-65px;margin-left:10px; position:absolute;width:180px"}
+  .gray_bold.left{:style => "width:180px"}
+    = link_to @movie.name, movie_path(@movie),:style => "color:#C2C1BD; font-size:13px"
+    .clear
+
+  %div{:style =>"color:#C2C1BD; font-size:13px; font-weight:bold"}
+    Release Date: 
+    =@movie.release_date
+  /.home_rating_bar.left{:style => "background-color:#FFFFFF"}
+  /  = ratingbar(@movie.tweet_percent)
+    
+  /-if @movie.tweet_percent != 0 and !@movie.tweet_percent.blank? and !@movie.tweet_percent.nil?
+  /  .home_ratingvalue.left
+  /    -tweet_percent = "#{@movie.tweet_percent || 0}%"
+  /    = link_to tweet_percent, movie_path(@movie, :anchor => "critics"),:style => "color:#FFFFFF; font-size:18px"

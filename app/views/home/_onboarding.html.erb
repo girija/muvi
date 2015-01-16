@@ -1,0 +1,55 @@
+<style>
+  .onboarding_modal{
+    height: 320px;
+    left: 50%;
+    margin: -143px 0 0 -550px;
+    top: 50%;
+    width: 1100px;
+  }
+</style>
+
+<script>
+  $(document).ready(function($) {
+    var browser = (navigator.userAgent).toLowerCase();
+    if(browser.indexOf("chrome") != -1){
+       $(".modal-body.lang").css("width", "1130px");
+    }
+  });
+</script>
+
+          <!----------- Language selection Modal -->
+          <link href="/stylesheets/inner_onboarding.css" media="screen" rel="stylesheet" type="text/css" />
+          <div class='modal fade hide' id='langModal' style="min-height: 400px;left: 50%; margin: -143px 0 0 -550px; top: 25%; width: 1150px;">
+              <div class='modal-body lang' style="overflow-y:none; min-height:420px; max-height:530px;">
+                <h2 style="color:#000000">Select your languages</h2>
+                <h4 style="color: #000000; font-size: 15px; font-weight: normal; line-height: 10px;">It will personalize your movie experience</h4>
+                <%= render :partial => "/home/language_popup" %>
+              </div>
+
+              <div class='modal-footer'></div>
+           </div>
+          <!-- ------------------------ -->
+          <!----------- Language selection Modal -->
+          <div class='modal fade hide' id='movieModal' style="min-height: 400px;left: 50%; margin: -143px 0 0 -550px; top: 25%; width: 1100px;">
+              <div class='modal-body' style="overflow-y:none; min-height:420px;">
+                 <h2 style="color:#000000">Rate a few movies</h2>
+                 <h4 style="color: #000000; font-size: 15px; font-weight: normal; line-height: 10px;">It will start matching movies based on your taste</h4>
+
+                <%= render :partial => "/home/movie_popup" %>
+              </div>
+
+              <div class='modal-footer'></div>
+           </div>
+          <!-- ------------------------ -->
+
+          <!----------- Language selection Modal -->
+          <div class='modal fade hide' id='listModal' style="min-height: 400px;left: 50%; margin: -143px 0 0 -550px; top: 25%; width: 1100px;">
+              <div class='modal-body' style="overflow-y:none; min-height:350px;">
+                <h2 style="color:#000000">Follow some list</h2>
+                <%= render :partial => "/home/list_popup" %>
+              </div>
+
+              <div class='modal-footer'></div>
+           </div>
+          <!-- ------------------------ -->
+

@@ -1,0 +1,269 @@
+%div{:id=>"filter_section"}
+  %div{:id=>"filter_btn",:class=>"filter_btn btn btn-primary", :onclick => "filter_button_click()"}
+    ="Filter<i class='icon-chevron-down' style='padding-left:10px;' id='filter_icon'></i>".html_safe
+  .clear{:style=>"height:10px;"}
+  %div{:id=>"filter_search",:style=>"padding-top:15px;display:none;"}
+    //%input{:type=>"text", :name=>"tags", :style=>"width:750px;", :class=>'tagManager', :placeholder=>"Tags" }
+    %input{:type=>"text" ,:class=>"tagManager" ,:name=>"tags",:id=>"cast_crew", :style=>"width:750px;", :placeholder=>"Search",:"data-provide"=>"typeahead", :autocomplete=>"off"}
+    %div{:style=>'padding-left:132px;', :id=>'tags_container', :class=>'tags_block'}
+    .clear{:style=>"height:10px;"}
+    %div{:class=>"filter_option",:id=>"avail_to_watch" , :onclick=>"push_tag('Available to Watch','avail_watch','');"}
+      Available to Watch
+    .clear{:style=>"height:7px;"}
+    %div{:class=>"filter_option", :id=>"top_rated" , :onclick=>"push_tag('Top Rated','top_rated','');"}
+      Top Rated
+    .clear{:style=>"height:7px;"}
+    %div{:style=>"height:20px;"}
+      %div{:class=>"filter_option" , :onclick=>"push_tag('Action','genre','Action');"}
+        Action, 
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Animation','genre','Animation');"}
+        Animation, 
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Comedy','genre','Comedy');"}
+        Comedy, 
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Drama','genre','Drama');"}
+        Drama, 
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Horror','genre','Horror');"}
+        Horror, 
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Thriller','genre','Thriller');"}
+        Thriller 
+    .clear{:style=>"height:7px;"}
+    %div{:style=>"height:20px;"}
+      %div{:class=>"filter_option" , :onclick=>"push_tag('Latest (Last 6 months)','year','new_6');"}
+        Latest (Last 6 months),
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('New (After 2010)','year','2010_now');"}
+        New (After 2010), 
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('1980 - 2009','year','1980-2009');"}
+        1980 - 2009,
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('1960 - 1979','year','1960-1979');"}
+        1960 - 1979,
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Classic (before 1960)','year','classic');"}
+        Classic (before 1960)
+    .clear{:style=>"height:7px;"}
+    %div{:style=>"height:20px;"}
+      %div{:class=>"filter_option" , :onclick=>"push_tag('Hollywood','language','English');"}
+        Hollywood,
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Bollywood','language','Hindi');"}
+        Bollywood,
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Tamil','language','Tamil');"}
+        Tamil,
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Telugu','language','Telugu');"}
+        Telugu,
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Kannada','language','Kannada');"}
+        Kannada,
+
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Marathi','language','Marathi');"}
+        Marathi,
+
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Gujarati','language','Gujarati');"}
+        Gujarati,
+
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Malayalam','language','Malayalam');"}
+        Malayalam,
+
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Bhojpuri','language','Bhojpuri');"}
+        Bhojpuri,
+
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Punjabi','language','Punjabi');"}
+        Punjabi,
+
+      %div{:class=>"filter_option",:style=>"padding-left:5px;" , :onclick=>"push_tag('Bengali','language','Bengali');"}
+        Bengali
+
+
+%div{:id=>"new_search_res",:style=>"display:none;"}  
+    
+:javascript
+    //var year = "" ,genre="" ,language="", top_rated = "", avail_watch = "",exist_tags="",casts="";
+    var map = {};
+    $(document).ready(function($) {
+      var year = "" ,genre="" ,language="", top_rated = "", avail_watch = "",exist_tags="",casts="";
+      load_mannual_list("#{params[:available_watch]}", '#{current_user.language.to_s}');
+
+      /*var avail_watch = "#{params[:available_watch]}";
+      if(avail_watch != "true"){
+        filter_avail_movies('page_load', '#{current_user.language.to_s}');
+      }else{
+        show_top_movies();
+        filter_avail_movies('movie_msg', '#{current_user.language.to_s}');
+      }
+      $('#cast_crew').typeahead({
+      	minLength:2,
+      	source: function (query,process) {
+          $.get("/fetch_cast_crew", { term: query }, function (data) {
+            var celebs = [];
+            $.each(data, function (i, celeb) {
+              map[celeb.label] = celeb;
+              celebs.push(celeb.label);
+            });
+            return process(celebs);
+          });
+        },
+        updater: function(item){
+          var id = map[item].id;
+          push_tag(item,'cast',id);
+          return item;
+        }
+      });*/
+    });
+    function filter_avail_movies_old(p_type, user_lang){
+    if(p_type == "pjax"){
+      year = "" ,genre="" ,language="", top_rated = "", avail_watch = "",exist_tags="";
+    }
+    $('input[name=hidden-tags]').val("");
+    var default_search = $("#avail_to_watch").html();
+    $(".tagManager").tagsManager();
+    //push_tag(default_search,'avail_watch','');
+    if(p_type == "page_load"){
+      push_tag('Top Rated','top_rated','');
+      push_tag('Latest (Last 6 months)','year','new_6');
+    }else{
+      push_tag('Available to Watch','avail_watch','');
+    }
+    var user_lang = '#{current_user.language.to_s}';
+    var lang_arr = JSON.parse(user_lang);
+    for(var i in lang_arr){
+      if(lang_arr[i] == "Hindi"){
+        push_tag('Bollywood','language',lang_arr[i]);
+      }else if(lang_arr[i] == "English"){
+        push_tag('Hollywood','language',lang_arr[i]);
+      }else{
+        push_tag(lang_arr[i],'language',lang_arr[i]);
+      }
+    }
+
+    $("#tags_container").css("padding-left","0px");
+    if(p_type != "movie_msg"){
+    $("#filter_btn").click(function() {
+      is_first = false;
+    });
+    }
+  }
+  function push_tag_old(tag_content,type,value){
+    exist_tags = $('input[name=hidden-tags]').val();
+    $("#cast_crew").val("");
+    if(exist_tags.indexOf(tag_content) < 0){
+      $(".tagManager").tagsManager('pushTag',tag_content);
+      var last_tag = $("#tags_container").children(".myTag").last().attr("id").split("_");
+      $("#tags_"+last_tag[1]).children(".myTagRemover").click(function() {
+        remove_available(type,value);
+      });
+      first_time = false;
+      filter_available(type,value);
+    }
+  }
+  function filter_available_old(type,value){
+    if(type == "year"){
+      if(year == ""){
+        year = value;
+      }else{
+        year += ","+value;
+      }
+    }
+    if(type == "top_rated"){
+      top_rated = "true";
+    }
+    if(type == "avail_watch"){
+      avail_watch = "true";
+    }
+    if(type == "genre"){
+      if(genre == ""){
+        genre = value;
+      }else{
+        genre += ","+value;
+      }
+    }
+    if(type == "language"){
+      if(language == ""){
+        language += "'"+ value + "'";
+      }else{
+        language += ",'"+ value + "'";
+      }
+    }
+    if(type == "cast"){
+      if(casts == ""){
+        casts +=  "'"+ value+ "'";
+      }else{
+        casts += ",'"+ value+ "'";
+      }
+    }
+    var url = "/filter_top_movies";
+    $.post(url,{year:year,genre:genre,language:language,top_rated:top_rated,avail_watch:avail_watch,cast:casts},function(res){
+      $("#new_search_res").show();
+      if(res != ""){
+        $("#new_search_res").html(res);
+      }else{
+        $("#new_search_res").html("No result found. Please refine your search.")
+      }
+    });
+  }
+
+  function remove_available_old(type,value){
+    //alert(type+'---'+value+'---'+language);
+    if(type == "top_rated"){
+      top_rated = "false";
+    }
+    if(type == "avail_watch"){
+      avail_watch = "false";
+    }
+    if(type == "genre"){
+      if(genre.indexOf(",") > 0){
+        genre = genre.replace(","+value,"");
+        genre = genre.replace(value+",","");
+      }else{
+        genre = "";
+      }
+    }
+    if(type == "cast"){
+      if(casts.indexOf(",") > 0){
+        casts = casts.replace(",'"+value+"'","");
+        casts = casts.replace("'"+value+"',","");
+      }else{
+        casts = "";
+      }
+    }
+    if(type == "language"){
+      if(language.indexOf(",") > 0){
+        language = language.replace(",'"+value+"'","");
+        language = language.replace("'"+value+"',","");
+      }else{
+        language = "";
+      }
+    }
+    
+    if(type == "year"){
+      if(year.indexOf(",") > 0){
+        year = year.replace(","+value,"");
+        year = year.replace(value+",","");
+      }else{
+        year = "";
+      }
+    }
+    var url = "/filter_top_movies";
+    $.post(url,{year:year,genre:genre,language:language,top_rated:top_rated,avail_watch:avail_watch,cast:casts},function(res){
+      if(res != ""){
+        $("#new_search_res").html(res);
+      }else{
+        $("#new_search_res").html("No result found. Please refine your search.")
+      }
+    });
+  }
+  function play_trailer(videourl,movie_name){
+    $("#myModalLabel").html(movie_name+" Trailer");
+    if (videourl == "") {
+      return false;
+    }
+    $('#video_player').remove();
+    var $video = $('<a />', {
+      href: videourl,
+      id: 'video_player',
+      style: 'display:block;height:290px;width:610px;'
+    });
+    $('#myTrailer .modal-body').append($video);
+    $('#myTrailer').modal("show");
+    flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+  }
+  /*function show_discovery(){
+    $("#discover_box").show();
+    $("#filter_available").hide();
+  }*/
+

@@ -1,0 +1,44 @@
+var inner_page = "<%= params[:inner_page]%>";
+var inner_item = "<%= params[:inner_item]%>";
+<% if params[:inner_page] == "movie" or params[:inner_page] == "celebrity"%>
+  var movie_id = "<%= @movie.id if @movie%>";
+  <% if params[:inner_item] == "movie" %>
+    $("#movie_diss").html("<%= escape_javascript(render :partial => 'shared/movie_comment') %>");
+    $("#question").val("");
+    $("#question").blur();
+  <% elsif params[:inner_item] == "celebrity" and params[:inner_page] == "celebrity"%>
+    <% if params[:block_type] == "costar"%>
+      $("#Celebrity_detail").html("<%= escape_javascript(render :partial => 'shared/show_celeb_block',:locals=>{:item => @refer,:type=> params[:block_type]})%> ");
+      $("#celeb_question").val("");
+      $("#celeb_question").blur();
+    <% else%>
+      $("#celebrity_diss").html("<%= escape_javascript(render :partial => 'shared/movie_comment') %>");
+      $("#question").val("");
+      $("#question").blur();
+    <% end %>
+  <% elsif params[:block_type] == "top"%>
+    $("#TopMovie_detail").html("<%= escape_javascript(render :partial => 'shared/show_muvi_detail',:locals => {:item => @movie,:type => "top"}) %>");
+    $("#question_"+movie_id).val("");
+    $("#question_"+movie_id).blur();
+  <% elsif params[:block_type] == "upcomming"%>
+    $("#UpMovie_detail").html("<%= escape_javascript(render :partial => 'shared/show_muvi_detail',:locals => {:item => @movie,:type => "upcomming"}) %>");
+    $("#question_"+movie_id).val("");
+    $("#question_"+movie_id).blur();
+  <% elsif params[:block_type] == "related_movies"%>
+    $("#Related_movie_detail").html("<%= escape_javascript(render :partial => 'shared/show_muvi_detail',:locals => {:item => @movie,:type => "#{params[:block_type]}"}) %>");
+    $("#question_"+movie_id).val("");
+    $("#question_"+movie_id).blur();
+  <% else %>
+    $("#Celebrity_detail").html("<%= escape_javascript(render :partial => 'shared/show_celeb_block',:locals=>{:item => @refer,:type=> params[:block_type]})%> ");  
+    $("#celeb_question").val("");
+    $("#celeb_question").blur();
+  <% end %>
+<%else%>
+  if( "<%= params[:reference_type] %>" == "Movie")
+    muvi_engage_page('<%= @refer.permalink %>');
+  else
+    celebrity_engage_page('<%= @refer.permalink %>');
+<%end%>
+badgePoints('for commenting',1);
+successMessage("You commented on <%= @refer.name %>");
+

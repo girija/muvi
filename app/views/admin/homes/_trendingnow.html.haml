@@ -1,0 +1,19 @@
+-for i in 0..3
+  %input{:type => "text", :id => "trendingnow_item_#{i}", :name => "trendingnow_item[]" ,:placeholder => 'Enter the name of movie', :style => "margin-right:5px"}
+  = hidden_field_tag "id_trendingnow_item_#{i}" , 0, :name => 'trendingnow_id[]'
+%input{:type => "radio", :name => "start", :value => "trendingnow", :style => "width:auto", :id => "trending_radio"}
+  Start here
+
+-unless @trendingnow.blank?
+  -t = 0
+  -@trendingnow.each do |tn|
+    -movie = Movie.find_by_id(tn.subject_id)
+    %script
+      $("#trendingnow_item_#{t}").val("#{movie.name}");
+      $("#id_trendingnow_item_#{t}").val("#{tn.subject_id}");
+      if("#{tn.start}" == "true"){
+      $("#trending_radio").attr("checked","checked");
+      }
+     
+    -t = t + 1
+

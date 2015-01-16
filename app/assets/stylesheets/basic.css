@@ -1,0 +1,163 @@
+/*
+ * SimpleModal Basic Modal Dialog
+ * http://www.ericmmartin.com/projects/simplemodal/
+ * http://code.google.com/p/simplemodal/
+ *
+ * Copyright (c) 2010 Eric Martin - http://ericmmartin.com
+ *
+ * Licensed under the MIT license:
+ *   http://www.opensource.org/licenses/mit-license.php
+ *
+ * Revision: $Id: basic.css 257 2010-07-27 23:06:56Z emartin24 $
+ */
+
+#basic-modal-content {display:none;}
+
+/* Overlay */
+#simplemodal-overlay {background-color:#000;}
+
+.clear{clear:both;}
+
+/* register_from */
+
+#register_from {height:414px; width:613px; color:#bbb; background:url(/images/register_widgetBg.png) no-repeat;padding:20px 25px;text-shadow: 0px 1px #57707C, 0px 0px; }
+
+#register_from .simplemodal-data {padding:8px;}
+#register_from code {background:#141414; border-left:3px solid #65B43D; color:#bbb; display:block; font-size:12px; margin-bottom:12px; padding:4px 6px 6px;}
+
+#register_from a.modalCloseImg {background:url(/images/x.png) no-repeat; width:35px; height:40px; display:inline; z-index:3200; position:absolute; top:15px; right:35px; cursor:pointer;}
+#login div.register{margin:0px auto;width:540px;color:#333;padding-top:35px;}
+
+
+/* login_from */
+
+#login_from {height:434px; width:631px; color:#bbb; background:url(/images/login_widgetBg.png) no-repeat;text-shadow: 0px 2px #57707C, 0px 0px;}
+#login_from .simplemodal-data {padding:8px;}
+#login_from code {background:#141414; border-left:3px solid #65B43D; color:#bbb; display:block; font-size:12px; margin-bottom:12px; padding:4px 6px 6px;}
+
+#login_from a.modalCloseImg {background:url(/images/x.png) no-repeat; width:35px; height:40px; display:inline; z-index:3200; position:absolute; top:19px; right:17px; cursor:pointer;}
+
+#login div.login{margin:0px auto;width:550px;color:#333;padding-top:75px;}
+
+/* post_reply */
+#post_reply {height:272px; width:642px; color:#bbb; background:url(/images/rate_widgetBg.png) no-repeat; text-shadow: 0px 1px #57707C, 0px 0px;}
+
+#post_reply .simplemodal-data {padding-top:12px;}
+
+#post_reply a.modalCloseImg {background:url(/images/x.png) no-repeat; width:35px; height:40px; display:inline; z-index:3200; position:absolute; top:18px; right:12px; cursor:pointer;}
+
+#login div.post_reply{margin:0px auto;width:550px;color:#333;padding-top:35px;padding-left:10px;}
+
+#login div.post_reply div.field label{font-size:16px;text-align:left;width:60px;}
+
+#login div.post_reply div.field label.express{width:150px;}
+#login div.post_reply div.field label.send_message{width:100%;}
+
+/* input styles */
+
+#login div.field label{
+	display:block;
+	float:left;
+	display:inline;
+	width:105px;
+	font-size:18px;
+	line-height:40px;
+	color:#fff;
+	padding:0px 10px 0px 0px;
+	text-align:right;
+	font-weight:normal;
+}
+
+#login div.login div.field label{width:122px;}
+
+#login div.field input{
+	background:url(/images/fieldInputBg.png) no-repeat right;
+	width:369px;
+        height:17px;
+	border:none;
+	margin:5px 0px 0px 0px;
+	padding:0px 15px 16px 15px;
+	font-size:14px;
+	color:#555;
+}
+
+#login div.field textarea {
+	background:url(/images/fieldTextareaBg.png) no-repeat right;
+    	width:406px;
+    	height:68px;
+	border:none;
+	padding:10px 20px;
+	color:#555;
+}
+
+
+#login div.actions{color:#fff;}
+#login div.actions a{line-height:38px;color:#fff;}
+
+#login div.mid_btn{margin:0 auto;width:200px;}
+
+#login div.rememberCheckbox{margin:20px 0px 15px 40px;}
+#login div.rememberCheckbox input{width:20px;}
+
+#login div.rememberCheckbox label{color:#fff;}
+#login div.rememberCheckbox input[type="checkbox"]{width:20px;padding:10px;}
+
+#login a{color:#356AB8;font-weight:bold;}
+
+#login div.links{margin:25px 0px 0px 20px}
+#login div.links a{text-decoration:none;margin-right:20px;color:#fff;background:url(/images/border_line.png) repeat-x bottom;padding-bottom:8px;font-size:12px;}
+#login div.links a:hover{text-decoration:none;}
+
+#login p.terms_service{font-size:12px;color:#fff;margin-top:40px;margin-bottom:5px;}
+#login p.terms_service span{font-weight:normal;}
+#login p.terms_service a{font-size:12px;color:#fff;}
+
+
+
+#login div.fb-signup{width:210px;height:90px;float:left;margin-left:20px;}
+#login div.fb-signup-text{
+	width:225px;
+	height:70px;
+	float:left;
+	color:#093044;
+	font-size:11px;line-height:16px;
+
+}
+#login div.fb-signup-text p{text-shadow:none;}
+
+#login div.fb-signup-text h3{
+	color:#fff;
+	font-size:16px;
+	margin-bottom:6px;
+	font-weight:normal;
+
+}
+
+#login div.heading{
+	margin-bottom:22px;
+	margin-left:18px;
+	height:28px;
+	}
+
+#login div.heading h3{
+	color:#fff;
+	font-size:16px;
+	font-weight:normal;
+	background:url(/images/exclamatory.png) no-repeat left;
+	padding-left:35px;
+	line-height:28px;
+	}
+
+.reset-password-button{margin:30px 20px 175px 130px;}
+
+#errors p{color:red;margin:0px;padding:0px;text-shadow:none;}
+
+
+/* videoPlayer */
+#videoPlayer {height:345px; width:520px; color:#bbb; background:#000; border:10px solid #fff;-moz-border-radius: 8px;
+-webkit-border-radius: 8px;}
+
+#videoPlayer .simplemodal-data {padding-top:12px;background:none;}
+
+#videoPlayer a.modalCloseImg {background:url(/images/x.png) no-repeat; width:35px; height:40px; display:inline; z-index:3200; position:absolute; top:-22px; right:-19px; cursor:pointer;}
+

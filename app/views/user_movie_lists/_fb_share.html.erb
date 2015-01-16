@@ -1,0 +1,121 @@
+	<!--script type="text/javascript" src="/javascripts/token.js"></script-->
+	<!--script>window.jQuery||document.write('<script src="/javascripts/token.js"><\/script>')</script-->
+	<link rel="stylesheet" href="/stylesheets/token-input.css" type="text/css" />
+	<link rel="stylesheet" href="/stylesheets/token-input-facebook.css" type="text/css" />
+
+
+	<input type="hidden" id="fb_access_token">
+
+        <h4>Suggest List to friends</h4>
+
+        Please enter your message
+        <div class="clear"></div>        	
+	<input type="text" style="background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); clear: left; cursor: text; font-family: Verdana; font-size: 12px; list-style-type: none; margin: 0px; min-height: 1px; overflow: hidden; padding: 0px; width: 100%; height: 50px;" id="suggestion_msg_<%= list_id %>">
+	<div style="clear:both"></div>
+
+        Start typing your friends name from Facebook
+        <div class="clear"></div>		
+	<input type="text" id="name_<%= list_id %>" style="background-color: #FFFFFF; border: 1px solid #CCCCCC; clear: left; cursor: text; font-family: Verdana; font-size: 12px; list-style-type: none; margin: 0px; min-height: 1px; overflow: hidden; padding: 0px; width: 100%; height: 30px;"/> 
+
+	<div class="clear" style="height:20px;"></div>
+
+	<!--input type="button" id="fb_suggest_btn" value="Suggest List" style="margin-bottom:10px;" onclick="suggest_list();" class="btn btn-primary"-->
+        <a onclick="suggest_list();" id="fb_suggest_btn" class="btn btn-primary tip_hint" data-toggle = "tooltip" data-original-title = "<%= generate_tooltip_block('f Suggest','list_page') %>" style="border-radius:2px 2px 2px 2px; padding:4px 12px 7px"><i class="icon-facebook" style="font-size:18px;"></i> Suggest List</a>
+
+        <div id="loading_suggestion" style="display: none;"><img src="/images/loading.gif"></div>
+		
+	<div id="fb-root"></div>
+
+	<script src="http://connect.facebook.net/en_US/all.js"></script> 
+
+	<script>
+		var list_id = "";
+                                var list_url = "";
+                                var url = document.URL;
+                                var u = url.split("/");
+                                                if(url.indexOf("profile") == -1){
+                                                   list_id = u[4];
+                                                   //list_url = url;
+                                                   list_url = url;
+                                                }
+                                                else{
+                                                  list_id = $("#selected_list_id").val();
+                                                  list_url = "http://www.muvi.com/movie_list/"+list_id+"/list";
+                                                }
+
+		$(function() {
+			show_fb_share_div();
+		});
+
+		function show_fb_share_div(){
+				FB.init({
+					appId      	: <%= FACEBOOK_APPID %>, // App ID
+					status     	: true, // check login status
+					cookie     	: true, // enable cookies to allow the server to access the session
+					oauth		: true,
+					xfbml		: true
+				});	
+				FB.getLoginStatus(function (response) {								
+					if (response.authResponse) {	// if the user is authorized...
+                                                $("#fb_div_<%= list_id %>").show();
+						var accessToken = response.authResponse.accessToken
+						var tokenUrl = "https://graph.facebook.com/me/friends?access_token=" + accessToken;
+						$("#fb_access_token").val(accessToken);
+							$("#name_"+list_id).tokenInput_new(tokenUrl, {
+								theme: "facebook"
+							});		
+					}
+					else{
+                        		}
+				});
+		}
+	
+		function handleLogin_list(){
+			location.reload(true);
+		}
+	
+		function suggest_list(){
+			var m = "";
+			var message = "";
+			var uid = "";
+		
+			var access_token = $("#fb_access_token").val();	
+			m = $("#suggestion_msg_"+list_id).val();
+
+			if(m == ""){
+				alert("Please enter your message");
+				return false;
+			}
+			else{
+                                $("#fb_suggest_btn").hide();
+				$("#loading_suggestion").show();
+
+				$('li.token-input-token-facebook').each(function() {
+					if(uid == ""){
+						uid = "@["+ $(this).attr("data_id")+ "]";
+					}else{
+						uid += "," + "@["+ $(this).attr("data_id")+ "]";
+					}
+
+				})
+				message = m +" "+uid;
+				var app = "<%= FB_NAMESPACE %>";
+				$.post('https://graph.facebook.com/me/'+app+':suggest?method=POST&list='+list_url+'&access_token='+access_token+'&message='+message, function(data) {
+        	                        $("#suggestion_msg_"+list_id).val("");
+	                                $("li.token-input-token-facebook").remove();
+					$("#fb_suggest_btn").show();
+					$("#loading_suggestion").hide();
+				});
+			}
+			
+		}
+
+	</script>
+
+
+
+
+	
+	
+
+

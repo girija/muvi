@@ -1,0 +1,24 @@
+-conn = ActiveSupport::JSON.decode(@count_follow.connections)
+-if conn.include?@user_profile.user_id
+  = form_for "connections",:url => "/connections/unfollow", :html => {:id => "follow_form"},  :remote => true do |f|
+    = f.hidden_field :user_id, :value => @user_profile.user_id
+    %div{:style => 'width:45%;float:left',:id => "follow_div"}
+      .actions.left
+        .orange-gradient-input-button.ui-corner-all
+          .orange-gradient-input-button.ui-corner-all
+            %input{:type => "submit", :value => "Unfollow", :name => "homepage_commit", :id => "comment_submit", :class => "label"}
+
+      .clear
+
+-else
+  = form_for "connections",:url => "/connections/follow", :html => {:id => "follow_form"},  :remote => true do |f|
+    = f.hidden_field :user_id, :value => @user_profile.user_id
+
+    %div{:style => 'width:45%;float:left',:id => "follow_div"}
+      .actions.left
+        .orange-gradient-input-button.ui-corner-all
+          .orange-gradient-input-button.ui-corner-all
+            %input{:type => "submit", :value => "Follow", :name => "homepage_commit", :id => "comment_submit", :class => "label"}
+
+      .clear
+

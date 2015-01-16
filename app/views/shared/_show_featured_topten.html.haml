@@ -1,0 +1,55 @@
+%h2
+  %span Featured
+  Top 10
+
+-unless @featured_topten.blank?
+  .right{:style => "width:75px;margin-top:-25px;margin-right:8px"}
+    %a{:href => "/top_ten", :class => "normal_font"}
+      more top10
+      .right_arrow.right &nbsp;
+  .clear
+
+  -begin
+    -img = TopTen.last_item(@featured_topten.subject_id)
+  -rescue
+    -img = ""
+  -unless img.blank?
+    -top = TopTen.find_by_id(@featured_topten.subject_id)
+    -unless top.blank?
+      .left{:style => "width:112px; height:175px;padding:2px;border:1px solid #dddddd; margin-right:10px;margin-right:10px"}
+        -if top.item_type == 1 
+          =link_to image_tag(img.large_image, :width => "112", :height => "175"),"/top_ten/#{top.id}/#{top.name}"
+        -else
+          =link_to image_tag(img.full_image, :width => "112", :height => "175"), "/top_ten/#{top.id}/#{top.name}"
+
+      .title.left{:style => "width:200px"}
+        .left{:style => "height:160px"}
+          = link_to raw("#{top.name}"), "/top_ten/#{top.id}/#{top.name}"
+          .clear
+          %span{:class => "small_light_gray"} By 
+          -user = User.find_by_id(top.user_id)
+          -unless user.blank?
+            -unless user.display_name.blank?
+              =link_to user.display_name, "/profile/#{top.user_id}/#{User.convert_to_seo_url(user.display_name)}", :class => "small_light_gray"
+            -else
+              -profile = UserProfile.find_by_user_id(top.user_id)
+              -unless profile.blank?
+                -unless profile.display_name.blank?
+                  =link_to profile.display_name, "/profile/#{top.user_id}/#{User.convert_to_seo_url(profile.display_name)}", :class => "small_light_gray"
+        .clear
+
+        - if current_user
+          = link_to "Remix", "/top_ten/edit/#{top.id}/#{top.name}", :class => "login_link", :style => "color:#656162;background-color:#E0E1E3"
+          &nbsp;
+          = link_to 'Add Top 10', '/top_ten/create/movies', :class => "login_link", :style => "color:#FFF" 
+        - else
+          /= link_to "Remix", new_user_session_path, :remote => true, :onclick => 'enableLoginError(registration(), "You need to login to remix the top 10");', :class => "login_link", :style => "color:#656162;background-color:#E0E1E3"
+          %a{:onclick => "check_login();", :style => "color:#656162;background-color:#E0E1E3; cursor:pointer"}
+            Remix
+
+          &nbsp;
+          /=link_to 'Add Top 10', new_user_session_path, :remote => true, :onclick => 'enableLoginError(registration(), "You need to login to add your top 10");', :class => "login_link", :style => "color:#FFF"
+          %a{:onclick => "check_login();", :class => "login_link", :style => "color:#FFF; cursor:pointer"}
+            Add Top 10
+      .clear
+  .clear{:style => "height:5px"}

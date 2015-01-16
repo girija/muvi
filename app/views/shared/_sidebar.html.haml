@@ -1,0 +1,131 @@
+-st = ""
+-current_url = request.fullpath
+/-if (current_url == '/' || current_url == '/released' || current_url == '/upcoming' || current_url == '/stars' || current_url == '/trailers' || current_url == '/msn_embed/home' || current_url == '/msn_embed/stars' || current_url == '/msn_embed/released' || current_url == '/msn_embed/upcoming' || current_url == '/msn_embed/trailers') 
+
+-if(current_url == '/msn_embed/home' || current_url == '/msn_embed/stars' || current_url == '/msn_embed/released' || current_url == '/msn_embed/upcoming' || current_url == '/msn_embed/trailers')
+  -st = "margin: 0 10px 0 -23px"
+
+ 
+.sidebar.left{:style => "#{st}"}
+
+  - if (params[:controller] == "connections"  and current_user)
+  - else
+    - if (current_user && !current_user.is_critic) or !current_user
+      .GrayHeaderBox
+        .sidebar_header
+          %h3 Latest Activities 
+        -if current_user && current_user.facebook_omniauth
+          - User.get_connections_activity(current_user).each do |activity|
+            -begin
+              = activity_block(activity)
+            -rescue
+        - else
+          -if current_user && current_user.facebook_omniauth.blank?
+            %p{:class=>'rightside_p'}
+              = link_to image_tag("facebook_64.png",  :alt => "facebook"), "/auth/facebook"
+              %br to see movies your friends like and want to watch
+          -else
+            -begin
+              - User.get_connections_activity('').each do |activity|
+                -begin
+                  = activity_block(activity)
+                -rescue
+            -rescue
+
+            %p{:style => "padding:5px; float:left"}
+              /= "#{link_to 'Login', new_user_session_path, :remote => true, :onclick => "registration()", :class => "login_link", :style => "color:#FFF"} to see your friends' activities".html_safe
+              %a{:onclick => "check_login()", :class => "login_link", :style => "color:#FFF", :style => "cursor:pointer; color:#FFFFFF; text-decoration:none"}
+                Login
+              &nbsp; to see your friends' activities
+            .clear
+  -unless params[:controller] == "user_profiles"
+    - unless @suggested_friend.blank?
+      = render "/shared/suggested_friend"
+
+  -if (params[:controller] == 'connections') and !current_user.blank?
+    = render "/shared/invite_friends"
+
+  - unless @your_network.blank?
+    = render "/shared/your_network"
+
+  -unless @top_buzz.blank?
+    =sidebar_content(:heading => "Top Tweets", :class => "GrayHeaderBox")
+    -count = 1
+    -@top_buzz.each do |tb|
+      -if count == @top_buzz.size
+        =sidebar_detail(display_buzz_image(tb), :name => tb[1].html_safe, :link_on_name => "http://www.twitter.com/#!/#{display_name(tb)}", :width => 42, :height => 42, :end => 1,:buzz => 1)
+      -else
+        -count = count + 1
+        =sidebar_detail(display_buzz_image(tb), :name => tb[1].html_safe, :link_on_name =>  "http://www.twitter.com/#!/#{display_name(tb)}", :width => 42, :height => 42,:buzz => 1)
+
+
+  /-unless @birthday_today.blank?
+  /  =render "/shared/happy_birthday"
+  .clear
+  -if (request.fullpath == '/') || (request.fullpath =~ /\/movies/) || (request.fullpath =~ /\/released/) || (request.fullpath =~ /\/upcoming/)
+    - if params['action'] != 'show'
+      -@in_theaters = Movie.get_in_theaters(params, cookies)
+      -if !@in_theaters.blank? and @in_theaters.size != 0
+        .clear{:style => "height:30px"}
+        #in_theater
+          =render "/shared/in_theaters"
+
+      /#ADS
+      /  =render "/shared/adsense"
+
+      -@upcoming = Movie.get_upcoming(params, cookies)
+      -if !@upcoming.blank? and @upcoming.size != 0
+        .clear{:style => "height:30px"}
+        #upcoming
+          =render "/shared/upcoming"
+
+  - unless @related_movies.blank?
+    = render "shared/related_movies"
+
+  -unless @celebrity_tweet.blank?
+    =sidebar_content(:heading => "Star Tweets", :class => "GrayHeaderBox")
+    -count = 1
+    -@celebrity_tweet.each do |ct|
+      -if count == @celebrity_tweet.size
+        =sidebar_detail("http://api.twitter.com/1/users/profile_image?screen_name=#{display_name(ct)}&size=normal", :name => ct[1].html_safe, :link_on_name => "#{star_path(Celebrity.find(ct[6]))}#reviews", :width => 42, :height => 42, :end => 1,:buzz => 1)
+      -else
+        -count = count + 1
+        =sidebar_detail("http://api.twitter.com/1/users/profile_image?screen_name=#{display_name(ct)}&size=normal", :name => ct[1].html_safe, :link_on_name =>  "#{star_path(Celebrity.find(ct[6]))}#reviews", :width => 42, :height => 42,:buzz => 1)
+
+
+  -unless @user_tweets.blank?
+    =sidebar_content(:heading => "User Tweets", :class => "GrayHeaderBox")
+    -count = 1
+    -@user_tweets.each do |ut|
+      -if count == @user_tweets.size
+        =sidebar_detail("http://api.twitter.com/1/users/profile_image?screen_name=#{display_name(ut)}&size=normal", :name => ut[1], :link_on_name => "http://www.twitter.com/#!/#{display_name(ut)}", :width => 42, :height => 42, :end => 1,:buzz => 1)
+      -else
+        -count = count + 1
+        =sidebar_detail("http://api.twitter.com/1/users/profile_image?screen_name=#{display_name(ut)}&size=normal", :name => ut[1], :link_on_name =>  "http://www.twitter.com/#!/#{display_name(ut)}", :width => 42, :height => 42,:buzz => 1)
+
+
+  -unless @top_costars.blank?
+    =render "/shared/top_costars"
+
+  -unless @top_crews.blank?
+    =render "/shared/top_crews"
+
+  /-unless @latest_trailers.blank?
+  /  =render "/shared/latest_trailers"
+
+
+  -unless @suggested_user.blank?
+    =sidebar_content(:heading => "Suggested Users", :class => "GrayHeaderBox")
+    -count = 1
+    -@suggested_user.each do |su|
+      -conn = ActiveSupport::JSON.decode(@count_follow.connections)
+      -if !conn.include?su
+        -user = UserProfile.find(:first,:conditions => ["user_id = ?",su])
+        -if count == @suggested_user.size
+          =sidebar_detail("#{user.profile_image.url(:small)}", :name => user.display_name, :link_on_name => "/profile/#{user.user_id}/#{user.display_name}", :width => 42, :height => 42, :end => 1)
+        -else
+          -count = count + 1
+          =sidebar_detail("#{user.profile_image.url(:small)}", :name => user.display_name, :link_on_name => "/profile/#{user.user_id}/#{user.display_name}", :width => 42, :height => 42)
+      .clear
+
+

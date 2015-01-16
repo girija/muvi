@@ -1,0 +1,29 @@
+-@celeb = item ? item : @celeb
+- @user_profile = @user_profile ? @user_profile : UserProfile.find_by_user_id(current_user.id)
+%div
+  %div{:style=>"border:1px solid #D2D6D9;width:128px;height:195px;float:left;"}
+    %div{:style => "width:124px;height:191px;padding:2px;"}
+      =link_to image_tag(@celeb.image,:style=>"height:191px;width:124px;"),star_path(@celeb.permalink), :style => "cursor:pointer"
+  %div{:style=>"padding-left:10px;width:390px;float:right"}
+    %div{:style=>"float:right;padding-right:5px;height:13px"}
+      %div{:class=>"prev_btn",:onclick=>"show_profile_block_item('Celebrity','#{prev_item.id}','prev','#{type}_celeb_detail','#{type}','#{@user_profile.user_id}');"}
+      %div{:style=>"width:4px;float:left"}
+      -unless next_item.blank?
+        %div{:class=>"next_btn",:onclick=>"show_profile_block_item('Celebrity','#{next_item.id}','next','#{type}_celeb_detail','#{type}','#{@user_profile.user_id}');"}
+      -else
+        %div{:class=>"next_btn"}
+    -if type == 'fan' or type == 'unfan'
+      -@count_fan = current_user ? Fan.find(:all,:select => ["id, is_fan"],:conditions =>["user_id = ? AND celebrity_id = ?", current_user.id,@celeb.id]) : ""
+      -check_fan = Fan.find(:all,:select => ["id, is_fan"],:conditions =>["user_id = ? AND celebrity_id = ?", @user_profile.user_id,@celeb.id]).first
+      %div{:style=>"height:128px;"}
+        %div{:style=>"float: left; width: 30px;"}
+          =image_tag("/images/double_quote_1.png")
+        %div{:class=>"right_sctivity"}
+          -if check_fan.is_fan == true
+            ="#{@user_profile.display_name} is a fan of #{@celeb.name}"
+          -else
+            ="#{@user_profile.display_name} is not a fan of #{@celeb.name}"
+        %div{:style=>"float:right; width: 18px;"}
+          =image_tag("/images/double_quote_2.png")
+      %div
+        =render "fans/form", :type=>type

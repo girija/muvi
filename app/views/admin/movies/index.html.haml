@@ -1,0 +1,177 @@
+/= form_for "search", :url => admin_movies_path, :html => {:method => :get} do |f|
+
+/  = f.label :name_contains, 'Movie title'
+/  = f.text_field :name_contains
+/  = f.label :release_date_gteq, 'Release Date between'
+/  = f.text_field :release_date_gteq , :id => 'release_date_lt', :size => 10
+/  = f.label :release_date_lteq, 'and'
+/  = f.text_field :release_date_lteq, :id => 'release_date_gt',  :size => 10
+/  = f.submit "Search"
+/  = link_to "New Movie", new_admin_movie_path
+/  .clear
+
+
+/  = f.check_box :movie_casts_count_is_blank
+/  = f.label :movie_casts_count_is_blank, 'Missing Cast'
+
+/  = f.check_box :critics_reviews_count_is_blank
+/  = f.label :critics_reviews_count_is_blank, 'Missing Critics Review'
+
+/  = f.check_box :tweets_count_is_blank
+/  = f.label :tweets_count_is_blank, 'Missing Tweet Review'
+
+= form_for "search", :url => admin_movies_path, :html => {:method => :get} do |f|
+  %table
+    %tr
+      %td{:width => "150px"}
+        %label{:for => "name_contains"}
+          Movie title
+      %td
+        %input{:id => "name_contains", :type => "text", :size => "30", :name => "name_contains"}
+
+      %td{:width => "180px"}
+        %label{:for => "release_date_gteq"}
+          Release Date between
+      %td
+        %input{:id => "release_date_lt", :type => "text", :size => "10", :name => "release_date_gteq"}
+
+        %label{:for => "release_date_lteq"}
+          and
+        %input{:id => "release_date_gt", :type => "text", :size => "10", :name => "release_date_lteq"}
+
+    %tr
+      %td{:width => "150px"}
+        %label{:for => "available_to_watch"}
+          Available to watch
+      %td
+        %input{:id => "available_to_watch", :type => "checkbox", :value => 1, :name => "available_to_watch"}
+
+      %td{:width => "180px"}
+        %label{:for => "content_partner"}
+          Content partner
+      %td
+        /%input{:id => "content_partner", :type => "text", :size => "30", :name => "content_partner"}
+        = select_tag "content_partner", '<option value="lehren">Lehren</option><option value="cine prime">Cine Prime</option><option value="pocketfilms">PocketFilms</option><option value="movieteevee">MovieTeeVee</option><option value="sepl">SEPL</option><option value="goldmine">Goldmine</option>'.html_safe
+
+    %tr
+      %td{:colspan => 4, :align => "center"}
+        %input{:type => "submit", :value => "Search", :name => "commit"}
+
+  
+  = link_to "New Movie", new_admin_movie_path
+  .clear
+
+%br
+
+#posterModal.modal.fade.hide.poster_modal
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    %h4#edit_poster_label
+      Add/Edit poster
+  .modal-body
+    %input{:type => "hidden", :id => "poster_id"}
+    #add_poster_div
+
+#addTrailerModal.modal.fade.hide.trailer_modal{:style => 'width:auto;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    %h4#addTrailerModalLabel
+  .modal-body
+    #add_trailer_div
+  .modal-footer
+
+- unless @movies.blank?
+  %br
+  .right
+    %span{:onclick => "mark_all_as_D()", :style => "cursor:pointer; font-weight:bold; margin-right:200px;"}
+      Mark all as grade D
+  .clear{:style => "height:20px"}
+
+
+- unless @movies.blank?
+  %table.listing
+    %tr
+      %th Movie Name
+      %th Movie ID
+      %th Released Date
+      %th Poster
+      %th Trailer
+      %th Grade
+      %th Actions
+
+    %form{:action => "/admin/movies/submit_grade"}
+      - @movies.each do |movie|
+        -trailer = ""
+        -video_id = ""
+        -video_name = ""
+
+        -trailer = Video.movie_trailer(movie.id)
+        -if trailer != ""
+          -video_id = trailer.id
+          -video_name = trailer.trailer_file_name.to_s
+
+        %tr{:style => "height:40px"}
+          %td{:style => "width:35%", :valign => "top"}= movie.name
+          %td{:style => "width:12%", :valign => "top"}= movie.id
+          %td{:style => "width:15%", :valign => "top"}= movie.release_date
+          %td{:style => "width:15%", :valign => "top"}
+            =image_tag(movie.banner_image,:style => "width:30px; height:30px;", :id => "image_#{movie.id}")
+            &nbsp;
+            %b
+              %a{:href => "#", :class => "edit_profilepicture", :id => "edit_poster_link", :onclick => "poster_from_page('#{movie.name}', #{movie.id}, 'image_#{movie.id}');", :style => "position:absolute"}
+                Edit
+
+          %td{:style => "width:12%", :valign => "top"}
+            =video_name
+            %span{:style => "color:#0084D1; cursor:pointer", :onclick => "javascript:add_trailer_from_page('#{movie.name}', #{movie.id}, '#{video_id}')"}
+              Trailer
+
+
+          %td{:style => "width:20%", :valign => "top"}
+            -@select_aplus = ""
+            -@select_a = ""
+            -@select_b = ""
+            -@select_c = ""
+            -@select_d = ""
+
+            -if movie.grade.to_s == 'A+'
+              -@select_aplus = "selected=selected"
+            -elsif movie.grade.to_s == 'A'
+              -@select_a = "selected=selected"
+            -elsif movie.grade.to_s == 'B'
+              -@select_b = "selected=selected"
+            -elsif movie.grade.to_s == 'C'
+              -@select_c = "selected=selected"
+            -elsif movie.grade.to_s == 'D'
+              -@select_d = "selected=selected"
+
+            = select_tag "movie_grade[#{movie.id}]", "<option value=''>-- Select --</option><option value='A+' #{@select_aplus}>A+</option><option value='A' #{@select_a}>A</option><option value='B' #{@select_b}>B</option><option value='C' #{@select_c}>C</option><option value='D' #{@select_d}>D</option>".html_safe
+   
+          %td{:style => "width:10%", :valign => "top"}
+            = link_to "Edit", edit_admin_movie_path(movie)
+            |
+            = link_to "Delete", admin_movie_path(movie), :confirm => 'Are you sure?', :method => :delete
+
+      %tr
+        %td{:colspan => 6} &nbsp;
+        %td= submit_tag "Submit Grade", {:confirm => "Are you sure?"}
+
+-else
+  %p 
+    %b
+      Sorry there are no results for your filter request(s)
+
+-unless @movies.blank?
+  = will_paginate @movies
+
+:javascript
+  function mark_all_as_D(){
+    $("select option[value='D']").attr("selected","selected") ;
+  }
+
+%style
+  table{
+  width:80%;
+  }  

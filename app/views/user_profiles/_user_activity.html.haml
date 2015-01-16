@@ -1,0 +1,4 @@
+- @user_profile.activities.limit(5).each do |activity|
+  %div
+    = activity_block(activity)
+  .clear{:style=>"height:15px;"}

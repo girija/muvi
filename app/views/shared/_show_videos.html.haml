@@ -1,0 +1,67 @@
+.clear{:style => 'height:5px'}
+%div{:style => 'float:right;padding-right:5px;height:13px'}
+  - if @video_list.size > 3
+    %div{:class => 'prev', :style => 'background:#ffffff url("'"#{URL}"'/images/previous.png") no-repeat;height:13px;width:8px;cursor:pointer;float:left'}
+    %div{:style => 'width:4px;float:left'}
+    %div{:class => 'next', :style => 'background:url("'"#{URL}"'/images/next.png");height:13px;width:8px;cursor:pointer;float:right'} 
+.clear{:style => 'height:5px;'}
+.video_scroll
+  %ul
+    - count = 0
+    - if object_type == "celebrity"
+      -hid_link = "stars"
+    -else
+      -hid_link = "movies"
+    - unless @video_list.blank?
+      - @video_list.each do |video|
+        =link_to "#{video.name}","/#{hid_link}/#{params[:id]}/video/#{video.id}#video",:style=>"display:none;"
+        %li
+          %div{:id => "video_image_#{count}", :class => "video_list"}
+            - unless video.video_remote_url.blank?
+              - video_id_arr = video.video_remote_url.split("/")
+              - video_id = video_id_arr[video_id_arr.size.to_i - 1]
+              %div{:style => "position:relative;background:url('http://img.youtube.com/vi/#{video_id}/1.jpg'); height:75px;width:100px;cursor:pointer;", :onclick => "javascript:show_video(#{video.id}, '#{object_type}', '#{params[:id]}');", :id => "video#{video.id}"}
+                %img{:src => "#{URL}/images/play_button.png", :style => "position:absolute;right:5px;bottom:5px"}
+            - else
+              %div{:style => "position:relative;background:url('#{URL}/system/trailer_thumbnails/#{video.id}/1.jpg'); height:75px;width:100px;cursor:pointer;", :onclick => "javascript:show_video('#{video.id}', '#{object_type}', '#{params[:id]}');", :id => "video#{video.id}"}
+                %img{:src => "#{URL}/images/play_button.png", :style => "position:absolute;right:5px;bottom:5px"}
+            .clear
+              %h4{:style => 'font-size:11px'}
+                = truncate(video.name.html_safe, :length =>17) unless video.name.blank?
+        - count += 1 
+
+:javascript
+  $(function() {
+    $(".video_scroll").jCarouselLite({
+      btnNext: ".next",
+      btnPrev: ".prev",
+      speed: 800,
+      visible: 4,
+      mouseWheel: true,
+      circular: false
+    });
+  });
+
+  function show_video(video_id, object_type, object_id){
+     $.fancybox({
+       'type' : 'ajax',
+       'centerOnScroll' : true,
+       'opacity' : true,
+       'hideOnOverlayClick' :true,
+       'overlayOpacity' : 1,
+       'overlayColor' : '#0e0e0e',
+       'showCloseButton': false,
+       'autoScale' : true,
+       'padding' : 0,
+       'transitionIn': 'elastic',
+       'transitionOut': 'elastic',
+       'onClosed' : function(){
+         $("body").css("overflow", "auto");
+       },
+       'onComplete': function() {
+         $("#fancybox-wrap").css({'top':'10px', 'bottom':'auto'});
+       },
+       'href': "/videos/"+object_type+"/"+object_id+"/"+video_id+"?hide_link=yes"
+    });
+
+  }

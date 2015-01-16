@@ -1,0 +1,52 @@
+= form_for "search", :url => admin_users_path, :html => {:method => :get} do |f|
+  = f.label :email_contains, 'Email'
+  = f.text_field :email_contains
+  = f.submit "Search"
+  .clear
+
+.right{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:2px 20px; font-size:12px"}
+  -unless params[:search].blank?
+    =link_to "Download Users Report", "/users/export?email=#{params[:search][:email_contains]}"
+  -else
+    =link_to "Download Users Report", "/users/export/"
+
+%br
+-unless @users.blank?
+  %table.listing
+    %tr
+      %th= check_box_tag('check_all')
+      %th Email
+      %th fb user
+      %th twitter user
+      %th display name
+      %th status
+
+    = form_tag(delete_users_admin_users_path) do
+      - @users.each do |user|
+        %tr
+          %td= check_box_tag("user_ids[]", user.id, false)
+          %td= user.email
+          %td= (user.facebook_omniauth.blank?? "" : 'yes')
+          %td= (user.twitter_omniauth.blank?? "" : 'yes')
+          %td
+            - if user.user_profile.blank?
+              -UserProfile.create!(:display_name => "test_#{user.id}", :user_id => user.id)
+              = "test_#{user.id}"
+            -else
+              = user.display_name
+          %td
+            -if user.is_disabled
+              Disable
+            -else
+              Enable
+      %tr
+        %td{:colspan => 4} &nbsp;
+        %td= submit_tag "Delete", {:confirm => "Are you sure?"}
+-else
+  %p
+    %b
+      Sorry there are no results for your filter request(s)
+
+-unless @users.blank?
+  = will_paginate @users
+

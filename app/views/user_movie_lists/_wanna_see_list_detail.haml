@@ -1,0 +1,147 @@
+- if !current_user.blank?
+  - @my_wanna_see_movies = []
+  - @my_seen_movies = []
+  - list = ListOfMovie.find_by_user_id(current_user.id)
+  - if list && !list.wanna_see_lists.blank?
+    - wannasee_list = ActiveSupport::JSON.decode(list.wanna_see_lists)
+    - wannasee_list.each do |wanna_see|
+      - @my_wanna_see_movies << wanna_see["object"]["id"].to_i
+  - if list && !list.seen_lists.blank?
+    - seen_list = ActiveSupport::JSON.decode(list.seen_lists)
+    - seen_list.each do |seen|
+      - unless seen["object"].blank?
+        - @my_seen_movies << seen["object"]["id"].to_i
+  - @my_rated_movies = []
+  - rated =  UserMovieList.where(:user_id => current_user.id)
+  - if rated
+    - rated.each do |rate|
+      - if !rate.movie_id.blank?
+        - rated_list = ActiveSupport::JSON.decode(rate.movie_id)
+        - rated_list.each do |movie|
+          - @my_rated_movies << movie.to_i
+  - @my_rated_movies.uniq!
+
+.container-fluid
+  .row-fluid
+    .span12.well-small
+      .row-fluid
+        .media
+          %div.media-heading.pull-left{:style => 'color:#494949;font-size:28px;font-weight:bold;padding-top:10px;line-height:26px;'}
+            -if !defined?(@list_type)
+              -if @list.class.to_s == "ListOfMovie"
+                All Wanna See Movies 
+              -else
+                /= @list.tag
+                %span{:id => "list_name_#{@list.id}", :style => "cursor:pointer", :onclick => "show_rename_list('#{@list.id}')", :onmouseover => "remove_flip('#{@list.id}');"}
+                  = @list.tag
+
+                %div{:id => "list_edit_#{@list.id}", :style => "display:none"}
+                  %input{:type => "text", :id => "list_new_name_#{@list.id}", :value => "#{@list.tag}", :style => "font-size: 20px; height: 30px; width: 400px;"}
+                  %span{:style => "cursor:pointer; font-size:20px; font-weight:bold;", :id => "save_rename_list_icon_#{@list.id}", :onclick => "rename_list('#{@list.id}')"}
+                    %i{:class => "icon-ok", :style => "font-size: 20px;margin-right: 20px;", :title => "Rename List"}
+
+                  %span{:style => "cursor:pointer; font-size:20px; font-weight:bold;", :onclick => "hide_rename_list('#{@list.id}')", :id => "close_rename_list_icon_#{@list.id}"}
+                    %i{:class => "icon-remove", :style => "font-size: 20px;", :title => "Cancel"}
+
+            -else
+              -if @list_type == "in_theater"
+                Now In Theaters
+              -elsif @list_type == "upcoming"
+                Upcoming Movies
+              -elsif @list_type == "top_rated"
+                Top New Movies    
+          %div{:style=>"float:right;padding-top:10px;"}
+            -if !defined?(@list_type)
+              .close_list{:onclick=>"close_wanna_see_list('#{@list.id}', '#{@list.user_id}');",:style=>"cursor:pointer;display:none;"}
+                <i class='icon-remove'></i>
+            -else
+              .close_list{:onclick=>"close_movie_list('');",:style=>"cursor:pointer;display:none;"}
+                <i class='icon-remove'></i>
+
+          .clear
+          -if !defined?(@list_type)
+            .pull-left{:id => "followers-#{@list.id}",:style=>"padding:5px 0;"}
+              = render "user_profiles/followers", :@tagged => @list
+
+            .clear
+          %div{:style=>"border-top:1px solid #dddddd;height:1px;"}
+          -if !defined?(@list_type) && current_user && current_user.id == @list.user_id && @list.class.to_s == "UserMovieList"
+            %div{:id=>"new_movie",:style=>"height:50px;"}
+              %div{:style=>"padding-top:5px;"}
+                -if request.fullpath.include?("movie_list")
+                  %input{:type=>"text", :id=>"movie_name_#{@list.id}",:size=>"30",:"data-provide"=>"typeahead", :autocomplete=>"off",:class=>"movie_name",:"data-id" => "#{@list.id}",:placeholder => "Movie title"}
+                -else
+                  %input{:type=>"text", :id=>"movie_name_#{@list.id}",:size=>"30", :autocomplete=>"off",:class=>"movie_name",:"data-id" => "#{@list.id}",:placeholder => "Movie title",:onkeypress=>"suggest();"}
+                %input{:type=>"hidden", :id=>"movie_id_#{@list.id}"}
+                %input{:type=>"button", :value => "Add", :onclick=>"add_movie_to_list('#{@list.id}');", :style=>"margin-bottom:10px;",:class=>"btn btn-primary bold_class"}
+        -if request.fullpath.include?("list")
+          /-style = "min-height:480px;"
+          -style = "height:400px; overflow:auto;";
+        -else
+          -style = "min-height:350px;height:400px;overflow:auto;"
+        -if !defined?(@list_type)   
+          .media{:id=>"movie_list_#{@list.id}",:style=>"#{style}", :class => "span6 movie_list_#{@list.id}"}
+            -if @list.class.to_s == "ListOfMovie"
+              - all_seen_movies = ActiveSupport::JSON.decode(@list.wanna_see_lists)
+              -movie_ids = []
+              - all_seen_movies.each do |all_movie|
+                - movie_ids  << all_movie["object"]["id"].to_i
+            -else
+              - movie_ids = ActiveSupport::JSON.decode(@list.movie_id)
+            - movie_ids = movie_ids.uniq
+            -cnt = movie_ids.count
+            - movie_ids.each_with_index do |movie_id,i|
+              - movie = Movie.find_by_id(movie_id)
+              -if i+1 == cnt
+                =link_to "","#",:name=>"#{movie_ids[i]}"
+              -else
+                =link_to "","#",:name=>"#{movie_ids[i+1]}"
+              %div{:id=>"movie_div_#{movie_id}_#{@list.id}"}
+                =render :partial => "shared/movie_block_new", :locals=>{:movie=>movie} if movie
+                -review = Review.where("user_id = #{@user_profile.user_id} and movie_id = #{movie.id}").first if movie
+                =render :partial => "shared/rate_block", :locals=>{:movie=>movie} if movie && !review.blank? && !review.description.blank?
+          .span5{:style => "margin-top:18px"}
+            %div{:id => "fb_div_#{@list.id}", :style => "display:none"}
+              -if !params[:controller].index("profile")
+                =render :partial => "/user_movie_lists/fb_share", :locals => {:list_id => @list.id}
+
+        -else
+          .media{:id=>"movie_list_#{@list_type}",:style=>"min-height:350px;height:400px;overflow:auto;", :class => "span6"}
+            -@list.each do |movie_list|
+              -movie = movie_list.movie
+              =render :partial => "shared/movie_block_new", :locals=>{:movie=>movie}
+              -review = Review.where("user_id = #{@user_profile.user_id} and movie_id = #{movie.id}").first if movie
+              =render :partial => "shared/rate_block", :locals=>{:movie=>movie} if movie && !review.blank? && !review.description.blank?
+          /.span5{:style => "margin-top:18px"}
+          /  %div{:id => "fb_#{@list_type}", :style => "display:none"}
+          /    =render :partial => "/user_movie_lists/fb_share", :locals => {:list_id => @list_type}
+
+        .clear{:style=>"height:15px;"}
+:javascript
+  function suggest(){
+    var map = {};
+    var list_id;
+    $('.movie_name').typeahead({
+      minLength:2,
+      source: function (query,process) {
+        list_id = this.$element.attr('data-id');
+        $.get("/fetch_movies", { term: query ,list_id:list_id}, function (data) {
+           var movies = [];
+           $.each(data, function (i, movie) {
+            map[movie.label] = movie;
+            movies.push(movie.label);
+           });
+           $(".typeahead").css("width","235px");
+           return process(movies);
+        });
+      },
+      updater: function(item){
+        var id = map[item].id;
+        $("#movie_id_"+list_id).val(id);
+        $("#movie_story_"+list_id).html(map[item].story);
+        $("#movie_pic_"+list_id).attr("src",map[item].thumb);
+        return item;
+      }
+
+    });
+  }

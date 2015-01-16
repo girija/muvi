@@ -1,0 +1,25 @@
+= link_to "Admin Updates", admin_updates_admin_reports_path
+
+&nbsp;&nbsp; | &nbsp;&nbsp;
+
+= link_to "Scheduler Updates", scheduler_updates_admin_reports_path
+
+%div{:id=>"activity_form",:style=>"height:60px;padding-left:30px;padding-top:20px;"}
+  - form_tag(download_activity_admin_reports_path, :method => :post, :onsubmit => "return validate_form();") do
+    = text_field_tag 'activity_date'
+    = submit_tag "Download Daily Activity"
+:javascript
+  $("#activity_date").datepicker({
+    dateFormat:'yy-mm-dd',
+    maxDate: new Date()
+  });
+  function validate_form(){
+    var activity_date = $("#activity_date").val();
+    if(activity_date == ""){
+      alert("Please select activity date!");
+      $("#activity_date").focus();
+      return false;
+    }else{
+      return true;
+    } 
+  }

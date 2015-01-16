@@ -1,0 +1,42 @@
+- user_id = current_user ? current_user.id : ""
+-movie = movie ? movie : @movie
+- if defined? type
+  -block_name = type
+-else
+  -block_name = "inner_page"
+%input{:type => 'hidden', :id => 'user_id', :name => 'user_id', :value => user_id}
+-if @count_want_to_see.blank?
+  = form_for "want_to_see",:url => "/want_to_see", :html => {:id => "want_to_see_form"},  :remote => true do |f|
+    = f.hidden_field :movie_id, :value => movie.id
+    = hidden_field_tag "action_type","" , :id => "action_type_#{block_name}"
+    = hidden_field_tag "block_type","",:value=>block_name
+    %div{:style => "height:33px;width:181px"}
+      %div{:class=>"tip_hint tooltipbottom",:style=>"height:33px;float:left;"}
+        %input{:type => "image", :src => '/images/want_to_see_normal.png',:value => "Want to see", :name => "commit", :id => "want_to_see_btn", :onclick => "check_login_wanttosee('#{FACEBOOK_APPID}','#{movie.id}','see');", :style => 'float:left;padding-top:1px;padding-left:1px'}
+        =generate_tooltip_block("wantto_see","movie_page")
+      %div{:class=>"tip_hint tooltipbottom",:style=>"height:33px;float:left;"}
+        %input{:type => "image", :src => '/images/not_want_normal.png', :value => "Not Want to see", :name => "commit", :id => "not_want_to_see_btn",:onclick => "check_login_wanttosee('#{FACEBOOK_APPID}','#{movie.id}','notsee');", :class => "not_see" }
+        =generate_tooltip_block("notwant_see","movie_page")
+      .clear
+-else
+  = form_for "want_to_see",:url => "/want_to_see",  :html => {:id => "want_to_see_form"},  :remote => true do |f|
+    = f.hidden_field :movie_id, :value => movie.id
+    = hidden_field_tag "action_type","" , :id => "action_type_#{block_name}"
+    = hidden_field_tag "block_type","",:value=>block_name
+    %div{:style => "height:33px;width:181px"}
+      -if @count_want_to_see[0]["is_want_to_see"]
+        %div{:class=>"tip_hint tooltipbottom",:style=>"height:33px;float:left;"}
+          %input{:type => "image", :src => '/images/want_to_see_hover.png', :id => 'want_to_see_btn',:value => "Want to see", :name => "commit",:onclick => "check_login_wanttosee('#{FACEBOOK_APPID}','#{movie.id}','see');", :style=>"float:left;padding-left:1px;padding-top:1px"}
+          =generate_tooltip_block("wantto_see","movie_page")
+        %div{:class=>"tip_hint tooltipbottom",:style=>"height:33px;float:left;"}
+          %input{:type => "image", :src => '/images/not_want_normal.png', :id => 'not_want_to_see_btn', :value => "Not Want to see", :name => "commit" , :class => "not_see", :onclick => "check_login_wanttosee('#{FACEBOOK_APPID}','#{movie.id}','notsee');"}
+          =generate_tooltip_block("notwant_see","movie_page")
+      -else
+        %div{:class=>"tip_hint tooltipbottom",:style=>"height:33px;float:left;"}
+          %input{:type => "image", :src => '/images/want_to_see_normal.png', :id => 'want_to_see_btn', :value => "Want to see", :name => "commit", :class => "label",:onclick => "check_login_wanttosee('#{FACEBOOK_APPID}','#{movie.id}','see');", :style => "float:left;padding-left:1px;padding-top:1px"}
+          =generate_tooltip_block("wantto_see","movie_page")
+        %div{:class=>"tip_hint tooltipbottom",:style=>"height:33px;float:left;"}
+          %input{:type => "image", :src => '/images/not_want-hover.png', :id => 'not_want_to_see_btn', :value => "Not Want to see", :name => "commit",:onclick => "check_login_wanttosee('#{FACEBOOK_APPID}','#{movie.id}','notsee');", :class => "not_see"}
+          =generate_tooltip_block("notwant_see","movie_page")
+    .clear
+

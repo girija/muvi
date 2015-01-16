@@ -1,0 +1,18 @@
+  $('#inviteModal').modal('hide');
+  $('#email_invitation').hide();
+
+  $('#errors').html("<p><%= flash[:msg] %> </p>");
+
+  $("#errors").show();
+  $("#email_submit").removeAttr("disabled");
+  $("#email_submit").removeAttr("style");
+  $("#email_submit").val("Get Invitation");
+
+  //$(".email-buffer-signin").show('shake', 55);
+  $('.email-buffer-signin').removeClass('expanded').animate({height: '40px'}, 500)
+  
+  if("<%= flash[:err] %>" != ""){
+    $('.buffer-signin').addClass('expanded').animate({height: '270px'}, 500)
+  }
+
+

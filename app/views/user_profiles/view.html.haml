@@ -1,0 +1,46 @@
+= render 'shared/meta_title_and_keywords', {:key => "profile", :object => @user_profile , :type => "user_profile"}
+:javascript
+  (function() {
+    var cur_user = "#{current_user}";
+    var user_name = "";
+    if(cur_user != ""){
+      var user_name = "#{current_user.display_name unless current_user.nil? }";
+      if(user_name == ""){
+        window.location.href = "/users/edit";
+      }
+    }
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+
+/#loginModal.modal.fade.hide{:style => 'width:620px;'}
+/  .modal-header
+/    %button.close{:type => "button", "data-dismiss" => "modal" , "aria-hidden" => "true"}
+/      x
+/    %h4#rateModalLabel
+/      Login
+/  .modal-body
+/  .modal-footer
+
+-unless @user_profile.blank?
+  - if request.env["REQUEST_URI"] =~ /msn_embed/
+    = render '/user_profiles/old_view'
+  -else
+    /%div{:class=>"activity_pannel"}
+    /  &nbsp;
+    /  -unless current_user.blank?
+    /    =show_feed_sidebar("#{current_user.id}")
+    /%div{:class=>"main_content"}
+    /  = render '/user_profiles/new_view'
+
+    .row-fluid
+      .span12{:style => "background-color:#FFFFFF"}
+        .span3
+          =render :partial => "/home/left_sidebar"
+
+        .span9{:style => "border-left: 4px solid #DFDFDF; margin-left: -2px;"}
+          %div{:class=>"main_content"}
+            = render '/user_profiles/new_view'
+
+

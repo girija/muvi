@@ -1,0 +1,27 @@
+-@conn =  ActiveSupport::JSON.decode(@follow.connections)
+-number_of_follow = 0
+-unless @conn.blank?
+  -@conn.each do |conn|
+    -user = UserProfile.find(:first,:conditions => ["user_id = ?",conn])
+    -user_token = UserToken.find(:first,:conditions => ["user_id = ?",conn])
+    -unless user_token.blank?
+      -number_of_follow = number_of_follow + 1
+      .tinybox.left  
+        -unless user.blank?
+          .tinyfriendsBox.left
+            -unless user.profile_image_file_name.blank?
+              =link_to image_tag(user_profile_image(user), :width => "80px", :height => "90px"),"/profile/#{user.user_id}/#{user.display_name}"
+            -else
+              -user_fb_id = User.find(conn)
+              -unless user_fb_id.facebook_id.blank?
+                =link_to image_tag("http://graph.facebook.com/#{user_fb_id.facebook_id}/picture", :width => "80px", :height => "90px"),"/profile/#{user.user_id}/#{user.display_name}"
+              -else
+                =link_to image_tag("/images/no-profile.png", :width => "80px", :height => "90px"),"/profile/#{user.user_id}/#{user.display_name}"
+          .tinyfriendstitle
+          =link_to user.display_name ,"/profile/#{user.user_id}/#{user.display_name}"
+
+-if number_of_follow == 0
+  Not following any user. 
+  
+.clear
+

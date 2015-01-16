@@ -1,0 +1,19 @@
+-for i in 0..3
+  %input{:type => "text", :id => "muvimeter_item_#{i}", :name => "muvimeter_item[]",:placeholder => 'Enter the name of movie', :style => "margin-right:5px"}
+  = hidden_field_tag "id_muvimeter_item_#{i}" , 0, :name => 'muvimeter_id[]'
+%input{:type => "radio", :name => "start", :value => "muvimeter", :style => "width:auto", :id => "muvi_radio"}
+  Start here
+
+-unless @muvimeter.blank?
+  -m = 0
+  -@muvimeter.each do |mm|
+    -movie = Movie.find_by_id(mm.subject_id)
+    %script
+      $("#muvimeter_item_#{m}").val("#{movie.name}");
+      $("#id_muvimeter_item_#{m}").val("#{mm.subject_id}");
+      if("#{mm.start}" == "true"){
+      $("#muvi_radio").attr("checked","checked");
+      }
+
+    -m = m + 1
+

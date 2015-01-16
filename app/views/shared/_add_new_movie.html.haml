@@ -1,0 +1,76 @@
+.container-fluid
+  .row-fluid
+    .span12.well-small
+      .row-fluid
+        .media{:style => "margin-left: -14px; margin-top: -9px;"}
+          .left{:onmouseover => "$('#edit_poster_link').show();", :onmouseout => "$('#edit_poster_link').hide();"}
+            %a.pull-left{:href => "#", :style => "width:245px; height:370px"}
+              =image_tag("/images/no-image.png", :style => "width:245px; height:370px;")
+
+          .media-body{:style=>"padding-left:15px;margin-top:0; background-color:#F0F0F0; border: 1px solid #BBB"}
+            -if params[:controller] != "home" and params[:action] != "add_movie"
+              .right{:style => "margin-right:5px"}
+                %span{:onclick => "go_back_to_movie_page();", :style => "cursor:pointer; font-weight:bold; font-size:18px;"}
+                  Go back
+
+            %form{:action => "/add_movie_from_page", :method => "post", "data-remote" => "true", :style => "float:left; padding-left:20px; padding-top:20px; padding-bottom:20px;"}
+              .left{:style => "margin-right:5px"}
+                .left
+                  %label
+                    Name:
+                  %input{:type => "text", :name => "movie[name]", :required => "true"}
+
+                .right
+                  %label
+                    Released date:
+                  %input{:type => "text", :name => "movie[release_date]", :id => "release_date"}
+                .clear
+
+                .left
+                  %label
+                    Genre:
+                  = select_tag 'movie[genre][]', options_for_select(option_for_genre || 'drama'), { :multiple => true }
+
+                .right
+                  %label
+                    Language:
+                  = select_tag 'movie[language]', options_for_select([['Hindi', 'Hindi'], ['English', 'English'], ['Telugu', 'Telugu'], ['Tamil', 'Tamil'], ['Kannada', 'Kannada'], ['Marathi', 'Marathi'], ['Gujarati', 'Gujarati'], ['Malayalam', 'Malayalam'], ['Bhojpuri', 'Bhojpuri'], ['Punjabi', 'Punjabi'], ['Bengali', 'Bengali']])
+
+                .clear
+                .left
+                  %label
+                    Story:
+                  %textarea{:style => "width:500px; height:50px", :name => "movie[story]"}
+                .clear
+
+                .left
+                  %label
+                    Additional Info
+                    %textarea{:style => "width:500px; height:50px", :name => "movie[additional_info]"}
+                .clear
+
+                .left
+                  %div
+                    %div{:class=>"heading",:style=>"float:left; width:100%"}
+                      CAST &amp; CREW
+                      .left
+                      %div{:id => "actors_crews", :style => "display:"}
+                        -for i in 0..3
+                          %input{:type => "hidden",:style => "width:100px", :name => "actor_name[]"}
+                          %input{:type=>"text",:name=>"actors[]",:class=>"moviecastName ui-autocomplete-input", :autocomplete=>"off", :role=>"textbox", "aria-autocomplete"=>"list", "aria-haspopup"=>"true", :style => "width:150px", :placeholder => "Actor"}
+
+                        -for d in 0..1
+                          %input{:type => "hidden",:style => "width:100px", :name => "director_name[]"}
+                          %input{:type=>"text",:name=>"directors[]",:class=>"moviecastName ui-autocomplete-input", :autocomplete=>"off", :role=>"textbox", "aria-autocomplete"=>"list", "aria-haspopup"=>"true", :style => "width:150px", :placeholder => "Director"}
+
+                        -for p in 0..1
+                          %input{:type => "hidden",:style => "width:100px", :name => "producer_name[]"}
+                          %input{:type=>"text",:name=>"producers[]",:class=>"moviecastName ui-autocomplete-input", :autocomplete=>"off", :role=>"textbox", "aria-autocomplete"=>"list", "aria-haspopup"=>"true", :style => "width:150px", :placeholder => "Producer"}
+
+                .left
+                  %input{:type => "submit", :value => "Save", :class => "btn btn-primary bold_class"}
+
+          /.span12.well-small{:id => "cast_crew_container"}
+
+          .clear{:style => "height:10px"}
+

@@ -1,0 +1,33 @@
+/= form_for @feed, :url => admin_new_tweets_path, :html => {:method => :get} do |f|
+
+/  = f.label :name_contains, 'Movie title'
+/  = f.text_field :name_contains
+/  = f.submit "Search"
+
+/%br
+
+/=render "menu"
+/=render "tweet_today"
+
+%table
+  %tr
+    %th{:width => "50%", :align => "left"} News
+    %th{:width => "40%", :align => "left"} Tags
+    %th{:width => "10%", :align => "left"} Actions
+  -unless @all_feed.blank?
+    -@all_feed.each do |feed|
+      %tr
+        %td= feed.entry_title
+        %td= feed.tags.collect {|t| t.name }.join(", ")
+        %td
+          = link_to "Edit", edit_admin_news_path(feed)
+          |
+          = link_to "Delete", "/admin/delete_news/#{feed.id}", :confirm => 'Are you sure?'
+  -else
+    %tr
+      %td{:colspan => 3}
+        %p Sorry there is no news
+
+= will_paginate @all_feed
+
+ 

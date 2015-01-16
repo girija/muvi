@@ -1,0 +1,215 @@
+body { background-color: #fff; color: #333; }
+
+body, p, ol, ul, td {
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size:   13px;
+  line-height: 18px;
+}
+
+pre {
+  background-color: #eee;
+  padding: 10px;
+  font-size: 11px;
+}
+
+a { color: #000;text-decoration:none;}
+a:visited { color: #666; }
+a:hover { color: #fff; background-color:#000; }
+
+div.field, div.actions {
+  margin-bottom: 10px;
+}
+
+#notice {
+  color: green;
+}
+
+.field_with_errors {
+  padding: 2px;
+  background-color: red;
+  display: table;
+}
+
+#error_explanation {
+  width: 450px;
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 0;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+}
+
+#error_explanation h2 {
+  text-align: left;
+  font-weight: bold;
+  padding: 5px 5px 5px 15px;
+  font-size: 12px;
+  margin: -7px;
+  margin-bottom: 0px;
+  background-color: #c00;
+  color: #fff;
+}
+
+#error_explanation ul li {
+  font-size: 12px;
+  list-style: square;
+}
+
+#wrapper{width: 1000px; margin: 20px auto; }
+.left{float: left;}
+.right{float: right;}
+.clear{clear: both;}
+.movie{width: 30%; border: 1px solid #ddd; margin-right: 10px; margin-bottom: 10px; padding: 5px;}
+
+.movie_display .details{ margin-top: 20px; margin-left: 10px;}
+
+textarea { width:100%; }
+
+#header{margin-bottom: 20px; border-bottom: 3px solid #ccc;}
+
+
+.tabs{margin:0px; padding: 0px;}
+
+.tabs li{display: inline;margin: 0; }
+
+.tabs li a{
+   text-shadow: 0px -1px #2c6272, 0px 0px;
+   border-bottom:none;
+   font-family:"Arial";
+   display:block;
+   font-weight: bold;
+   float: left;
+   margin:0px 4px 0px 0px;
+   padding:0px 20px 0px 18px;
+   font-size:15px;
+   color:#fff;
+   line-height:38px;
+   text-align:center;
+   background:url('/images/tab-bg.png') repeat-x;
+   text-decoration: none;
+    -moz-border-radius: 9px 9px 0px 0px;
+   -webkit-border-radius: 9px 9px 0px 0px;
+}
+
+
+.tabs li a:hover {
+	background:url('/images/activetab.jpg') repeat-x;
+    background-color:none;
+	text-decoration:none;
+}
+
+.tabs li.active a {
+	background: url(/images/activetab.jpg) repeat-x;
+	background-color:none;
+}
+table { width:100%;}
+.listing tr th {
+  text-align:left;
+}
+
+.main{
+	border:1px solid #ddd;
+	padding:12px;
+}
+h1.heading{
+	font-size:13px;
+	text-decoration:underline;
+}
+h2.heading{
+	font-size:12px;
+}
+
+
+.form label{
+    width: 110px;
+    float: left;
+    margin-bottom: 10px;
+    padding:5px 0px;
+
+}
+
+.form input{
+    width: 200px;
+    margin-bottom: 10px;
+    padding:5px 3px;
+	border:1px solid #888;
+
+}
+
+.form select{
+    width: 210px;
+    margin-bottom: 10px;
+    padding:5px 3px;
+
+}
+
+.form textarea{
+    width: 400px;
+    margin-bottom: 10px;
+    padding:5px 3px;
+
+}
+
+.form input.large{
+    width: 500px;
+
+}
+
+
+.col_one{width:350px;float:left;}
+.col_two{width:400px;float:left;}
+
+.col_two label{
+    width: 80px;
+    float: left;
+    margin-bottom: 10px;
+    padding:5px 0px;
+}
+
+.col_two label.date{width: 150px;}
+
+
+
+.checkbox{width:300px;}
+
+.checkbox input[type="checkbox"]{width:20px;}
+
+.critics_review div.col_one{
+ width:350px;float:left;
+}
+
+.critics_review div.col_two{
+ width:170px;float:left;
+}
+
+.critics_review div.col_two label{
+ width:100px;
+}
+.critics_review div.col_two select{
+ width:50px;
+}
+
+.critics_review div.col_three{
+ width:320px;float:left;
+}
+.critics_review div.col_three label{
+ width:110px;
+}
+
+.large_text input{
+ width:720px;
+ height:30px;
+ margin-bottom:10px;
+}
+
+.large_text textarea{
+ width:720px;
+ height:50px;
+ margin-bottom:10px;
+ border:1px solid #222;
+}
+.review_text_delete span{line-height:60px;margin-left:3px;}
+.add{margin-bottom:30px;}
+.add a, span.delete a{background:#CCCCCC;padding:5px;border:1px solid #222;}
+.actions{margin:20px 0px;margin-left:110px;}
+

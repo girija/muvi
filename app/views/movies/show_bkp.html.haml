@@ -1,0 +1,71 @@
+- if request.env["REQUEST_URI"] =~ /msn_embed/
+  :javascript
+    $(document).ready(function($) {
+      $(".container").css("background-color", '#FFFFFF');
+      $(".container").css("border", '1px solid #d2d6d9');
+    });
+    var $stickyHeight = 600;
+    var $padding = 10;
+    var $topOffset = 100;
+    var $footerHeight = 83;
+
+    function scrollSticky(){
+      if($(window).height() >= $stickyHeight) {
+        var aOffset = $('#sticky').offset();
+        if($(window).scrollTop() + $padding > $topOffset) {
+          $('#sticky').attr('style', 'position:fixed;margin-top: -99px;');
+        }else{
+          $('#sticky').attr('style', 'position:relative;margin-top: 17px;');
+        }
+      }
+    }
+
+    $(window).scroll(function(){
+      scrollSticky(); 
+    });
+-else
+  :javascript
+    var $stickyHeight = 600;
+    var $padding = 10;
+    var $topOffset = 100;
+    var $footerHeight = 83;
+
+    function scrollSticky(){
+      if($(window).height() >= $stickyHeight) {
+        var aOffset = $('#sticky').offset();
+        if($(window).scrollTop() + $padding > $topOffset) {
+          $('#sticky').attr('style', 'position:fixed;margin-top: -22px;');
+        }else{
+          $('#sticky').attr('style', 'position:relative;margin-top: 17px;');
+        }
+      }
+    }
+
+    $(window).scroll(function(){
+      scrollSticky();
+    });
+
+= render 'shared/meta_title_and_keywords', { :object => @movie }
+= render 'shared/fb_metatags', { :object => @movie }
+:javascript
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+- if request.env["REQUEST_URI"] =~ /msn_embed/
+  %div{:style => "height:50px;margin-top:17px;padding-left:12px;",:id => "sticky"}
+    %div{:class=>"top_btn_inner",:id=>"top_btn", :onclick => "muvi_detail_page()"}
+    -if @movie.release_date && @movie.release_date <= Date.today
+      %div{:class=>"engage_btn_inner",:id=>"engage_btn", :onclick => "muvi_engage_page('#{@movie.permalink}')"}
+      %div{:class=>"review_btn_inner",:id=>"review_btn", :onclick => "review_block();"}
+    -else
+      %div{:class=>"engage_upcomming",:id=>"engage_btn", :onclick => "muvi_engage_page('#{@movie.permalink}')"}
+
+  .clear
+
+  = render '/shared/movie', {:from => 'movies'}
+-else
+  = render '/shared/new_movie', {:from => 'movies'}
+  = render '/shared/movie_macrodata'
+

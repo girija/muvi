@@ -1,0 +1,439 @@
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <%= javascript_include_tag "video.dev","vjs.youtube","browser" %>
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+    <%= stylesheet_link_tag    "flat-ui","video_style","small_style" %>
+
+    <script>
+      var _gaq=[['_setAccount','UA-23408239-1'],['_trackPageview']];
+      (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+      g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
+
+    <center>
+      <div class="demo-video" >
+          <!--[if !IE]> -->
+            <video id = "video_block" class="video-js" controls
+              preload="auto" poster="/images/black.png" data-setup='{"techOrder": ["youtube", "html5"]}'>
+              <source src="<%#= @default_trailer%>" type="video/mp4">
+            </video>
+            <!--<input type="button" value="full screen" onclick="fullscreen();" id="fullscreen" style="margin-top:40px;">-->
+          <!-- <![endif]-->
+
+          <!--[if IE]>
+            <video class="video-js" controls
+              preload="auto" width="620" height="256" poster="http://video-js.zencoder.com/oceans-clip.jpg" data-setup="{}">
+              <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'/>
+              <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'/>
+            </video>
+          <![endif]-->
+      </div> <!-- /video -->
+    </center>
+      <div id="trailer_div" style="display:none;" class="trailer_div">
+        <video id = "trailer_block" class="video-js" controls
+            preload="auto"  width="650" height="375" poster="/images/black.png" data-setup="{}" style="margin-top:-5px;">
+        </video>
+        <div style="left:98%;top:0;position:absolute;cursor:pointer;" onclick="backto_info();"><img alt="Popup_close" src="/images/video_close.png"></div>
+        <!--<div style="float:right;padding-right:50px;">
+          <input type="button" value="OK" onclick="backto_info();" class="btn btn-info" style="width:80px;"/>
+        </div>-->
+      </div>
+      
+      <!--<div id="bottom_div_parent"><div id="bottom_div" class="bottom_div"></div></div>-->
+<script>
+  /*_gaq.push(['_trackEvent', 'Video', 'Play', 'playing the '+v_type+' video']);
+  _gaq.push(['_trackEvent', 'Video', 'Pause', 'Paused the '+v_type+' video']);
+  _gaq.push(['_trackEvent', 'Video', 'Stop', 'Stopped the '+v_type+' video']);
+  */
+
+  var myPlayer,full_screen=false,request_sent = false,first_time = true, plus_content="", btn_html = "";
+
+  $(document).ready(function() {
+
+    //// video log
+    var u = document.URL;
+    var a = u.split("ads=");
+    var v_type = "";
+    var video_type = "";
+
+    if(a[1] == 'true'){
+      v_type = 'f';
+      video_type = "free";
+    }else{
+      v_type = 'p';
+      video_type = "paid";
+    }
+
+    // video log
+    var l = u.split("?");
+    var mid_arr = l[0].split("/");
+    var mid = mid_arr[4];
+
+    if(mid != "" && mid != undefined){
+      $.post( "/add_to_vl?mid="+mid+"&status=start&vt="+v_type, function( data ) {
+        //$( ".result" ).html( data );
+      });  
+      _gaq.push(['_trackEvent', 'Video', 'Play', 'Clicked to play the '+video_type+' video']); 
+    }
+    // log ends
+
+    $("#trailer_block .vjs-control-bar").remove();
+    $("#big_style").attr("disabled", "disabled");
+    var wannasee_cnt = "<%= @wannasee_cnt %>";
+    if(wannasee_cnt > 0){
+      plus_content = '<div class="vjs-plus-control vjs-control " aria-live="polite" tabindex="0" onclick="display_wannasee_block();"><div class="vjs-control-content"><span class="vjs-control-text">Plus</span></div></div>';
+    }else{
+      plus_content = '<div class="vjs-plus_dis-control vjs-control " aria-live="polite" tabindex="0" onmouseover="display_wannasee_msg();"><div class="vjs-control-content"><span class="vjs-control-text">Plus</span></div></div>';
+    }
+    var btn_html = '<div class="btn_div"><div class="btn-toolbar"><div class="btn-group"><a class="btn btn-primary btn-large" href="javascript:void(0);"  onclick="explore();"  style="padding:12px 80px 13px">Explore</a><a class="btn active play_btn btn-large" href="javascript:void(0);" style="padding:12px 80px 13px">Play</a></div></div></div>';
+    $("#video_block").click(function(){
+      if(full_screen == true){
+        $("#video_block .vjs-control-bar").show();
+        $("#bottom_div").show();
+        $(".youtube_bottom").hide();
+        var timeout = setTimeout(function(){
+          //full_screen = true;
+          if(full_screen == true){
+            $("#video_block .vjs-control-bar").hide();
+            $("#bottom_div").hide();
+            $(".youtube_bottom").show();
+          }
+        },10000);
+      }else{
+        clearTimeout(timeout);
+        $(".youtube_bottom").hide();
+      }
+    });
+
+    setTimeout(function(){$("#video_block .vjs-control-bar").mouseover(function() {
+      if($("#wannasee_block").length == 0 ||  $("#wannasee_block").css("display") == "none"){
+        if ($("#bottom_div").length == 0){
+          request_recomend_movie();
+        }
+        $("#bottom_div").show();
+        hide_wannasee_msg();
+      }
+    }).mouseout(function() {
+      if($("#wannasee_block").length == 0 ||  $("#wannasee_block").css("display") == "none"){
+        $("#bottom_div").hide();
+      }
+      if(full_screen != true){
+        $("#bottom_div").mouseenter(function() {
+          $("#bottom_div").show();
+          hide_wannasee_msg();
+        }).mouseleave(function() {
+          $("#bottom_div").hide();
+        });
+      }
+    })},10000);
+
+    $(".vjs-tech").mousemove(function() {
+      if(full_screen == true){
+        $("#video_block .vjs-control-bar").show();
+        $("#bottom_div").show();
+        setTimeout(function(){
+          //full_screen = true;
+          $("#video_block .vjs-control-bar").hide();
+          $("#bottom_div").hide();
+        },10000);
+      }else{
+        $("#video_block .vjs-control-bar").show();
+	$("#video_block").unbind('mousemove');
+      }
+    });
+
+    //setTimeout(function(){video_player.requestFullScreen()},3000);
+    setTimeout(function(){
+      $("#video_block .vjs-control-bar").prepend(plus_content);
+      $("#video_block .vjs-control-bar").append(btn_html);
+      request_recomend_movie();
+      videojs("video_block").on("fullscreenchange",resize_player);
+      //videojs("video_block").on("play",set_player);
+      var movie_id = "<%= @first_movie_id %>";
+      var video_link = "<%= @video_link %>";
+      var ads = "<%= params[:ads] %>";
+      if(video_link != ""){
+        /*if(ads == "true"){
+          play_video(video_link,movie_id);
+        }else if(ads == "false"){
+          pay_video('5',video_link,movie_id);
+        }*/
+        //play_video(video_link,movie_id);
+        pay_video('5',video_link,movie_id);
+      }else{
+        if(first_time == true && movie_id != ""){
+          first_time = false
+          show_more_info(movie_id);
+        }
+      }
+
+    },2000);
+    $(".btn-group a").on('click', function() {
+      $(this).siblings().removeClass("active").end().addClass("active");
+    });
+  });
+
+  function set_player(){
+    var source = $("#video_block_html5_api").attr('src');
+    if(first_time == true && source == undefined){
+      first_time = false
+      show_more_info('<%= @first_movie_id %>');
+    }
+  }
+  function resize_player(data){
+    if(full_screen == false){
+      full_screen = true;
+      var large_screen = setTimeout(function(){ 
+        if(full_screen == true){
+          $("#video_block .vjs-control-bar").hide();
+          $("#bottom_div").hide();
+	  $(".random_msg").hide();
+          $(".youtube_bottom").show();
+        }
+      },5000);
+    }else{
+      clearTimeout(large_screen);
+      full_screen = false;
+      $(".youtube_bottom").hide();
+      $("#video_block .vjs-control-bar").show();
+      $("#bottom_div").show();
+    }
+  } 
+  function display_wannasee_msg(){
+    if($("#wannasee_msg").length == 0){
+      var wannasee_msg = "<div id='wannasee_msg' class='wannasee_msg'>No movies from your Wanna See list is currently available to watch. Click 'Explore' to find more movies and add to your wanna see list. This will be enabled when any of them is available to watch.</div>";
+      $("#video_block").append(wannasee_msg);
+    }
+    $("#wannasee_msg").show();
+  }
+  function hide_wannasee_msg(){
+    if($("#wannasee_msg").length != 0){
+      $("#wannasee_msg").hide();
+    }
+  }
+
+  function display_wannasee_block(){
+    if($("#wannasee_block").length == 0){
+      var muvi_block = '<div id="wannasee_block" class="wannasee_block" style="overflow:scroll;"><div id="loader_div"><img src="/images/loading.gif" style="height:100px;width:100px;"></div></div>';
+      $("#video_block").append(muvi_block);
+      $("#wannasee_block").show();
+      var wannasee_block = "";
+      $.post("/wannasee_movies",function(res){
+        for(var i =0; i< res.length; i++){
+          wannasee_block += '<div id="movie_block_'+res[i].id+'" class="left_movie_block" onclick="show_more_info(\''+res[i].id+'\')"><div style="float:left;"><img src="'+res[i].poster+'" style="height:93px;width:61px;"></div><div style="float:left;padding-left:10px;width:70%;"><div  class="movie_name">'+res[i].name+'</div><div class="cast_name">'+res[i].casts+'</div></div></div><div style="clear:both;"></div>';  
+        }
+        $("#wannasee_block").append(wannasee_block);
+        $("#loader_div").hide();
+      });
+      $("#bottom_div").hide();
+    }else{
+      if($("#wannasee_block").css("display") == 'none'){
+        $("#wannasee_block").show();
+      }else{
+        $("#wannasee_block").hide();
+      }
+      $("#bottom_div").hide();
+    }
+  }
+  
+  function request_recomend_movie(){
+    if($("#bottom_div").length == 0  && request_sent == false){
+      request_sent = true;
+      $.post("/recomended_movies",function(res){
+        var muvi_block = '<div id="bottom_div" class="bottom_div">';
+	var movie_id = "<%= @first_movie_id %>";
+	if(movie_id == ""){
+          show_more_info(res[0].id);
+	}
+        for(var i =0; i< res.length; i++){
+          muvi_block += '<div class="btm_movie_block" id="btm_movie_block_'+res[i].id+'" style="float:left;" onclick="show_more_info(\''+res[i].id+'\')"><div style="float:left;"><img src="'+res[i].poster+'" style="height:90px;width:60px;"></div><div class="btm_movie_name">'+res[i].name+'</div></div>';
+        }
+        muvi_block += '</div>';
+        $("#video_block").append(muvi_block);
+      });
+    }
+  }
+  function show_more_info(id){
+    var url = "/trailer_info";
+    if($("#vid_more_info").length == 0){
+      var more_info = '<div id="vid_more_info" class="more_info"><div style="left:98%;top:0;position:absolute;cursor:pointer;display:none;" id="info_close" onclick="close_info();"><img alt="Popup_close" src="/images/video_close.png"></div><div style="float:left;"><img src="" id="img_block" height="30%"></div><div  class="all_info"><div id="name_block" style="font-weight:bold;"></div><div style="clear:both;height:10px;"></div><div><span id="cast1_name"  style="color:#fff;"></span><span id="cast2_name" style="padding-left:20px;color:#fff;"></span></div><div style="clear:both;height:10px;"></div><div><a href="javascript:void(0);" id="play_trailer" style="color:#fff;display:none;text-decoration:none;"><div style="float:left"><img src="/images/round_trailer.png" height="30px" width="30px"></div><div style="float:left;padding-left:10px;padding-top:5px;font-size:16px;">Trailer</div></a></div><div style="clear:both;height:10px;"></div><div id="story_block"></div><div style="clear:both;height:15px;"></div> <div style="float:left;" id="free_btn"></div><div style="clear:both;height:20px;"></div><div id="paid_btn"></div></div><div style="clear:both"></div></div><div class="random_msg">You currently don\'t have any matching movies to watch. <br> Do more activities from your feed, Muvi will find movies that match your interest!<br>  <a href="http://www.muvi.com?available_watch=true" style="color:#fff;">Movies currently available to watch</a></div>';
+
+      $("#video_block").append(more_info);
+    }
+    $.post(url,{movie_id:id},function(res){
+      $("#img_block").attr("src",res.poster_path);
+      $("#img_block").css("height",get_infoimg_height(98));
+      $("#img_block").css("width",get_infoimg_width(26));
+      $("#name_block").html("<a href='/movies/"+res.movie_permalink+"' style='color:#fff;text-decoration:none;'>"+res.name+"</a>");
+      $("#story_block").html(res.story);
+      $("#why_watch_block").html(res.why_watch);
+      $("#cast1_name").html("<a href='/stars/"+res.cast1_permalink+"' style='color:#fff;text-decoration:none;'>"+res.cast1_name+"</a>");
+      $("#cast2_name").html("<a href='/stars/"+res.cast2_permalink+"' style='color:#fff;text-decoration:none;'>"+res.cast2_name+"</a>");
+      $("#play_icon").removeAttr("onclick");
+      //$(".payment_btn").removeAttr("onclick");
+      $("#play_trailer").hide();
+      $("#play_trailer").removeAttr("onclick");
+      
+     if(res.uploaded_path != ""){
+        $("#paid_btn").html('<div style="float:left;"><a href="javascript:void(0)"  style="font-weight:bold;padding:7px 25px;" class="btn btn-primary paid_play">Play</a><span style="color:white;padding-left:10px">No Ads</span></div>');
+        if (bowser.firefox){
+          $(".paid_play").attr("onclick","pay_video('5','"+res.uploaded_webm_path+"','"+id+"')");
+        }else{
+          $(".paid_play").attr("onclick","pay_video('5','"+res.uploaded_path+"','"+id+"')");
+        }
+      }else{
+        $("#paid_btn").html("");
+      }
+      if(res.youtube_path != ""){
+        $("#free_btn").html('<a href="javascript:void(0)" style="font-weight:bold;padding:7px 20px;" class="btn btn-primary youtube_btn">Play</a><span style="color:white;padding-left:10px">With Ads</span>');
+        $(".youtube_btn").attr("onclick","play_video('"+res.youtube_path+"','"+id+"')");
+      }else{
+        $("#free_btn").html("");
+      }
+      /*if(res.video_path != ""){
+	$("#free_btn").html('<a href="javascript:void(0)" style="font-weight:bold;padding:7px 20px;" class="btn btn-primary youtube_btn">Play</a><span style="color:white;padding-left:10px"></span>');
+        $(".youtube_btn").attr("onclick","play_video('"+res.video_path+"','"+id+"')");
+      }*/
+
+      if(res.trailer_path != ""){
+        $("#play_trailer").show();
+        $("#play_trailer").attr("onclick","play_vid_trailer('"+res.trailer_path+"','"+res.trailer_poster+"')");
+      }
+      $("#trailer_div").hide();
+      $("#vid_more_info").show();
+      $(".random_msg").show();
+    });
+    $("#btm_movie_block_"+id).parent().children().removeClass("active_block");
+    $("#btm_movie_block_"+id).addClass("active_block");
+    $("#movie_block_"+id).parent().children().removeClass("active_block");
+    $("#movie_block_"+id).addClass("active_block");
+    if($("#wannasee_block").css("display") == 'block'){
+      $("#wannasee_block").show();
+    }
+    $("#vid_more_info").mouseover(function() {
+      $("#info_close").show();
+    }).mouseout(function() {
+      $("#info_close").hide();
+    });
+  }
+
+  function pay_video(amt,movie_path,id){
+    var url = "/pay_for_movie";
+    $.post(url,{coins:amt,movie_id:id},function(res){
+      if(res == "ok"){
+        play_video(movie_path,id);
+      }else{
+        window.location.href = "/profile_edit"
+      }
+    }); 
+  }
+  function get_infoimg_height(percent){
+    var info_height = $("#vid_more_info").css("height");
+    var img_px = parseInt(info_height)*(percent/100);
+    return img_px+"px";
+  }
+
+  function get_infoimg_width(percent){
+    var info_width = $("#vid_more_info").css("width");
+    var img_px = parseInt(info_width)*(percent/100);
+    return img_px+"px";
+  }
+
+  function play_vid_trailer(video_link,poster){
+    $("#trailer_div").show();
+    $("#vid_more_info").hide();
+    $(".random_msg").hide();
+    var trailer = videojs("trailer_block");
+    if(video_link.indexOf('http://youtu') > -1){
+      trailer.src({type: "video/youtube", src: video_link });
+    }else{ 
+      trailer.src({type: "video/mp4", src: video_link });
+      $("#trailer_block").attr('poster',poster);
+    }
+    $("#trailer_block").css("margin-top","-5px");
+    $("#trailer_block .vjs-control-bar").hide();
+    trailer.play();
+    trailer.on("ended", function(){
+      $("#trailer_div").hide();
+      $("#vid_more_info").show();
+      myPlayer.play();
+    });
+    myPlayer = videojs("video_block");
+    myPlayer.pause();
+  }
+
+  function play_video(video_link,movie_id){
+    $("#wannasee_block").hide();
+    $("#bottom_div").hide();
+    $("#vid_more_info").hide();
+    $(".random_msg").hide();
+    var main_video = videojs("video_block");
+    if(video_link.indexOf('http://youtu') > -1){
+      var vid_type = "free";
+      main_video.src({ type: "video/youtube", src: video_link });
+      /*$(".vjs-control-bar").mouseover(function() {
+        var w_see = $("#wannasee_block").css("display");
+        if(($("#wannasee_block").length == 0 || w_see == "none")){
+          if ($("#bottom_div").length == 0){
+            request_recomend_movie();
+          }
+          $("#bottom_div").show();
+        }
+      }).mouseout(function() {
+        var w_see = $("#wannasee_block").css("display");
+        if(($("#wannasee_block").length == 0 || w_see == "none") && $("#vid_more_info").css("display") == "none" && $("#trailer_div").css("display") == "none"){
+          $("#bottom_div").hide();
+        }
+        $("#bottom_div").mouseenter(function() {
+          $("#bottom_div").show();
+        }).mouseleave(function() {
+          $("#bottom_div").hide();
+        });
+      });*/
+      $("#video_block").append("<div class='youtube_bottom'></div>");
+    }else{
+      var vid_type = "paid";
+      main_video.src({type: "video/mp4", src: video_link });
+    }
+    main_video.play();
+    addto_wannasee(movie_id);
+    main_video.on("ended", function(){
+      $.post( "/add_to_vl?mid="+movie_id+"&status=complete&vt="+vid_type, function( data ) {
+        //$( ".result" ).html( data );
+      });
+      addto_seen(movie_id);
+    });
+  }
+
+  function addto_seen(movie_id){
+    var url = "/addto_seen";
+    $.post(url,{movie_id:movie_id},function(res){});
+  }
+  function addto_wannasee(movie_id){
+    var url = "/addto_wannasee";
+    $.post(url,{movie_id:movie_id},function(res){});
+  }
+
+  function backto_info(){
+    var trailer = videojs("trailer_block");
+    trailer.pause();
+    $("#trailer_div").hide();
+    $("#vid_more_info").show();
+  }
+  
+  function close_info(){
+    $("#vid_more_info").hide();
+    $("#wannasee_block").hide();
+    $(".random_msg").hide();
+  }
+
+  function explore(){
+    var main_video = videojs("video_block");
+    main_video.pause();
+    //var movie_id = "<%= params[:fullmovie_id]%>";
+    //if(movie_id != ""){
+      window.location.href = "http://www.muvi.com";
+    //}
+  }
+
+</script>

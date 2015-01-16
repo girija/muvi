@@ -1,0 +1,47 @@
+<script type="text/javascript" charset="utf-8">
+$(function() {  
+  $('#cropbox').Jcrop({  
+    onChange: update_crop,  
+    onSelect: update_crop,  
+    setSelect: [0, 0, 500, 350],  
+    aspectRatio: 78/119  
+  });
+  //$('#cropbox').live("load", function() {
+  //$(this).Jcrop({
+  //    onChange: update_crop,
+  //    onSelect: update_crop,
+  //    setSelect: [0, 0, 500, 500],
+  //    aspectRatio: 1
+  //  });
+  //});  
+
+}); 
+<% @user_profile = current_user.user_profile %>
+function update_crop(coords) {
+  var rx = 100/coords.w;
+  var ry = 100/coords.h;
+
+  var ratio = <%= @user_profile.profile_image_geometry(:original).width %> / <%= @user_profile.profile_image_geometry(:small).width %>;
+  $("#crop_x").val(Math.round(coords.x * ratio));
+  $("#crop_y").val(Math.round(coords.y * ratio));
+  $("#crop_w").val(Math.round(coords.w * ratio));
+  $("#crop_h").val(Math.round(coords.h * ratio));
+}
+</script>
+
+<div style="margin-left:20px">
+  <%#= image_tag @user_profile.profile_image.url(:small), :id => "cropbox" %>
+  <%= image_tag("/system/profile_images/#{@user_profile.id}/small/#{@user_profile.profile_image_file_name.gsub(' ', '%20')}", :id => "cropbox") %>
+
+
+  <% form_for @user_profile do |f| %>
+    <% for attribute in [:crop_x, :crop_y, :crop_w, :crop_h] %>
+      <%= f.hidden_field attribute, :id => attribute %>
+    <% end %>
+    <br/>
+    <div class="clear" style="height:20px"></div>
+    <div style="float:right;margin-right:30px;">
+      <%= f.submit "Save", :class=>"login_link" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,13 @@
+%div{:class=>"movie_from_list_pannel"}
+  .clear{:style => "height:10px"}
+  =@user_followed_list
+  .clear
+
+  #movies_from_list
+    =render :partial => 'load_movies', :locals => {:movie_lists => movie_lists}
+
+:javascript
+  $(document).ready(function(){
+    $('.scroll-pane').jScrollPane();
+  });
+

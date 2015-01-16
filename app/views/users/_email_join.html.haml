@@ -1,0 +1,72 @@
+#email_reg_form
+  %form{"data-remote" => true, :id => "join_form",:onsubmit => "validate_email_form();"}
+    %input{:type => "text", :name => "name", :id => "name", :placeholder => "First and Last Name", :required => true}
+    %input{:type => "text", :name => "email", :id => "email", :placeholder => "Email Address", :required => true}
+    -begin
+      %input{:type => "hidden", :name => "from", :value => "#{from}"}
+    -rescue
+    %input{:type => "password", :name => "pass", :id => "password", :placeholder => "Password", :required => true}
+    %input{:type => "hidden", :class => "reg_txtbox", :name => "hid_password", :id => "hid_password"}
+
+    %input{:class => "md-trigger join_btn", "data-modal" => "modal-91", :style => "width:110px; border-radius:5px;", :type => "submit", :name => "join", :value => "Join"}
+
+    %span{:class => "load_div", :style => "width:110px; display:none"}
+      %img{:src => "/images/loading.gif", :width => "50px", :height => "40px", :style => "margin-top:-20px;"}
+    .clear
+    %span{:id => "err_message"}
+                                           
+:javascript
+  function validate_email_form(){
+    var err_msg = "";
+    if($("#name").val() == ""){
+      err_msg += "Please enter name <br>";
+      $("#name").css("border","1px solid red");
+    }else{
+      $("#name").css("border","1px solid #CCCCCC");
+    }
+    if($("#email").val() == ""){
+      err_msg += "Please enter email address <br>";
+      $("#email").css("border","1px solid red");
+    } else if(!validateEmail($("#email").val())){
+      err_msg += "Oops! seems an invalid email! <br>";
+      $("#email").css("border","1px solid red");
+    }else{
+      $("#email").css("border","1px solid #CCCCCC");
+    }
+    if($("#password").val() == ""){
+      err_msg += "Please enter password <br>";
+      $("#password").css("border","1px solid red");
+    }else if($("#password").val().length < 6 ){
+      err_msg += "Please enter atleast 6 characters for password";
+      $("#password").css("border","1px solid red");
+    }else{
+      $("#password").css("border","1px solid #CCCCCC");
+    }
+
+    if(err_msg != ""){
+      $("#err_message").show();
+      $("#err_message").html(err_msg);
+      $('#err_message').css("float", "left");
+      $('#err_message').css("padding-left", "120px");
+      $('#err_message').css("color", "red");
+      $('#err_message').css("background", "none");
+      $('#err_message').css("display", "inline");
+      $('#err_message').css("font-size", "12px");
+      $('#err_message').css("font-weight", "normal");
+      return false;
+    }else{
+      $("#name").css("border","1px solid #CCCCCC");
+      $("#email").css("border","1px solid #CCCCCC");
+      $("#password").css("border","1px solid #CCCCCC");
+      var hid_pw = base64_encode($("#password").val());
+      $("#hid_password").val(hid_pw);
+      $("#err_message").hide();
+      $("#join_form").attr('action', '/user_register');
+
+      $(".join_btn").hide();
+      $(".load_div").show();
+      $("#join_form").submit();
+    }
+  }
+
+

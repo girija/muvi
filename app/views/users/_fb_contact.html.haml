@@ -1,0 +1,19 @@
+%input{:type => "text", :id => "user_user_tokens_attributes_0_provider", :name => "user_user_tokens_attributes_0_provider"}
+%input{:type => "text", :id => "user_user_tokens_attributes_0_uid", :name => "user_user_tokens_attributes_0_uid"}
+%input{:type => "text", :id => "user_user_tokens_attributes_0_token", :name => "user_user_tokens_attributes_0_token"}
+%input{:type => "text", :id => "user_user_tokens_attributes_0_secret", :name => "user_user_tokens_attributes_0_secret"}
+%input{:type => "text", :id => "page_type", :name => "page_type", :value => "onboarding"}
+
+:javascript
+  var int2 = self.setInterval("fill_fb_token()", 1000);
+
+  function fill_fb_token(){
+    if($("#user_user_tokens_attributes_0_provider").val() != ""){
+      $(".modal-backdrop").show();
+      $("#joinModal").show();
+
+      window.clearInterval(int1)
+    }
+  }
+
+/=User.fetch_fb_friends_onboard

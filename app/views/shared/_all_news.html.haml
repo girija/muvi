@@ -1,0 +1,25 @@
+-if !@celebrity.nil?
+  -@refer = "celebrity"
+  -@item = @celebrity
+-else
+  -@refer = "movie"
+  -@item = @movie
+%h3
+  %span All News
+  %span{:style=>"float:right;"}
+    =link_to "See Latest News", "javascript:void(0);", :onclick => "show_latest_news();", :style => "font-weight:normal;text-transform:capitalize;"
+.clear{:style => "height:10px"}
+-check = []
+-@news.each do |n|
+  -if !check.include?n.taggable_id
+    -check << n.taggable_id
+    -feed = Feed.get_news_feed(n.taggable_id)
+    -unless feed.blank?
+      %h1{:style => "font-size:13px"}= link_to feed.entry_title.html_safe, "/news/#{@refer}/#{@item.permalink}/#{n.id}", :style => "color:#4F4F4F;"
+      %i
+        =feed.source
+        =feed.created_at.strftime('%B %d, %Y')
+      .clear
+      =feed.summary.html_safe unless feed.summary.blank?
+      =link_to "More", "/news/#{@refer}/#{@item.name}/#{n.id}", :class => "right"
+      .clear{:style => "height:20px"}

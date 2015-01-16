@@ -1,0 +1,50 @@
+-unless @celebrity.blank?
+  .containerIn.borderDiv
+    .moviBanner.left
+      .moviImage
+        = image_tag(@celebrity.image, :width => "130", :height => "200")
+
+      %h4
+        -if @celebrity.celebrity_type.kind_of?(Array) == true
+          -profession_type=""
+          -@celebrity.celebrity_type.each do |profession|
+            -profession_type += profession.capitalize+", "
+          -unless profession_type.blank?
+            =profession_type.chop.chop
+        -else
+          =@celebrity.celebrity_type
+      .clear
+
+    .moviDetail.left
+      .detail
+        %h3 News
+        %h5
+          =link_to @feed.entry_title, @feed.entry_url
+        .clear
+        =@feed.summary.html_safe
+    .clear
+    %div
+      %iframe{:src => "#{@feed.entry_url}", :width => "100%", :style => "min-height:600px"}
+
+-unless @movie.blank?
+  .containerIn.borderDiv
+    .moviBanner.left
+      .moviImage
+        = image_tag @movie.banner_image, :size => "125x200"
+      -default_video = get_default_video(@movie)
+      -if default_video != false
+        %a{:href=>'#', :class=>'gradient-button2 left trailerLink'}
+          .gradient-button2
+            .label view trailer
+      .clear{:style => "height:10px"}
+      - if current_user
+        = link_to "Comment", '#comments' , :id => 'comment_count'
+      -else
+        = link_to "Comment", new_user_session_path(:login => 'comment'), :remote => true, :onclick => "enableLoginError(registration(), 'You need to login to add comment')"
+
+    .moviDetail.left
+      .detail
+        %h3 News title
+        %h5
+          =@feed.entry_title
+ 

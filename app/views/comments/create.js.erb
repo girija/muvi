@@ -1,0 +1,62 @@
+//window.location.href = window.location;
+
+<% if @comment.errors.empty? %>  
+  <% if @comment.ancestry %>
+    $("#comment_<%= @comment.root.id%>_ul").append("<%= escape_javascript(render 'shared/comment_field', {:comment => @comment}) %>");
+    $("#comment_<%= @comment.root.id%>_form").find('textarea').val('');
+  <%else%>
+    <% if !params[:celeb_comment].blank? %>
+      $("#comments").prepend("<%= escape_javascript(render 'shared/celeb_comment', {:comment => @comment}) %>");
+
+    <% elsif !params[:activity_comment].blank? %>
+      $("#comment_<%= params[:id] %>").val("");
+      $("#activity_comments_<%= params[:id] %>").append("<%= escape_javascript(render 'shared/activity_comment', {:comment => @comment}) %>");
+    <% elsif !params[:movie_review_comment].blank? %>
+      $("#comment_<%= params[:id] %>").val("");
+      $("#comment_cnt_<%= params[:id] %>").html("<%= @review.comments.count %>");
+      var class_name = "<%= @review.class.to_s %>";
+      if( class_name == "CriticsReview"){
+        $("#review_reply_<%= params[:id] %>").html("<%= escape_javascript(render '/shared/review_replies', {:review => @review}) %>");
+        $('#mas_container').masonry({
+          itemSelector : '.mas_item'
+        });
+      }else{
+        $("#user_review_reply_<%= params[:id] %>").html("<%= escape_javascript(render '/shared/review_replies', {:review => @review}) %>");
+        $('#mas_container_u_reviews').masonry({
+          itemSelector : '.mas_item'
+        });
+      }
+    <% elsif !params[:celeb_tweet_comment].blank? %>
+      $("#comment_<%= params[:celeb_tweet_comment] %>").val("");
+      $("#comment_cnt_<%= params[:celeb_tweet_comment] %>").html("<%= @celeb_tweet.comments.count %>");
+      $("#tweet_reply_<%= params[:celeb_tweet_comment] %>").html("<%= escape_javascript(render '/shared/review_replies', {:review => @celeb_tweet}) %>");
+    <% elsif !params[:review_comment].blank? %>
+      $("#review_comment_<%= params[:id] %>").val("");
+      $("#review_comments_<%= params[:id] %>").append("<%= escape_javascript(render 'shared/review_comment', {:comment => @comment}) %>");
+    <% elsif !params[:discussion_comment].blank? %>
+      $("#comment_<%= params[:discussion_comment] %>").val("");
+      $("#user_id").val("<%= current_user.id %>");
+      <% if params[:inner_page] == "true" %>
+        $("#<%= params[:item_class] %>_detail").html("<%= escape_javascript(render :partial => "shared/show_block_detail", :locals=>{:item=>@refer}) %>");
+      <% else %>
+        $("#discussion_list_<%= params[:discussion_comment] %>").load("/discussion/discussion_detail/<%= params[:discussion_comment] %>?refer_type=<%= params[:refer_type] %>&item_class=<%= params[:item_class]%>");
+      <% end %>
+      $("#discussion_list_<%= params[:discussion_comment] %>").load("/discussion/discussion_detail/<%= params[:discussion_comment] %>?refer_type=<%= params[:refer_type] %>&item_class=<%= params[:item_class]%>");
+    <% elsif !params[:poster_comment].blank? %>
+      $("#comment_<%= params[:poster_id] %>").val("");
+      $("#comment_data").append("<%= escape_javascript(render 'shared/comment_format', {:comment => @comment}) %>");
+    <% elsif !params[:video_comment].blank? %>
+      $("#comment_<%= params[:video_id] %>").val("");
+      $("#comment_data").append("<%= escape_javascript(render 'shared/comment_format', {:comment => @comment}) %>");
+    <% else %>
+      $("#comments").prepend("<%= escape_javascript(render 'shared/comment', {:comment => @comment}) %>");
+
+    <% end %>
+
+    $("#comment_comment").val('');
+  <%end%>
+<% else %>
+   $('#error_container_id').html('<%= escape_javascript(render 'shared/error_display', {:error_object => @comment}) %>');
+<% end %>
+badgePoints('commenting',1)
+successMessage('Your comment has been posted');

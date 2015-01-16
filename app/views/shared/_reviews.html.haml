@@ -1,0 +1,6 @@
+.right
+  #pagination
+    = will_paginate(@movie_user_reviews,:entry_name => 'review', :params => {:controller => "tweets" , :action => "index", :id => @movie.id,:user => "review" })
+.clear
+= render '/shared/movie_reviews'
+

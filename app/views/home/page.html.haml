@@ -1,0 +1,54 @@
+= render 'shared/meta_title_and_keywords', { :key => 'home'}
+
+
+:javascript
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+
+-unless @page.blank?
+  %div{:style => "background-color: #FFFFFF; border: 1px solid #DBDBDB; padding: 10px; width: 97%; float:left;"}
+    /%h2{:style => "font-size: 18px; padding-left:10px;"}
+    /  = @page.title
+    .containerIn.borderDiv
+      .left{:style => "width:14%; margin-right:1%; margin-top:15px;"}
+        %ul{:id => "footer_link"}
+          %li{:class => ('active' if params[:id] == "what-is-muvi")} 
+            -if params[:msn_embed] == "msn_embed"
+              = link_to "About Us", find_page_msn('what-is-muvi')
+            -else
+              = link_to "About Us", find_page('what-is-muvi')
+
+          %li{:class => ('active' if params[:id] == "careers")} 
+            -if params[:msn_embed] == "msn_embed"
+              = link_to "Career", find_page_msn('career')
+            -else
+              = link_to "Career", "http://www.muvi.com/careers"
+
+          %li 
+            =link_to "Press", "http://www.muvi.com/press"
+          %li
+            =link_to "Partners", "http://www.muvi.com/partners"
+
+          %li 
+            %a{:href => "http://www.studio.muvi.com", :target => "_blank"}
+              Content Partners
+
+          %li{:class => ('active' if params[:id] == "contact_us")} 
+            =link_to "Contact Us", contact_us_path
+
+      .left{:style => "width:85%"}    
+        %h2 
+          =@page.title
+        %div{:style => "border-top:2px solid #EEEEEE"}
+        .clear{:style => "height:10px;"}
+
+        - unless @page.blank?
+          = @page.content.html_safe
+
+        - else
+          No page found.
+
+

@@ -1,0 +1,26 @@
+-unless current_user.blank?
+  .well-small{:style => 'height:800px;padding:0px;'}
+    .media{:style => "background-color:#FFFFFF"}
+      .items.scroll-pane.gradient_class{:style => 'overflow:auto;height:766px;'}
+        -unless movie_lists.blank?
+          -movie_lists.each do |mov|
+            -m = Movie.find_by_id(mov)
+            -unless m.blank?
+              .gradient_class{:style => "padding:5px; font-size:12px; background-color: #FFFFFF"}
+                %a{:class => "pull-left", :href => "/movies/#{m.permalink}"}
+                  %img{:src => "#{POSTER_URL}#{m.banner_image}", :alt => '', :class => "image_class"}
+
+                .media-body{:style => "min-height:90px;"}
+                  %h5{:class => "media-heading"}
+                    = link_to m.name, "/movies/#{m.permalink}"
+                  &nbsp;
+                  -begin
+                    =m.get_first_two_actors_link_gray.html_safe
+                  -rescue
+                    &nbsp;
+                  %br
+                  .clear
+                  .right{:style => "margin-top:18px; margin-right:10px;"}
+                    /=render "/shared/movie_rating", movie_name: m.name, movie_image: m.banner_image, movie_id: m.id
+                    = render :partial => "reviews/new_form_feed", :locals => {:movie => m, :review => true }
+

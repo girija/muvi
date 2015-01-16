@@ -1,0 +1,30 @@
+-unless @birthday_today.blank?
+  =sidebar_content(:heading => "Happy Birthday", :class => "GrayHeaderBox")
+  -count = 1
+
+  -@birthday_today.each do |bd|
+    -movies = get_movie_name_of_celeb(bd,"")
+    -movie_name = ""
+    -movie_link = ""
+    -unless movies.blank?
+      -i=0
+      -movies.each do |mov|
+        - unless mov.name.blank?
+          -if i == 2
+            -break
+          - else
+            - i = i + 1
+
+          -if movie_name.blank?
+            -movie_name = mov.name
+            -movie_link = movie_path(mov.permalink)
+          -else
+            -movie_name = movie_name + ","+ mov.name
+            -movie_link = movie_link + "," + movie_path(mov.permalink)
+          
+    -if count == @birthday_today.size
+      =sidebar_detail(bd.thumb_image, :name => bd.name, :link_on_name => star_path(bd), :width => 42, :height => 42,:subtexts => movie_name, :sublink => movie_link, :end => 1)
+    -else
+      -count = count + 1
+      =sidebar_detail(bd.thumb_image, :name => bd.name, :link_on_name => star_path(bd), :width => 42, :height => 42,:subtexts => movie_name, :sublink => movie_link)
+

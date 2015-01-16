@@ -1,0 +1,144 @@
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, dl, dt, dd, ol, ul, li, fieldset, form, label, legend,  table, caption{
+margin : 0;
+padding : 0;
+border : 0;
+outline : 0;
+vertical-align : baseline;
+font-style:normal;
+font-weight:normal;
+text-decoration:none;
+}
+ 
+:focus {
+outline : 0;
+}
+ 
+ 
+table {
+border-collapse : separate;
+border-spacing : 0;
+}
+ 
+caption, th, td {
+text-align : left;
+font-weight : normal;
+}
+ 
+blockquote:before, blockquote:after, q:before, q:after {
+content : "";
+}
+ 
+blockquote, q {
+quotes : "" "";
+}
+
+
+.left{float:left;}
+.right{float:right;}
+
+.clear{clear:both;}
+
+@font-face {
+     font-family: "PTS55F";
+     src: url("PTS55F.ttf") format("opentype");
+     font-weight: bold;
+   }
+
+.top{  
+      background: url(images/navigation.jpg) center;
+      width:930px;
+      height:50px;
+      margin:0 auto;
+}
+
+div#menu ul {margin:0px;text-align:right;padding-top:15px;color:#fff;float:right;}
+
+div#menu li {
+    position: relative;
+    display: block;
+    float: left;
+    padding:0px 3px;
+}
+
+div#menu li div {
+   list-style: none;
+    float: left;
+    position: absolute;
+    z-index: 11;
+    top: 13px;
+    visibility: hidden;
+    width: 210px;
+    margin: 0px 0px 0px 0px;
+    background:url(images/pointer.png) no-repeat left top;
+}
+
+div#menu li:hover>div {
+    visibility: visible;
+}
+
+div#menu a {
+    font-size:13px;text-decoration:none;color:#fff;font-weight:bold;padding:0px 8px;
+}
+
+
+div#menu ul ul{
+    	background-color:#0D1720;
+	border:3px solid #4F88C0;
+    	margin-top:14px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	width: 210px;
+}
+
+div#menu ul ul li {
+    background: none;
+    padding-top:5px; 
+}
+div#menu ul ul a {
+    display: block;
+    padding:0px 0px 15px 5px;
+    font-weight:normal;
+     text-align:left;
+    font-size: 12px;
+    color: #fff;   
+}
+    
+
+.con_number{font-size:12px;color:#fff;padding:15px 0px 0px 10px;}
+.con_number a{color:#7DB7F1;text-shadow: 0px -1px #5587BA, 0px 0px;}
+.con_number span{color:#F4D26E;margin:0px 5px;}
+
+hr{border-top:1px solid #ddd;margin:10px 0px;}
+
+#footer{
+         background-color:#020609;
+	 margin-top:20px;
+}
+
+.footer{
+         margin:0 auto;
+	 width:930px;
+}
+
+.foo{
+	width:310px;
+	float:left;
+	padding:20px 0px;
+}
+
+.foo p{
+	color:#fff;
+	line-height:20px;
+}
+.footer div.first p{}
+.footer div.first p span{
+	display:block;
+	width:75px;;
+	display:inline;
+	float:left;
+	text-align:right;
+	margin-right:10px;
+	color:#7DB7F1
+}
+.footer div.second{text-align:center;}
+.footer div.third{text-align:left;color:white;width:210px;padding-left:100px}

@@ -1,0 +1,30 @@
+%div{:style => "width:575px; font-weight:bold;color:#445B6D"}
+  %h2
+    Remind invitation
+-count = 0
+.homeContainerIn.connectionborderDiv{:id => "remind_list"}
+  = form_for "connections",:url => "/connections/send_invitation", :html => {:id => "invite_form"},  :remote => true do |f|
+    %div{:id => "scroll_remind_div",:style => "min-height:100px; overflow:auto;"}
+      -@remind_user.each do |remind|
+        -user = UserProfile.find(:first,:conditions => ["user_id = ?",remind])
+        -user_fb_id = User.find(remind)
+        .tinybox.left
+          %input{:type => "checkbox", :style => "float:left;margin-top:10px;",:id => "invite_#{count}", :name => "connections_invite[]", :onclick => "count_checkbox(this);", :value => remind}
+
+          .tinyfriendsBox.left
+            -unless user.profile_image_file_name.blank?
+              =image_tag(user_profile_image(user))
+            -else
+              -unless user_fb_id.facebook_id.blank?
+                =image_tag("http://graph.facebook.com/#{user_fb_id.facebook_id}/picture")
+              -else
+                =image_tag('no-profile.png')
+          .tinyfriendstitle
+            =truncate(user.display_name, :length => 14)
+        -count = count + 1
+        -if count >= 6
+          %script
+            $("#scroll_div").css("height","300px");
+  -if count == 0
+    %script
+      $("#remind_list").hide();

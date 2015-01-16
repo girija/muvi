@@ -1,0 +1,25 @@
+#alertModal.modal.fade.hide
+  .modal-body{:style => 'font-size:17px;text-align:center'}
+    .clear
+      %button.close{:type => "button", "data-dismiss" => "modal" , "aria-hidden" => "true"}
+        x
+    .clear
+      There is new version of Muvi, wanna check it out.
+    .clear{:style => 'height:10px'}
+    = link_to "Let's do it",  "http://www.muvi.com" , :class => 'btn btn-home btn-warning bold_class'
+
+:javascript
+  $(document).ready(function($) {
+    var cur_user = "#{current_user}";
+    if(cur_user == ""){
+      //setTimeout(notify_new_version,6000);
+    }
+  });
+  function notify_new_version(){
+    var first_time = "#{session[:first_time]}";
+    if(first_time == ""){
+      var first_time = "#{session[:first_time] = 1}";
+      $("#alertModal").modal("show");
+    }
+  }
+

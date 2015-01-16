@@ -1,0 +1,83 @@
+if("<%= @current_movie%>" != ""){	
+	$("#movie_id").val("<%= @current_movie.id %>");
+	$("#movie_released").val("<%= @current_movie.release_date%>");
+	$("#movie_name").html('<%= @current_movie.name %>');
+	$("#movie_cast").html('<%= @current_movie.get_first_two_actors.strip.gsub(/[']/, '\\\\\'')  %>');
+	$("#movie_story").html('<%= @current_movie.story.truncate(100).strip.gsub(/[']/, '\\\\\'') if @current_movie.story %>');
+	$("#movie_add_info").html('<%= @current_movie.additional_info.truncate(100).strip.gsub(/[']/, '\\\\\'') if @current_movie.additional_info %>');
+	$("#movie_image").attr({src : '<%= POSTER_URL + @current_movie.banner_image %>', alt : '<%= @current_movie.name %>'})
+	$("#movie_link").val("/movies/<%= @current_movie.permalink %>");
+ 
+	//if("<%#= @videos%>" != ""){
+	<% unless @videos.blank? and @videos.nil? %>
+		$("#movie_trailer_url").val("<%= VIDEO_URL %>/system/trailers/<%= @videos.id %>/original/<%= @videos.trailer_file_name.to_s %>");
+	<% end %>
+	//}
+}
+
+	var rel_dt = $("#movie_released").val();
+	var release_dt = new Date(rel_dt);
+	var today = new Date();
+
+
+	$("#more_info").html("");
+	current_movie_id = $("#movie_id").val();
+	current_movie_name = $("#movie_name").html();
+	current_movie_image = $("#movie_image").attr("src");
+	current_movie_link = $("#movie_link").attr("href");
+
+	var movie_id = $("#movie_id").val();
+	var movie_name = $("#movie_title").val();
+	var movie_cast = $("#movie_cast").val();
+	var movie_story = $("#movie_story").val();
+	//var movie_add_info = $("#movie_add_info").val();
+	var movie_image = $("#movie_image").attr("src");;
+	var movie_link = $("#movie_link").val();
+	var movie_trailer_url = $("#movie_trailer_url").val();
+	var rel_dt = $("#movie_released").val();
+
+	
+	$("#load_div").hide();
+	$("#discovery_div").show();
+		
+	//$("#movie_add_info").html(movie_add_info);
+	$("#movie_image").attr({src : movie_image, alt : movie_name});
+	$("#movie_link").attr({href : movie_link});
+	$("#movie_page_link").attr({href : movie_link});
+
+	if(movie_trailer_url == ""){
+		$(".play_icon").hide();
+		$(".btn_view_trailer").hide();
+		$(".btn_view_trailer").attr({"data-id" : ""});
+	} 
+	else {
+		$(".play_icon").show();
+		$(".btn_view_trailer").show();
+		$(".btn_view_trailer").attr({"data-id" : movie_trailer_url});
+		$("#video_player").attr({href : movie_trailer_url});
+	}
+	//});
+		
+	if(rel_dt == ""){
+		$(".btn-seen").addClass("btn-dis");
+		$(".btn-seen").removeClass("btn-primary");
+	}
+	else if(today < release_dt){
+		$(".btn-seen").addClass("btn-dis");
+		$(".btn-seen").removeClass("btn-primary");
+	}
+	else{
+		$(".btn-seen").addClass("btn-primary");
+	}
+  
+	<% if @trailer != false %>
+	  $("#next_movie_trailer_url").val("<%= VIDEO_URL %>/system/trailers/<%= @trailer.id %>/original/<%= @trailer.trailer_file_name.to_s %>");
+	  $("#next_movie_trailer_title").val("<%= @trailer.trailer.url.to_s %>");
+	<% else %>
+	  $("#next_movie_trailer_url").val("");
+	  $("#next_movie_trailer_title").val("");
+	<% end %>
+	$("#movie_block").fadeTo(2000,1,function(){
+	  enableButtons();
+	});
+

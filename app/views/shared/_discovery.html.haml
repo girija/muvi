@@ -1,0 +1,377 @@
+/-list = UserMovieList.find(:all, :conditions => ["user_id = #{current_user.id}"],:order => "created_at desc")
+/-tags = []
+/-fst_tag = ""
+/-sec_tag = ""
+/-trd_tag = ""
+
+/-unless list.blank?
+/  -list.each do |l|
+/    -unless l.tag.blank?
+/      -tags << l.tag
+/-if !tags.nil?
+/  -fst_tag = tags[0] if tags[0]
+/  -sec_tag = tags[1] if tags[1]
+/  -trd_tag = tags[2] if tags[2]
+/%input{:type => 'hidden', :id => 'rec_tag_1', :value => "#{fst_tag}"}
+/%input{:type => 'hidden', :id => 'rec_tag_2', :value => "#{sec_tag}"}
+/%input{:type => 'hidden', :id => 'rec_tag_3', :value => "#{trd_tag}"}
+
+
+/- if !current_user.blank?
+/  %input{:type => 'hidden', :name=> 'logged_in_user_id' , :id => 'logged_in_user_id', :value => current_user.id}
+/  - @my_wanna_see_movies = []
+/  - @my_seen_movies = []
+/  - list = ListOfMovie.find_by_user_id(current_user.id)
+/  - if list && !list.wanna_see_lists.blank?
+/    - wannasee_list = ActiveSupport::JSON.decode(list.wanna_see_lists)
+/    -if wannasee_list
+/      - wannasee_list.each do |wanna_see|
+/        - @my_wanna_see_movies << wanna_see["object"]["id"].to_i
+/  - if list && !list.seen_lists.blank?
+/    - seen_list = ActiveSupport::JSON.decode(list.seen_lists)
+/    -if seen_list
+/      - seen_list.each do |seen|
+/        - unless seen.blank?
+/          - unless seen["object"].blank?
+/            - @my_seen_movies << seen["object"]["id"].to_i
+/  - @my_rated_movies = []
+/  - rated =  UserMovieList.where(:user_id => current_user.id)
+/  - if rated
+/    - rated.each do |rate|
+/      - if !rate.movie_id.blank?
+/        - rated_list = ActiveSupport::JSON.decode(rate.movie_id)
+/        - rated_list.each do |movie|
+/          - @my_rated_movies << movie.to_i
+/  - @my_rated_movies.uniq!
+
+#myModal.modal.fade.hide{:style => 'width:640px;height:435px;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    #DiscTrailerLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+      Trailer
+  .modal-body{:style => 'max-height:290px'}
+    %a{:href => "#" , :id => 'video_player_discv', :style => 'display:block;height:300px;width:610px;'}
+  .modal-footer
+    %button.btn.btn-primary.bold_class{"data-dismiss" => "modal", "aria-hidden" => "true" }
+      Done
+#myTrailer.modal.fade.hide{:style => 'width:640px;height:435px;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    #myModalLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+      Trailer
+  .modal-body{:style => 'max-height:290px'}
+    %a{:href => "#" , :id => 'video_player', :style => 'display:block;height:300px;width:610px;'}
+  .modal-footer
+    %button.btn.btn-primary.bold_class{"data-dismiss" => "modal", "aria-hidden" => "true" }
+      Done
+
+
+#more_info{:style => 'right:0;border:1px solid grey;position:absolute;height:600px;width:0;background-color:#fff;z-index:1;display:none'}
+.row-fluid{:style => 'position:relative'}
+  #top_movies.hide.discover
+    %div{:id=>"search_filter",:style=>"height:40px;margin-top:20px;"}
+      %div{:style=>"float:left;"}
+        %div{:style=>"color:#a6a6a6;font-size:16px;font-weight:bold;"}
+          TOP RATED MOVIES
+      %div{:style=>"float:right;"}
+        =link_to "Go back","javascript:void(0);",:onclick=>"hide_top_movies();",:style=>"float:right;color:#a4a4a4;"
+      - all_genre = option_for_genre << ["Genre","all"]
+      - year_filter = [["New (Last 6 months)","new_6"],["2000 - Current" , "2000_now"], ["1990s" , "1990"] , ["1980s" , "1980"] , ["1970s" , "1970"], ["1960s" , "1960"], ["Classic (Before 1960)" , "classic"]]
+    %div
+      %div{:style=>"float:left;"}
+        =select_tag "year",options_for_select(year_filter),:style=>"width:auto;",:onchange=>"filter_topmovies();"
+      %div{:style=>"float:left;padding-left:10px;"}
+        =select_tag 'genre', options_for_select(all_genre, 'all'),:style=>"width:auto;",:onchange=>"filter_topmovies();"
+      %div{:style=>"float:left;padding-left:10px;"}
+        %input{:type=>"text",:id=>"cast",:style=>"width:150px;",:placeholder=>"Actor or Director",:"data-provide"=>"typeahead", :autocomplete=>"off"}
+        =image_tag("32_close.png",:id=>"cast_clear",:style=>"top:65px;left:440px;position:absolute;width:18px;display:none;cursor:pointer;",:onclick=>"clear_cast_field();")
+        %input{:type => 'hidden', :id => 'cast_id', :value => ''}
+      %div{:style=>"float:left;padding-left:20px;cursor:pointer;"}
+        -lang_option = [["Hollywood","English"],["Bollywood","Hindi"],["Tamil","Tamil"],["Telugu","Telugu"]]
+        %div{:class=>"lang_dropdown",:onclick=>"show_lang_dropmenu();"}
+          Region
+          .pull-right
+            ="<i class='icon-chevron-down' style='padding-left: 30px;padding-top:2px;'></i>".html_safe
+        /=image_tag("glob_icon.png",:onclick=>"show_lang_dropmenu();")
+      .clear
+      %div{:id=>"lang_drop", :class=>"lang_dpbox"}
+        %input{:type => 'hidden', :id => 'sel_lang', :value => "'English',"}
+        %div
+          %div{:style=>"float:left;"}
+            %input{:type => 'checkbox', :value => 'English', :onclick => "setLanguage(this)", :name => "language[]",  :id => "chkenglish",:checked=>"checked"}
+          %div{:style=>"float: left; padding-left: 5px; padding-top: 3px;"}
+            Hollywood
+        .clear
+        %div
+          %div{:style=>"float:left;"}
+            %input{:type => 'checkbox', :value => 'Hindi', :onclick => "setLanguage(this)", :name => "language[]",  :id => "chkhindi" }
+          %div{:style=>"float: left; padding-left: 5px; padding-top: 3px;"}
+            Bollywood
+        .clear
+        %div
+          %div{:style=>"float:left;"}
+            %input{:type => 'checkbox', :value => 'Tamil', :onclick => "setLanguage(this)", :name => "language[]",  :id => "chktamil"  }
+          %div{:style=>"float: left; padding-left: 5px; padding-top: 3px;"}
+            Tamil
+        .clear
+        %div
+          %div{:style=>"float:left;"}
+            %input{:type => 'checkbox', :value => 'Telugu', :onclick => "setLanguage(this)", :name => "language[]",  :id => "chktelugu" }
+          %div{:style=>"float: left; padding-left: 5px; padding-top: 3px;"}
+            Telugu
+
+    .clear
+    %div{:id=>"search_res",:class=>"scroll-bar"}
+      /=render "shared/toprated_movies"
+.row-fluid{:style => 'position:relative'}
+  -@user_profile = current_user.user_profile
+  /= render :partial => "/shared/followings"
+  #discover_box.span11.well-small.discover.hide
+    .row-fluid.pagination-centered.hide
+      %div{:style=>'padding:50px 0;z-index:10'}
+        %div{:style=>"color:#494949;font-weight:bold;font-size:37px;height:100px;line-height:100px;"}
+          ="Find movies that match your taste".html_safe
+        = link_to "Discover", "javascript:void(0);" , :class => 'btn btn-primary btn-discover tip_hint',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('discover','home_page'),:style=>"line-height:45px;font-size:35px;"
+        %div{:style=>"font-size:20px;font-weight:bold;padding-top:20px;"}
+          or
+          = link_to "filter manually", "#", :onclick => "show_top_movies();",:style=>"color:#389ed8;", :class => "see_top_movies tip_hint",:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('see top movies','home_page')
+
+    .row-fluid{:style => 'min-height:400px;'}
+      %div{:style=>"padding-bottom:20px;font-size:20px;float:left;font-weight:bold;"}
+        Movies matched for you
+      .clear
+      #movie_block.row-fluid{:style => 'min-height:300px;border:1px solid #ececec;box-shadow:1px 0px 2px #ECECEC;'}
+        #load_div{:style => "display:none; padding-left:40%; padding-top:80px;"}
+          =image_tag("loading.gif")
+
+        #discovery_div
+          .span5{:style=>"margin-left:-1px;margin-top:-1px;"}
+            %a{:href => "#", :id => "movie_page_link"}
+              = image_tag "http://muvi.com/images/no-image.png", :id => "movie_image", :style => "height:300px;width:210px;"  
+          .span7{:style=>"margin-left:-80px;width:530px;"}
+            %div{:id => 'movie_name',:style=>"font-size:35px;font-weight:bold;color:#494949;padding-top:20px;line-height:34px;"}
+              &nbsp;
+            %div{:id => 'movie_cast',:style=>"font-size:15px;color:#5f5f5f;padding-top:10px;"}
+              &nbsp;
+            %div{:style=>"padding-top:20px;"}
+              .left{:style => "width: 30px"}
+                =image_tag("play_icon_discv.png",:class=>"play_icon")
+              .left
+                =link_to "Watch the trailer", "#myModal" , :style => 'font-size:20px;color:#389ed8;', "data-toggle" => "modal", "role" => "button", :class => 'btn_view_trailer',"data-id" => ""
+
+            .clearfix{:style => 'height:35px'}
+            %div{:id => "movie_story", :style => 'display:block;color:#707070;font-size:15px;'}
+              &nbsp;
+            .clearfix{:style => 'height:25px'}
+            %div{:id => "movie_add_info", :style => 'display:block;color:#707070;font-size:15px;padding:10px;'}
+              &nbsp;
+            .clearfix{:style => 'height:5px'}
+
+            %form
+              %input{:type => 'hidden', :name => 'movie_id', :id => 'movie_id', :value => ''} 
+              %input{:type => 'hidden', :name => 'user_id', :id => 'user_id', :value => "#{current_user.id}"}
+            %input{:type => 'hidden', :name => 'movie_released', :id => 'movie_released', :value => ''}
+            %input{:type => 'hidden', :name => 'movie_trailer_url', :id => 'movie_trailer_url', :value => ''}
+
+            %input{:type => 'hidden', :name => 'next_movie_released', :id => 'next_movie_released', :value => ''}
+            %input{:type => 'hidden', :name => 'next_movie_id', :id => 'next_movie_id', :value => ''}
+            %input{:type => 'hidden', :name => 'next_movie_title', :id => 'next_movie_title', :value => ''}
+            %input{:type => 'hidden', :name => 'next_movie_cast', :id => 'next_movie_cast', :value => ''}
+            %input{:type => 'hidden', :name => 'next_movie_image', :id => 'next_movie_image', :value => ''}
+            %input{:type => 'hidden', :name => 'next_movie_story', :id => 'next_movie_story', :value => ''}
+            %input{:type => 'hidden', :name => 'next_movie_add_info', :id => 'next_movie_add_info', :value => ''}
+            %input{:type => 'hidden', :name => 'next_movie_link', :id => 'next_movie_link', :value => ''}
+            %input{:type => 'hidden', :name => 'next_movie_trailer_url', :id => 'next_movie_trailer_url', :value => ''}
+            %input{:type => 'hidden', :name => 'next_movie_trailer_title', :id => 'next_movie_trailer_title', :value => ''}
+
+      .clearfix
+        &nbsp;
+      .row-fluid.pagination-centered
+        %input{:type => 'hidden', :name => 'movie_id', :id => 'movie_id', :value => ''}
+        %input{:type => 'hidden', :name => 'user_id', :id => 'user_id', :value => "#{current_user.id}"}
+        %input{:type => 'hidden', :name => 'movie_released', :id => 'movie_released', :value => ''}
+
+        = link_to "<i class='icon-ok' style='padding-top: 5px;'></i> Have Seen".html_safe, "#seen" , :class => 'btn btn-extra-large btn-seen btn-primary tip_hint',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('seen','all')
+
+        = link_to "<i class='icon-plus' style='padding-top: 5px;'></i> Wanna see".html_safe, "#wannasee" , :class => 'btn btn-extra-large btn-wanna-see btn-primary tip_hint',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('wanna_see','all'),:style=>'margin-left:15px;'
+        = link_to "<i class='icon-chevron-right' style='padding-top: 5px;'></i> Pass".html_safe, "#pass" , :class => 'btn btn-extra-large btn-pass tip_hint',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('pass','home_page'),:style=>'margin-left:15px;'
+        = link_to "Learn more", "#", :id => "movie_link", :style=>"display:none;"
+      #learn_more_panel{:class=>"learn_more_panel"}
+    %div{:style=>"padding-bottom:20px;font-size:20px;float:left;font-weight:bold;"}
+      Find Manually
+    .clear
+    #filter_available
+      =render "shared/filter_available"
+= subscribe_to "/home/index"
+
+:javascript
+  var ac_type = "show";
+  var sel_lang = "'English',";
+  function play_trailer(videourl,movie_name){
+    $("#myModalLabel").html(movie_name+" Trailer");
+    if (videourl == "") {
+      return false;
+    }
+    $('#video_player').remove();
+    var $video = $('<a />', {
+      href: videourl,
+      id: 'video_player',
+      style: 'display:block;height:290px;width:610px;'
+    });
+    $('#myTrailer .modal-body').append($video);
+    $('#myTrailer').modal("show");
+    flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+  }
+  function hide_top_movies(){
+    $("#discover_box").show();
+    //$("#top_movies").hide();
+    $("#filter_available").hide();
+  }
+
+  function hide_filter_available(){
+    $("#discover_box").show();
+    $("#filter_available").hide();
+  }
+  
+  /*function show_top_movies(){
+    $("#discover_box").hide();
+    $("#filter_available").show();
+  }*/
+
+  function filter_topmovies(){
+    var year = $("#year").val();
+    var genre = $("#genre").val();
+    var cast_id = $("#cast_id").val();
+    var language = $("#sel_lang").val();
+    var url = "/filter_top_movies";
+    $.post(url,{year:year,genre:genre,cast_id:cast_id,language:language},function(res){
+      if(res != ""){
+        $("#search_res").html(res);
+      }else{
+        $("#search_res").html("No result found. Please refine your search.")
+      }
+    });
+  }
+  function clear_cast_field(){
+    $("#cast").val("");
+    $("#cast_id").val("");
+    $("#cast_clear").hide();
+    filter_topmovies();
+  }
+
+  function show_lang_dropmenu(){
+    $("#lang_drop").toggle();
+  }
+
+  function setLanguage(elm){
+    var lang_checked = $(elm).val();
+    if (elm.checked){
+      sel_lang  = sel_lang +"'"+ lang_checked+"',";
+    }else{
+      sel_lang  = sel_lang.replace("'"+lang_checked+"',","");
+    }
+    $("#sel_lang").val(sel_lang);
+    $("#lang_drop").hide();
+    filter_topmovies();
+  }
+
+  function fetch_more_content(){
+    var learn_more_content = $("#more_info").html();
+    if(learn_more_content == ""){
+      var movie_id = $("#movie_id").val();
+      _gaq.push(['_trackEvent', 'Discovery block', 'Learn more', movie_id]);
+      $.post("/movies/fetch_more",{movie_id:movie_id},function(res){
+        $("#more_info").html(res)
+        open_more_info();
+      });
+    }else{
+      open_more_info();
+    }
+  }
+  function open_more_info(){
+    var showoptions = {"direction" : "right","mode" : "show"};
+    var hideoptions = {"direction" : "right","mode" : "hide"};
+    if(ac_type == "show"){
+      ac_type = "hide";
+      $("#more_info").show("slow");
+      $("#more_info").animate({width:"488px"}, 1000);
+    }else{
+      ac_type="show";
+      $("#more_info").animate({width:"0px"},1000);
+      $("#more_info").hide("slow");
+    }
+  }
+
+  function close_more_info(){
+    ac_type="show";
+    var hideoptions = {"direction" : "right","mode" : "hide"};
+    $("#more_info").animate({width:"0px"},1000);
+    $("#more_info").hide("slow");
+  }
+
+  $(function() {
+    fetch_movie_lists("#{VIDEO_URL}");
+  });
+  
+  function fetch_movie_lists(VIDEO_URL){
+    var movie_list_content = $("#movie_lists").html();
+    if(movie_list_content == ""){
+      $("#movie_lists").load("/fetch_movie_lists");
+    }
+    var map = {};
+    $(".go_back").click( function () {
+      $(this).parent().parent().hide();               
+      $("#discover_box").children().first().show(); 
+    }); 
+    $('#cast').typeahead({
+      minLength:2,
+      source: function (query,process) {
+        $.get("/fetch_cast_crew", { term: query }, function (data) {
+           var celebs = [];
+           $.each(data, function (i, celeb) {
+            map[celeb.label] = celeb;
+            celebs.push(celeb.label);
+           });
+           $(".typeahead").css("width","165px");
+           return process(celebs);
+        });
+      },
+      updater: function(item){
+        var id = map[item].id;
+        $("#cast_id").val(id);
+        $("#cast_clear").show();
+        filter_topmovies();
+        return item;
+      }
+
+    });
+
+    //passIT(true);
+    /*$(".btn_view_trailer").live("click", function(){
+      var movie_name = $("#movie_name").html();
+      $('#DiscTrailerLabel').html(movie_name+" Trailer");
+      videourl = $(this).attr('data-id');
+      if (videourl == "") {
+        return false;
+      }
+      $('#video_player_discv').remove();
+      var $video = $('<a />', {
+        href: videourl,
+        id: 'video_player_discv',
+        style: 'display:block;height:290px;width:610px;'
+      });
+      $('#myModal .modal-body').append($video);
+      $('#myModal').modal("show");
+      flowplayer("video_player_discv", {src:VIDEO_URL+"/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+    });*/
+    $(".btn_view_trailer").live("click", function(){
+      play_discover_trailer("#{VIDEO_URL}")
+    });
+  }
+  //flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+
+/.row-fluid
+/  .discover{:style => 'position:relative'}
+/    #movie_lists{:style=>"min-height:500px;margin-left:10px;"}

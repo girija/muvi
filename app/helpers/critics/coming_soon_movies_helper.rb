@@ -1,0 +1,3 @@
+module Critics::ComingSoonMoviesHelper
+end
+

@@ -1,0 +1,72 @@
+-unless @current_movie.blank?
+  .span5{:style=>"margin-left:-1px;margin-top:-1px;"}
+    = image_tag "#{POSTER_URL + @current_movie.banner_image}", :id => "movie_image", :style => "height:300px;width:210px;"
+
+  .span7{:style=>"margin-left:-80px;width:65%;"}
+
+    %div{:id => 'movie_name', :style => "display:none"}
+      = @current_movie.name
+
+    %div{:id => 'movie_name_link',:style=>"font-size:35px;font-weight:bold;color:#494949;padding-top:20px;line-height:34px;"}
+      %a{:href => "/movies/#{@current_movie.permalink}"}
+        = @current_movie.name
+
+    %div{:id => 'movie_cast',:style=>"font-size:15px;color:#5f5f5f;padding-top:10px;"}
+      = @current_movie.get_first_two_actors_link.strip.html_safe
+
+    %div{:style=>"padding-top:10px;"}
+      .left{:style => "width: 30px"}
+        =image_tag("play_icon_discv.png",:class=>"play_icon")
+      .left
+        =link_to "Watch the trailer", "#myModal" , :style => 'font-size:20px;color:#389ed8;', "data-toggle" => "modal", "role" => "button", :class => 'btn_view_trailer',"data-id" => ""
+
+    .clear{:style=>"height:10px;"}
+    %div{:id => "movie_story", :style => 'display:block;color:#707070;font-size:15px;'}
+      =@current_movie.story.truncate(300).strip if @current_movie.story
+    -if !@current_movie.additional_info.blank?
+      %div{:id => "movie_add_info", :style => 'display:block;background-color:#f7f7f7;color:#707070;font-size:15px;padding:10px;'}
+        = @current_movie.additional_info.truncate(300)
+
+    .clearfix{:style => 'height:5px'}
+
+  -unless @videos.blank? and @videos.nil?
+    :javascript
+      $(".play_icon").show();
+      $(".btn_view_trailer").show();
+      $(".btn_view_trailer").attr({"data-id" : "#{VIDEO_URL}/system/trailers/#{@videos.id}/original/#{@videos.trailer_file_name.to_s}"});
+      $("#video_player").attr({href : "#{VIDEO_URL}/system/trailers/#{@videos.id}/original/#{@videos.trailer_file_name.to_s}"});
+
+  -else
+    :javascript
+      $(".play_icon").hide();
+      $(".btn_view_trailer").hide();
+      $(".btn_view_trailer").attr({"data-id" : ""});
+  
+
+  :javascript
+    $("#movie_id").val("#{@current_movie.id}");
+    $("#movie_released").val("#{@current_movie.release_date}");
+    $("#movie_link").val("/movies/#{@current_movie.permalink}");
+    $("#movie_link").attr({href : "/movies/#{@current_movie.permalink}"});
+
+    var rel_dt = $("#movie_released").val();
+    var release_dt = new Date(rel_dt);
+    var today = new Date();
+	
+    if(rel_dt == ""){
+      $(".btn-seen").addClass("btn-dis");
+      $(".btn-seen").removeClass("btn-primary");
+    }
+    else if(today < release_dt){
+      $(".btn-seen").addClass("btn-dis");
+      $(".btn-seen").removeClass("btn-primary");
+    }
+    else{
+      $(".btn-seen").addClass("btn-primary");
+    }
+  
+    $("#movie_block").fadeTo(2000,1,function(){
+      enableButtons();
+    });
+
+

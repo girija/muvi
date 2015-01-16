@@ -1,0 +1,23 @@
+- @user_movies.each do |m|
+  -movie = m.movie
+  .gradient_class{:style => "padding:5px; font-size:12px; background-color: #F9F9F9; float:left; width:340px;margin-right:10px; margin-bottom:10px; height:120px;"}
+    %a{:class => "pull-left"}
+      %img{:src => "#{POSTER_URL}#{movie.banner_image}", :alt => '', :class => "image_class"}
+
+    .media-body{:style => "height:90px; overflow: hidden;"}
+      %h5{:class => "media-heading"}
+        = link_to movie.name.truncate(25), movie_path(movie)
+      &nbsp;
+      -begin
+        =movie.get_first_two_actors_link_gray.html_safe
+      -rescue
+        &nbsp;
+      %br
+      .clear
+      %div{:style => "float:right;margin-top:8px;"}
+        = render :partial => "reviews/new_form" , :locals => { :movie => movie}
+        /, :locals => { :from => from, :movie => movie, :review => ((from == 'movies')? false : true) }
+
+:javascript
+  $(".btn-primary").removeClass("bold_class");
+

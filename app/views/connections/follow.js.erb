@@ -1,0 +1,12 @@
+if("<%=params[:homepage_commit]%>" == ""){
+  $("#follow_form").attr("action","/connections/unfollow");
+  $('#follow_div').dialog('destroy');
+  $('#follow_div').html('<div class="actions left"><div class="gradient-input-button3 ui-corner-all" style="width:110px"><div class="gradient-input-button3 ui-corner-all"><input type="submit" value="Following" name="commit" class="label" style="background: url(\'/images/tick_mark.png\') no-repeat scroll 7px center transparent; padding-left: 17px;" onmouseout="$(this).val(\'Following\');$(this).css(\'background\',\'url(/images/tick_mark.png) no-repeat scroll 7px center transparent\');$(this).css(\'padding-left\',\'17px\')" onmouseover="$(this).val(\'Unfollow\');$(this).css(\'background\',\'none\');$(this).css(\'padding-left\',\'5px\')"></div></div></div>');
+
+  window.location.href = window.location;
+}
+else{
+  $("#follow_form").attr("action","/connections/unfollow");
+  $('#follow_div').dialog('destroy');
+  $('#follow_div').html('<div class="actions left"><div class="orange-gradient-input-button ui-corner-all"><div class="orange-gradient-input-button ui-corner-all"><input type="submit" value="Unfollow" name="homepage_commit" class="label"></div></div></div>');
+}

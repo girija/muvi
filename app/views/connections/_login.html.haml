@@ -1,0 +1,34 @@
+.login
+  .heading
+    .heading_label{:style=>"display: none;"} You need to login to view activity
+  #message
+  - @user = User.new
+  = form_for(@user,  :url => session_path(@user), :remote => true) do |f|
+    %fieldset.registration
+    .field
+      = f.label :email, 'Email Address'
+      = f.email_field :email
+    .clear
+    .field
+      = f.label :password
+      = f.password_field :password
+    .clear
+    %hr
+    .left.forgot_password
+      = link_to "Not a user?", "javascript:swapMe();open_window();" , :style=>"color: #5d92ab; font-size: 14px !important; font-weight: normal; text-shadow: none; text-decoration: underline;"
+    .actions.mid_btn.right
+      .right
+        = image_submit_tag('/images/login_btn.png')
+  .clear
+:javascript
+  $(document).ready(function() {
+    $("#new_user").submit(function(){
+        if(jQuery.trim($("#user_email").val()) == "" || jQuery.trim($("#user_password").val()) == ""){
+            $('#login > .login > .heading > div.heading_label').html('Oh Beep! something went wrong please try again.').show();
+            return false;
+        }else{
+            return true;
+        }
+    });
+  });
+

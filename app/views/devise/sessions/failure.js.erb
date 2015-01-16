@@ -1,0 +1,16 @@
+$('#message').html("<p><%= flash[:alert] %> </p>");
+$('#message').css("z-index", "3000");
+$('#message').css("color", "red");
+$('#message').css("display", "inline");
+$('#message').css("background", "none");
+
+//$('#errors').hide();
+$('#errors').css("color", "red");
+$('#errors').html("<p><%= flash[:alert] %> </p>");
+
+$("#user_submit").removeAttr("disabled");
+$("#user_submit").removeAttr("style");
+$("#user_submit").val("Login");
+
+$(".buffer-signin").show('shake', 55);
+//$("#errors").html("");

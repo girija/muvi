@@ -1,0 +1,23 @@
+%h1.heading Edit News
+.form
+  = form_for(@news, :url => "/admin/news/#{@news.id}") do |f|
+    -feed = Feed.find_by_id(@news.id)
+    #news_div{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:10px 2px; font-size:12px"}
+      .left
+        = f.label :entry_title, "News Title"
+        = f.text_field :entry_title ,:class => 'large'
+      .clear
+      = f.label :tag_list, 'Tag List'
+      = f.text_field :tag_list ,:class => 'large', :value => "#{feed.tags.collect {|t| t.name }.join(", ")}"
+      .clear
+      =f.label :rank, 'Rank'
+      = f.text_field :rank
+    %hr
+    .actions
+      = f.submit 'Save'
+      \- or -
+      = link_to 'Cancel', '/admin/news/'
+
+  .clear
+
+

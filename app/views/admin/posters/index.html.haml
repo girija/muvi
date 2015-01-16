@@ -1,0 +1,114 @@
+= form_tag admin_posters_path, :method => :get do
+  Search by tag
+  %input{:type => "text", :name => "search_tag", :value => "#{params[:search_tag]}"}
+
+  = submit_tag "Search"
+
+%h3
+  New Video
+=render :partial => "form"
+
+%table
+  %tr
+    %th{:align => "left"} Poster Name
+    %th{:align => "left"} Tags
+    %th{:align => "left"}Poster
+    %th{:align => "left"}Cropped
+    %th{:align => "left"}Rank
+    %th{:align => "left"} Actions
+    -unless @all_posters.blank?
+      -@all_posters.each do |poster|
+        %tr
+          %td= poster.name
+          %td= poster.tags.collect {|t| t.name }.join(", ")
+          %td
+            -unless poster.poster_file_name.blank?
+              <img class = 'lazy' alt='#{poster.poster_file_name}' height='35' src='/images/grey.gif' data-original='/system/posters/#{poster.id}/thumb/#{poster.poster_file_name}' width='35' />
+          %td
+            -unless poster.poster_file_name.blank?
+              <img class = 'lazy' alt='#{poster.poster_file_name}' height='76' src='/images/grey.gif' data-original='/system/posters/#{poster.id}/crop_thumb/#{poster.poster_file_name}' width='76' />
+          %td= poster.rank
+          %td
+            = link_to "Edit", edit_admin_poster_path(poster)
+            |
+            = link_to "Delete", "/admin/posters/#{poster.id}/delete", :confirm => 'Are you sure?'
+      /= will_paginate @all_posters
+      - adjacents = 3
+      - page = params[:page].blank? ? 1 : params[:page].to_i
+      - prev_page = page - 1
+      - next_page = page + 1
+      - lastpage = @poster_count/100.to_f
+      - lastpage = lastpage.ceil
+      - lpm1 = lastpage - 1
+      - pagination = ""
+      - if lastpage > 1
+        - pagination = "#{pagination} <div class='pagination'>"      
+        - if page > 1
+          - pagination = "#{pagination}<a href='?page=#{prev_page}'> &lt; previous </a>"
+        - else
+          - pagination = "#{pagination}<span class='disabled'> &lt; previous</span>"
+        
+        - if (lastpage < 7 + (adjacents * 2))
+          - counter = 1
+          - while (counter <= lastpage)
+            - if (counter == page)
+              - pagination = "#{pagination}<span class='current'>#{counter}</span>"
+            - else
+              -pagination = "#{pagination}<a href='?page=#{counter}'>#{counter}</a>"
+            - counter = counter+ 1
+
+        - elsif (lastpage > 5 + (adjacents * 2))
+          - if (page < 1 + (adjacents * 2))
+            - counter = 1
+            - while (counter <= 4 + (adjacents * 2))
+              - if (counter == page)
+                - pagination = "#{pagination}<span class='current'>#{counter}</span>"
+              - else
+                -pagination = "#{pagination}<a href='?page=#{counter}'>#{counter}</a>"
+              - counter = counter+ 1
+
+            - pagination = "#{pagination}...";
+            - pagination = "#{pagination}<a href='?page=#{lpm1}'>#{lpm1}</a>"
+            - pagination = "#{pagination}<a href='?page=#{lastpage}'>#{lastpage}</a>"
+          - elsif (lastpage - (adjacents * 2) > page && page > (adjacents * 2))
+            - pagination = "#{pagination}<a href='?page=1'>1</a>"
+            - pagination = "#{pagination}<a href='?page=2'>2</a>"
+            - pagination = "#{pagination}..."
+            - counter = page - adjacents
+            - while (counter <= page + adjacents)
+              - if counter == page
+                - pagination = "#{pagination}<span class='current'>#{counter}</span>"
+              - else
+                - pagination = "#{pagination}<a href='?page=#{counter}'>#{counter}</a>" 
+              - counter = counter + 1
+            - pagination = "#{pagination}..."
+            - pagination = "#{pagination}<a href='?page=#{lpm1}'>#{lpm1}</a>"
+            - pagination = "#{pagination}<a href='?page=#{lastpage}'>#{lastpage}</a>";
+          - else
+            - pagination = "#{pagination}<a href='?page=1'>1</a>"
+            - pagination = "#{pagination}<a href='?page=2'>2</a>"
+            - pagination = "#{pagination}..."
+            - counter = lastpage - (2 + adjacents*2)
+            - while (counter <= lastpage)
+              - if counter == page
+                - pagination = "#{pagination}<span class='current'>#{counter}</span>"
+              - else
+                - pagination = "#{pagination}<a href='?page=#{counter}'>#{counter}</a>"
+              - counter = counter + 1
+        - if page < counter-1
+          - pagination = "#{pagination}<a href='?page=#{next_page}'> next &gt; </a>"
+        - else
+          - pagination = "#{pagination}<span class='disabled'> next &gt; </span>"
+ 
+        - pagination = "#{pagination} </div>"
+      = pagination.html_safe 
+    -else
+      %tr
+        %td{:colspan => 4}
+          %p Sorry there is no posters
+
+
+:javascript
+   $(function() {
+     $("img").lazyload();
+   }); 

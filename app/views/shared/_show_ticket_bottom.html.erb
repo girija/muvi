@@ -1,0 +1,70 @@
+<STYLE>
+	.close {
+		position:absolute; 
+		margin-left: 152px;
+		text-align:right;
+		z-index:3500;
+	}
+	.sticky_d {
+		background-color: #EBEBEB;
+		bottom: 0;
+		box-shadow: 1px 1px 7px #676767;
+		margin-left: 87.2%;
+		left: 0;
+		position: fixed;
+		z-index: 3000;
+	}
+</STYLE>
+
+<script>
+	function show_ticket(){
+	  $("#notify").show();
+	  //$("#notify").css("height", "0px");
+	  //$("#notify").animate({height:'345px'},1000).children('p').animate({opacity:1},500);
+	}
+
+ 
+	$(document).ready(function() {		
+	  setTimeout("show_ticket()", 10000);          
+          $(".pt-gw-sidebar").css("cursor", "pointer");
+          $(".pt-gw-sidebar").click(function(){
+            window.location.href = "http://www.muvi.com/user_signup#widget";
+          })
+	});
+	
+</script>
+ 
+
+<div id="notify" class="notification sticky_d visible" style="margin-top: 0px; height:362px;">
+	<a href="javascript:" class="close" onclick="$('#notify').animate({height:'0px'},1000).children('p').animate({opacity:0},500);">
+		<img src="/images/icon-close.png">
+	</a>
+	<div id="ticket">
+	  <!--script src="//www.punchtab.com/mast/9038/giveaway_widget.js"></script-->
+
+          <div style="width: 170px; font-family: 'Open Sans', sans-serif; font-size: 14px; border: 1px solid #DDD; border-radius: 5px; margin: 0 auto;">
+            <div class="pt-gw-sidebar" style="font-weight: bold; position: relative;">
+              <div class="pt-gw-title" style="color: #fff; overflow: hidden; clear: both; border-top-left-radius: 5px; border-top-right-radius: 5px;background: url(//static.punchtab.com/nd/images/logo-18.png) no-repeat; background-position: 10px 0; background-color: #434343; padding: 5px 0; min-height: 22px; width: 100%;">
+                <div class="inner" style="text-align: center; float: left; margin: 0 30px;">
+                    FREE Tickets to The Bourne Legacy
+                </div>
+              </div>
+          </div>
+          <div class="pt-gw-content" style="clear: both; overflow: hidden; position: relative;">
+        
+              <div class="pt-gw-image" style="margin: auto; margin-top:10px; width: 100px; height: 160px;">
+                  <img src="http://muvi.com/images/ticket_cropped.jpg" alt="FREE Tickets to The Bourne Legacy" title="FREE Tickets to The Bourne Legacy"/>
+              </div>
+              <div style="clear: both;"></div>
+        
+              <div class="pt-gw-description" style="text-align:center;margin-top:10px;">
+                  Like or follow us on Facebook and Twitter & enroll to win 2 free tickets. More points u collect, higher are ur chances.
+              </div>
+          </div>
+          <div class="pt-gw-enter_now" style="margin: 10px auto 5px; min-height: 28px; width: 100%; background: none; border: none; box-shadow: none; padding: 0;">
+             <a href="http://www.muvi.com/user_signup" style="text-decoration: none; background: #2F9AB5; background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2F9AB5), color-stop(50%,#2F9AB5), color-stop(51%,#267B91), color-stop(100%,#267B91)); filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2f9ab5', endColorstr='#267b91',GradientType=0 ); margin: auto !important; color: white !important; border-radius: 5px !important; border: none !important; font-family: cabin,sans-serif !important; display: block !important; font-weight: bold !important; padding: 5px 15px; padding: 5px 15px; width: 75px; font-size: 15px !important; cursor: pointer;">Enter Now</a>
+          </div>
+        </div>
+    </div>
+</div>
+

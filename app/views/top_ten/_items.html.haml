@@ -1,0 +1,15 @@
+- 5.times do |n|
+  - if n < 5
+    - style = 'dislay:block'
+  - else
+    - style = 'display:none'
+  .row{:style => style}
+    .name.left
+      = text_field_tag "item_#{n+1}",'' ,:style => 'width:339px' ,:placeholder => 'Enter the name of movie or celebrity'
+      = hidden_field_tag "id_item_#{n+1}" , 0, :name => 'id_item[]'
+      .clear
+      %textarea{:id => "note_#{n+1}",:name => "note[]", :rows => 1, :cols => 40, :style => "height:20px;margin-left:0px", :placeholder => 'Add a note saying why do you like'}
+    %div.image.left{:id => "img_item_#{n+1}", :style => 'margin-left:5px;margin-top:1px;'}
+      = image_tag("/images/no-image.png", :size => "45x45")
+    = link_to image_tag("/images/cross.png", :style => 'float:right'),"#" , :class=>'removeBox' 
+    .clear

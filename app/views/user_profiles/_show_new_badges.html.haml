@@ -1,0 +1,55 @@
+- unless @ub.blank?
+  .badge_scroll
+    %ul
+      - @badges = ActiveSupport::JSON.decode(@ub['badge_points'])
+      %li
+        - if @badges["movie"].to_i < 5 and @badges['movie'].to_i >= 1
+          .bronze_badge.muvi_badge.tooltiptop.left
+            = image_tag("Bronze_badge.png", :width => 120)
+            .tooltip_description{:style => 'display:none',:title => "Muvi Scraper"}
+              Win points by doing activities and get 'Muvi Junkie' badge
+        - elsif @badges["movie"].to_i < 10 and @badges["movie"].to_i >= 5
+          .silver_badge.muvi_badge.tooltiptop.left
+            = image_tag("Silver_badge.png", :width => 120)
+            .tooltip_description{:style => 'display:none', :title => "Muvi Junkie"}
+              Win points by doing activities and get 'Muvi Maniac' badge
+        - elsif @badges["movie"].to_i >= 10
+          .gold_badge.muvi_badge.tooltiptop.left
+            = image_tag("Gold_badge.png", :width => 120)
+            .tooltip_description{:style => 'display:none', :title => "Muvi Maniac"}
+              Win points by doing activities and get more badges
+      - celebs =  @badges["celeb"]
+      - unless celebs.nil?
+        - celebs.each do |celeb|
+          - star = Celebrity.find_by_id(celeb['id'])
+          - unless star.blank?
+            %li
+              - if celeb['points'].to_i >= 1  and celeb['points'].to_i < 3
+                .muvi_badge.tooltiptop{:style => 'float:left;width:120px; height:120px;padding:2px; margin-right:5px;position:relative;'}
+                  = image_tag('/images/Celeb_Bronze.png', :style => "position: absolute; z-index: 1;")
+                  .left{:class => "badge", :style => "position: absolute; z-index:0;background: url('#{star.image}')"}
+                  .tooltip_description{:style => 'display:none', :title => "Fan of #{star.name}"}
+                    = "Rate 2 movies of #{star.name} to get the 'Super Fan of #{star.name}' badge."
+              - elsif celeb['points'].to_i >= 3 and celeb['points'].to_i < 5
+                .muvi_badge.tooltiptop{:style => 'float:left;width:120px; height:120px;padding:2px; margin-right:5px;position:relative;'}
+                  = image_tag('/images/Celeb_Silver.png', :style => "position: absolute; z-index: 1;")
+                  .left{:class => "badge", :style => "position: absolute; z-index:0;background: url('#{star.image}')"}
+                  .tooltip_description{:style => 'display:none', :title => "Super Fan of #{star.name}"}
+                    = "Rate 2 movies of #{star.name} to get the 'Mega Fan of #{star.name}' badge."
+              - elsif celeb['points'].to_i >= 5
+                .muvi_badge.tooltiptop{:style => 'float:left;width:120px; height:120px;padding:2px; margin-right:5px;position:relative;'}
+                  = image_tag('/images/Celeb_Gold.png', :style => "position: absolute; z-index: 1;")
+                  .left{:class => "badge", :style => "position: absolute; z-index:0;background: url('#{star.image}')"}
+                  .tooltip_description{:style => 'display:none', :title => "Mega Fan of #{star.name}"}
+                    = "Rate movies of #{star.name} to get more badge."
+
+:javascript
+  $(function() {
+    $(".badge_scroll").jCarouselLite({
+      btnNext: ".badge_next",
+      btnPrev: ".badge_prev",
+      visible: 8,
+      mouseWheel: true,
+      circular: false
+    });
+  });

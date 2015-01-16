@@ -1,0 +1,13 @@
+-for i in 0..2
+  %input{:type => "text", :id => "celebrity_tweet_item_#{i}", :name => "celebrity_tweet_item[]" ,:placeholder => 'Enter the name of celebrity', :style => "margin-right:5px"}
+  = hidden_field_tag "id_celebrity_tweet_item_#{i}" , 0, :name => 'celebrity_tweet_id[]'
+
+-unless @celebrity_tweet.blank?
+  -ct = 0
+  -@celebrity_tweet.each do |cel|
+    -celeb = Celebrity.find_by_id(cel.subject_id)
+    %script
+      $("#celebrity_tweet_item_#{ct}").val("#{celeb.name}");
+      $("#id_celebrity_tweet_item_#{ct}").val("#{cel.subject_id}");
+    -ct = ct + 1
+

@@ -1,0 +1,5 @@
+<% unless params[:from].blank? %>
+  <iframe src="/show_cropbox?from=1" name="crop_frame" width="97%" height="380px" id="crop_frame" style="border:1px solid #DFDFDF;"></iframe>
+<% else %>
+  <iframe src="/show_cropbox" name="crop_frame" width="97%" height="600px" id="crop_frame" style="border:1px solid #DFDFDF;"></iframe>
+<% end %>

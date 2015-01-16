@@ -1,0 +1,24 @@
+.critics_review
+  %div.col_one
+    = ff.label :film_critic_id, ""
+    - critics_name = ff.object.film_critic ? ff.object.film_critic.name : ""
+    = ff.hidden_field :film_critic_id
+    %input{:type=>"text",:name=>"critics_name[]", :autocomplete=>"off", :role=>"textbox", "aria-autocomplete"=>"list", "aria-haspopup"=>"true", :style => "width:150px", :value => "#{critics_name}"}
+    /= text_field_tag "critics_name_#{@counter}", critics_name, :class => "critics_name"
+    /= ff.hidden_field :film_critic_id,:id=>"critics_id_#{@counter}"
+  %div.col_two
+    = ff.label :rating, "Review Stars"
+    = ff.select :rating, options_for_select([ ['0', '0.0'], ['0.5', '0.5'], ['1', '1.0'], ['1.5', '1.5'], ['2','2.0'], ['2.5','2.5'], ['3','3.0'], ['3.5','3.5'], ['4','4.0'], ['4.5','4.5'], ['5','5.0']], ff.object.rating)
+  %div.col_three
+    = ff.label :link, "Link To Review"
+    = ff.text_field :link
+  .clear
+  .large_text.left
+    = ff.label :summary, "Review Text"
+    = ff.text_area :summary
+  .left.review_text_delete
+    %span.delete
+      = link_to_remove_fields "Delete Review", ff
+  %br
+.clear
+

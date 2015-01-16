@@ -1,0 +1,6 @@
+<% if params[:block] == "inside"%>
+  $("#critics_review_block").html("");
+  $("#critics_review_block").html("<%= escape_javascript(render '/shared/show_review_news',:type=>"critics_reviews") %>");
+<% else %>
+  $("#critics_reviews").html("<%= escape_javascript(render '/shared/critics_reviews') %>");
+<% end %>

@@ -1,0 +1,14 @@
+<% if resource.errors.empty?  %>
+ $('#errors').html("").hide();
+ $('#message').html("You will receive an email with reset password instructions in a while.<div class='clear'></div>").show().css({"display": "inline-block"});
+
+ $('#message').css("float", "none");
+ $('#message').css("background", "none");
+ $('#message').css("display", "inline");
+
+ $('#user_email').val('');
+ <%else%>
+ <% messages = resource.errors.full_messages.map { |msg| content_tag(:p, msg) }.join %>
+  $('#errors').html("<%= messages.html_safe %>").show();
+ <%end%>
+

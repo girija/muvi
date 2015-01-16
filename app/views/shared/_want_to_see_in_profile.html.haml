@@ -1,0 +1,11 @@
+-unless user_movie.blank?
+  - count = 0  
+  -user_movie.each do |want|
+    -movie = Movie.find_by_id(want.movie_id)
+    -unless movie.blank?
+      .profile_fan_div.left
+        =link_to image_tag(movie.banner_image, :width => 80, :height => 114), movie_path(movie)
+        .clear
+        =link_to movie.name, movie_path(movie)
+        .clear
+.clear{:style => "height:20px"}

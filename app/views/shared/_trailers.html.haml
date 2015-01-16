@@ -1,0 +1,43 @@
+-default_trailer = get_default_trailer(movie_id)
+-if default_trailer != false
+  /-video = Video.find_by_id(default_trailer,:conditions => ["rank = 1"])
+  -video = Video.where("id IN (#{default_trailer})").find(:all,:conditions => ["rank = 1"]).first
+  -unless video.blank?
+    %script
+      $("#video_div_#{movie_id}").css("visibility", "visible")
+    -if video.video_remote_url == ""
+      %div{:style => 'cursor:pointer;font-weight:bold', :onclick => "javascript:show_video(#{video.id}, 'movie', '#{movie_permalink}');", :id => "video#{video.id}"}
+        View Trailer
+    -else
+      -video_id_arr = video.video_remote_url.split("/")
+      -video_id = video_id_arr[video_id_arr.size.to_i - 1]
+      %div{:style => 'cursor:pointer;font-weight:bold', :onclick => "javascript:show_video(#{video.id}, 'movie', '#{movie_permalink}');", :id => "video#{video.id}"}
+        View Trailer
+-if default_trailer == false
+  .video_div{:style => "visibility:hidden"}
+
+:javascript
+  function show_video(video_id, object_type, object_id){
+     $.fancybox({
+       'type' : 'ajax',
+       'centerOnScroll' : true,
+       'opacity' : true,
+       'hideOnOverlayClick' :true,
+       'overlayOpacity' : 1,
+       'overlayColor' : '#0e0e0e',
+       'showCloseButton': false,
+       'autoScale' : true,
+       'padding' : 0,
+       'transitionIn': 'elastic',
+       'transitionOut': 'elastic',
+       'onClosed' : function(){
+         $("body").css("overflow", "auto");
+       },
+       'onComplete': function() {
+         $("#fancybox-wrap").css({'top':'10px', 'bottom':'auto'});
+       },
+       'href': "/videos/"+object_type+"/"+object_id+"/"+video_id
+    });
+
+  }
+

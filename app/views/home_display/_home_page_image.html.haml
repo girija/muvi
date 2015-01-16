@@ -1,0 +1,260 @@
+-unless options["mouseover"].blank?
+  -permalink = options["mouseover"][0]["path"].split("/")
+
+-if !options["path"].blank? and options["type"] != "news"
+  %a{:href => "#{options["path"]}"}
+    /=image_tag("#{options["images"]["url"]}", :style => "width:#{img_width}; height:#{img_height}; margin:5px;")
+    =image_tag("#{options["images"]["url"]}", :style => "width:#{box_img_width}; height:#{box_img_height}; margin:6px;")
+
+-else
+  / NEWS STARTS
+  -if options["type"] == "news"
+    .left{:style => "margin-left:5px; margin-top:25px;"}
+      %b
+        =link_to(options["title"], "#{options["path"]}", :style => "color:#404447; font-size:13px; text-decoration:none")
+    .clear{:style => "height:10px"}
+    %div{:style => "width:170px; margin:5px 5px 0px;"}
+      -unless options["summary"].blank?
+        =options["summary"].gsub(/<\/?[^>]+>/, '')
+
+  -elsif options["type"] == "celebtweet"
+    %div{:style => "width:#{img_width}; margin:5px;"}
+      -unless options["summary"].blank?
+        =options["summary"].slice!(0,150)
+      -else
+        =options["summary"]
+
+  -elsif options["type"] == "video" or options["type"] == "poster"
+    -unless permalink.blank?
+      -if permalink[1] == "movies"
+        -url = "movie"
+      -elsif  permalink[1] == "stars"
+        -url = "celeb"
+  
+      -if options["type"] == "video"
+        -type = "videos"
+      -if options["type"] == "poster"
+        -type = "posters"
+
+      /=image_tag("#{options["images"]["url"]}", :onclick => 'play_'"#{url}"'_video("'"#{permalink[2]}"'", "'"#{options["id"]}"'", "'"#{type}"'")', :style => "width:#{img_width}; height:#{img_height}; margin:5px;")
+      -if type == "videos"
+        =image_tag("#{options["images"]["url"]}", :onclick => 'play_'"#{url}"'_video("'"#{permalink[2]}"'", "'"#{options["id"]}"'", "'"#{type}"'")', :style => "width:#{img_width};margin:5px; cursor:pointer")
+      -else
+        =image_tag("#{options["images"]["url"]}", :onclick => 'play_'"#{url}"'_video("'"#{permalink[2]}"'", "'"#{options["id"]}"'", "'"#{type}"'")', :style => "width:#{img_width};margin:5px; cursor:pointer")
+
+      -if options["type"] == "video"
+        -tag = Tagging.where("taggable_type = 'Video' and taggable_id = #{options['id']} and tagger_type = 'trailer'").first
+        -if !options["mouseover"].blank? and tag
+          /-over = options["mouseover"].first
+          -over = []
+          -options["mouseover"].each do |mouse_over|
+            -if mouse_over["path"]  =~ /movies/
+              -over = mouse_over
+              -break
+          -if !over.blank?
+            .left{:class => "mouseover_div", :style => "margin-top:-167px; margin-left:5px;"}
+              %span{:style => "color: #FFFFFF; font-size: 9px; text-transform: capitalize;", :id => "#{options["type"]}_info_span_#{options["id"]}"}
+                =link_to(image_tag("#{over["image"]}", :height => "159px"),"#{over["path"]}")
+    -else
+      /=image_tag("#{options["images"]["url"]}", :style => "width:#{img_width}; height:#{img_height}; margin:5px;")
+      =image_tag("#{options["images"]["url"]}", :style => "width:#{img_width}; margin:5px;")
+
+:javascript
+  function highlight_text(id, type){
+    $("#video_poster_comment_btn_"+id).css("color", "#F66110");
+
+    if(type == "poster" || type == "video"){
+      $("#like_btn_"+id).css("background", 'url("/images/like_icon_o.png") no-repeat scroll 6px 4px transparent');
+      $("#like_text_"+id).css("color", "#F66110");
+ 
+      $("#not_like_btn_"+id).css("background", 'url("/images/dislike_icon_o.png") no-repeat scroll 10px 4px transparent');
+    } 
+    else if(type == "star"){
+      $("#fan_btn_"+id).css("background", 'url("/images/fan_icon_o.png") no-repeat scroll 6px 4px transparent');
+      $("#fan_text_"+id).css("color", "#F66110");
+
+      $("#unfan_text_"+id).css("color", "#F66110");
+    }
+    
+    else if(type == "movie"){
+      $("#seen_btn_"+id).css("background", 'url("/images/seen_icon_o.png") no-repeat scroll 6px 4px transparent');
+      $("#want_btn_"+id).css("background", 'url("/images/wts_icon_o.png") no-repeat scroll 6px 4px transparent');
+
+      $("#seen_text_"+id).css("color", "#F66110");
+      $("#wts_text_"+id).css("color", "#F66110");       
+      $("#not_want_text_"+id).css("color", "#F66110");
+
+      $("#not_seen_btn_"+id).css("background", 'url("/images/notseen_icon_o.png") no-repeat scroll 6px 4px transparent');
+      $("#not_want_btn_"+id).css("background", 'url("/images/nwts_icon_o.png") no-repeat scroll 6px 4px transparent');
+
+      $("#not_seen_text_"+id).css("color", "#F66110");
+    }
+   
+  }
+
+  function remove_highlight_text(id, type){
+    $("#video_poster_comment_btn_"+id).css("color", "#535353");
+
+    if(type == "poster" || type == "video"){
+      if($("#like_btn_"+id).attr('class').indexOf("active") != -1){
+        $("#like_btn_"+id).css("background", 'url("/images/like_icon_b.png") no-repeat scroll 6px 4px #D7D7D7');
+      }else{
+        $("#like_btn_"+id).css("background", 'url("/images/like_icon_b.png") no-repeat scroll 6px 4px transparent');
+      }
+      $("#like_text_"+id).css("color", "#535353");
+
+      if($("#not_like_btn_"+id).attr('class').indexOf("active") != -1){
+        $("#not_like_btn_"+id).css("background", 'url("/images/dislike_icon_b.png") no-repeat scroll 10px 4px #D7D7D7');
+      }else{
+        $("#not_like_btn_"+id).css("background", 'url("/images/dislike_icon_b.png") no-repeat scroll 10px 4px transparent');
+      }
+    }
+    else if(type == "star"){
+      if($("#fan_btn_"+id).attr('class').indexOf("active") != -1){
+        $("#fan_btn_"+id).css("background", 'url("/images/fan_icon_b.png") no-repeat scroll 6px 4px #D7D7D7');
+      }else{
+        $("#fan_btn_"+id).css("background", 'url("/images/fan_icon_b.png") no-repeat scroll 6px 4px transparent');
+      }
+
+      $("#fan_text_"+id).css("color", "#535353");
+      $("#unfan_text_"+id).css("color", "#535353");
+    }
+
+    else if(type == "movie"){
+      try{
+        if($("#seen_btn_"+id).attr('class').indexOf("active") != -1){
+          $("#seen_btn_"+id).css("background", 'url("/images/seen_icon_b.png") no-repeat scroll 6px 4px #D7D7D7');
+        }else{
+          $("#seen_btn_"+id).css("background", 'url("/images/seen_icon_b.png") no-repeat scroll 6px 4px transparent');
+        }
+      }catch(E){}
+
+      try{
+        if($("#want_btn_"+id).attr('class').indexOf("active") != -1){
+          $("#want_btn_"+id).css("background", 'url("/images/wts_icon_b.png") no-repeat scroll 6px 4px #D7D7D7');
+        }else{        
+          $("#want_btn_"+id).css("background", 'url("/images/wts_icon_b.png") no-repeat scroll 6px 4px transparent');
+        }
+      }catch(E){}
+
+      $("#seen_text_"+id).css("color", "#535353");
+      $("#wts_text_"+id).css("color", "#535353");
+      $("#not_want_text_"+id).css("color", "#535353");
+
+
+      try{
+        if($("#not_seen_btn_"+id).attr('class').indexOf("active") != -1){
+          $("#not_seen_btn_"+id).css("background", 'url("/images/notseen_icon_b.png") no-repeat scroll 6px 4px #D7D7D7');
+        }else{        
+          $("#not_seen_btn_"+id).css("background", 'url("/images/notseen_icon_b.png") no-repeat scroll 6px 4px transparent');
+        }
+      }catch(E){}
+
+      try{
+        if($("#not_want_btn_"+id).attr('class').indexOf("active") != -1){
+          $("#not_want_btn_"+id).css("background", 'url("/images/nwts_icon_b.png") no-repeat scroll 6px 4px #D7D7D7');
+        }else{
+          $("#not_want_btn_"+id).css("background", 'url("/images/nwts_icon_b.png") no-repeat scroll 6px 4px transparent');
+        }
+      }catch(E){}
+
+
+      $("#not_seen_text_"+id).css("color", "#535353");
+    }
+
+  }
+  
+  $('.home_item .btn_div_1').hover(function(e) {
+     e.stopPropagation();
+  })
+  $('.home_item .btn_div_2').hover(function(e) {
+     e.stopPropagation();
+  })
+
+  function change_border(type, div, btn, txt, img){
+    $('.home_item .btn_div_1').hover(function(e) {
+      e.stopPropagation();
+    })
+    $('.home_item .btn_div_2').hover(function(e) {
+      e.stopPropagation();
+    })
+
+    //$("#"+div).css("border", "1px solid #AAAAAA");
+    $("#"+btn).css("background", 'url("/images/'+img+'") no-repeat scroll 6px 4px transparent');
+    if(txt != ""){
+      $("#"+txt).css("color", "#F66110");
+    }
+    $("div.tip_hint").tooltip();
+  }
+
+  function change_border_1(type, div, btn, img, id){
+    //$("#"+div).css("border", "1px solid #AAAAAA");
+    if(img == "unfan"){
+      $("#unfan_text_"+id).css("color", "#F66110");
+    }
+    else{
+      if(type == "poster" || type == "video"){
+        $("#"+btn).css("background", 'url("/images/'+img+'") no-repeat scroll 10px 4px transparent');
+      }else{
+        var l = div.indexOf("like_span");
+        var dl = div.indexOf("dislike_span");
+
+        if(type == "movie" && (l != -1 || dl != -1)){
+          $("#"+btn).css("background", 'url("/images/'+img+'") no-repeat scroll 10px 4px transparent');
+        }else{
+          $("#"+btn).css("background", 'url("/images/'+img+'") no-repeat scroll 6px 4px transparent');
+        }
+      }
+    }
+  }
+
+  function remove_border(class_name, div, btn, txt, img){
+    //$("#"+div).css("border", "0px solid #AAAAAA");
+
+    $('.home_item .btn_div_1').hover(function(e) {
+      e.stopPropagation();
+    })
+    $('.home_item .btn_div_2').hover(function(e) {
+      e.stopPropagation();
+    })
+
+    if(class_name.indexOf("active") != -1){
+      $("#"+btn).css("background", 'url("/images/'+img+'") no-repeat scroll 6px 4px #D7D7D7');
+    }
+    else{
+      $("#"+btn).css("background", 'url("/images/'+img+'") no-repeat scroll 6px 4px transparent');
+    }  
+    if(txt != ""){
+      $("#"+txt).css("color", "#535353");
+    }
+  }
+  
+  function remove_border_1(class_name, div, btn, img, id){
+    //$("#"+div).css("border", "0px solid #AAAAAA");
+    if(img == "unfan"){
+      $("#unfan_text_"+id).css("color", "#535353");
+    }
+    else{
+      if(class_name.indexOf("active") != -1){
+        $("#"+btn).css("background", 'url("/images/'+img+'") no-repeat scroll 6px 4px #D7D7D7');
+      }
+      else{
+        $("#"+btn).css("background", 'url("/images/'+img+'") no-repeat scroll 10px 4px transparent');
+      }
+    }
+  }
+
+  function change_link_color(id){
+    $('.home_item a.engage').hover(function(e) {
+      e.stopPropagation();
+    })
+    $('#video_poster_comment_btn_'+id).css('color','#F66110');
+  }
+
+  function remove_link_color(id){
+    $('.home_item a.engage').hover(function(e) {
+      e.stopPropagation();
+    })
+    $('#video_poster_comment_btn_'+id).css('color','#535353');
+  }
+

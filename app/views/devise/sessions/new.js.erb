@@ -1,0 +1,13 @@
+$('#registration').html('<%= escape_javascript(render "new") %>');
+$('#registration').modal(
+  {
+    /*minHeight: 450, 
+    minWidth: 636, */
+    autoPosition: true
+  }
+);
+$('#user_email').focus();
+<% if flash[:alert] %>
+  $('#message').html('<%= flash[:alert]%>');
+<%end%>
+

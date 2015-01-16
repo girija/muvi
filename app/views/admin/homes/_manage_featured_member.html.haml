@@ -1,0 +1,14 @@
+%input{:type => "text", :id => "featured_member_item", :name => "featured_member" ,:placeholder => 'Enter the name of user'}
+= hidden_field_tag "id_featured_member_item" , 0, :name => 'featured_member_id'
+.clear
+
+-unless @featured_member.blank?
+  -user = UserProfile.find_by_id(@featured_member.subject_id)
+
+  -unless user.blank?
+    %script
+      $("#featured_member_item").val("#{user.display_name}");
+      $("#id_featured_member_item").val("#{@featured_member.subject_id}");
+
+
+

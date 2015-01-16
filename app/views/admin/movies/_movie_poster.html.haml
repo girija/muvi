@@ -1,0 +1,18 @@
+%div{:style => "width:100%", :class => "col_one"}
+  = image_tag (ff.object.poster.url.to_s),:width => 45, :height => 45
+  = ff.label :poster, 'Poster:', :style => "float:none"
+  = ff.file_field 'poster', :style => "width:auto"
+  /&nbsp; &nbsp;
+  
+  = ff.label :album_name, 'Album Name:', :style => "float:none"
+  = ff.text_field 'album_name', :style => "width:120px"
+  
+  = ff.check_box :default_poster,:style => "width:50px",:onclick => "javascript:validate_poster_checkbox(this.id);"
+  Set as default
+
+  -unless ff.object.id.blank?
+    %span.delete
+      &nbsp; &nbsp; &nbsp; &nbsp;
+      = link_to "Delete", "#{destroy_poster_admin_movies_path}/#{@movie.permalink}/#{ff.object.id}", :confirm => 'Are you sure?', :method => :delete
+  %br
+  %br

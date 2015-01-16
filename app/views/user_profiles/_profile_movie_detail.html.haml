@@ -1,0 +1,80 @@
+-@movie = item ? item : @movie
+- @user_profile = @user_profile ? @user_profile : UserProfile.find_by_user_id(current_user.id)
+%div
+  %div{:style=>"border:1px solid #D2D6D9;width:128px;height:195px;float:left;"}
+    %div{:style => "width:124px;height:191px;padding:2px;"}
+      =link_to image_tag(@movie.banner_image,:style=>"height:191px;width:124px;"),movie_path(@movie.permalink), :style => "cursor:pointer"
+  %div{:style=>"padding-left:10px;width:390px;float:right"}
+    %div{:style=>"float:right;padding-right:5px;height:13px"}
+      %div{:class=>"prev_btn",:onclick=>"show_profile_block_item('Movie','#{prev_item.id}','prev','#{type}_movie_detail','#{type}','#{@user_profile.user_id}');"}
+      %div{:style=>"width:4px;float:left"}
+      -unless next_item.blank?
+        %div{:class=>"next_btn",:onclick=>"show_profile_block_item('Movie','#{next_item.id}','next','#{type}_movie_detail','#{type}','#{@user_profile.user_id}');"}
+      -else
+        %div{:class=>"next_btn"}
+    -if type == 'like' or type == 'dislike'
+      - review = @movie.reviews.where("user_id = #{@user_profile.user_id}").first
+      -if review
+        %div{:style=>"height:128px;"}
+          %div{:style=>"float: left; width: 30px;"}
+            =image_tag("/images/double_quote_1.png")
+          %div{:class=>"right_sctivity"}
+            -if review.description.blank?
+              -if review.rating > 3
+                ="#{review.user.display_name} liked #{review.movie.name}"
+              -else
+                ="#{review.user.display_name} didn't like #{review.movie.name}"
+            -else 
+              =review.description.truncate(120)
+          %div{:style=>"float:right; width: 18px;"}
+            =image_tag("/images/double_quote_2.png")
+        %div
+          %div{:style=>"float:left;font-weight:bold;padding-top:9px;font-size:12px;"}
+            Your Review
+          = form_for [@movie, Review.new],:remote => true,:html=>{:id => "#{type}_review_form"} do |f|
+            %div{:style => "height:33px;width:88px;float:left;padding-left:15px;padding-top:5px;"}
+              %input{:type=> 'hidden', :name => "review[rating]", :value => 0 , :id => "#{type}_rating"}
+              - if current_user && current_user.reviwed_movie?(@movie)
+                - if current_user.my_rating(@movie) && current_user.my_rating(@movie) >= 3
+                  %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+                    = image_tag("new_like_active.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px;border:0 none;", :id => 'like_it_btn_block')
+                    =generate_tooltip_block("like_movie","movie_page")
+                  %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+                    = image_tag("d_like.png", :style => "float:right;cursor:pointer;padding-right:1px;padding-top:1px;border:0 none;", :onclick => "profile_reviewblock_submit('#{@movie.id}',2,'#{type}')", :id => 'not_like_it_btn_block')
+                    =generate_tooltip_block("dislike_movie","movie_page")
+                - else
+                  %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+                    = image_tag("new_like.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px;border:0 none;", :onclick => "profile_reviewblock_submit('#{@movie.id}',4,'#{type}')" , :id => 'like_it_btn_block')
+                    =generate_tooltip_block("like_movie","movie_page")
+                  %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+                    = image_tag("d_like_active.png", :style => "float:right;cursor:pointer;padding-right:1px;padding-top:1px;border:0 none;", :id => 'not_like_it_btn_block')
+                    =generate_tooltip_block("dislike_movie","movie_page")
+              - else
+                %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+                  = image_tag("new_like.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px;border:0 none;", :onclick => "profile_reviewblock_submit('#{@movie.id}',4,'#{type}')" , :id => 'like_it_btn_block')
+                  =generate_tooltip_block("like_movie","movie_page")
+                %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+                  = image_tag("d_like.png", :style => "float:right;cursor:pointer;pointer;padding-right:1px;padding-top:1px;border:0 none;", :onclick => "profile_reviewblock_submit('#{@movie.id}',2,'#{type}')", :id => 'not_like_it_btn_block')
+                  =generate_tooltip_block("dislike_movie","movie_page")
+            %div{:style => "float:left;padding-left:5px;"}
+              - user_id = current_user ? current_user.id : ""
+              =hidden_field_tag "profile_review","",:value=>"true"
+              =hidden_field_tag "block","",:value=>"#{type}"
+              /=hidden_field_tag "user_id","",:value=>user_id
+              =f.text_area :description ,:id => "user_review", :class => "commentBox",:style=>"width:315px;border:1px solid #D2D6D9;", :onkeypress => "check_event_profile_review(event,'#{user_id}','#{type}');", :placeholder => "Add a comment"
+        .clear
+    -else
+      -@count_want_to_see = current_user ? WantToSee.find(:all,:conditions =>["user_id = ? AND movie_id = ?", current_user.id,@movie.id]) : ""
+      -watch = WantToSee.find(:all,:conditions =>["user_id = ? AND movie_id = ?", @user_profile.user_id,@movie.id]).first
+      %div{:style=>"height:128px;"}
+        %div{:style=>"float: left; width: 30px;"}
+          =image_tag("/images/double_quote_1.png")
+        %div{:class=>"right_sctivity"}
+          -if watch.is_want_to_see == true
+            ="#{watch.user.display_name} wants to watch #{watch.movie.name}"
+          -else
+            ="#{watch.user.display_name} is not interested to watch #{watch.movie.name}"
+        %div{:style=>"float:right; width: 18px;"}
+          =image_tag("/images/double_quote_2.png")
+      %div 
+        =render "want_to_see/form", :type=>type

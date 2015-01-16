@@ -1,0 +1,7 @@
+-unless @fan.blank?
+  - count = 0  
+  -@fan.each do |fan|
+    -count = count + 1
+    -if count > 6
+      -break
+    = image_tag(fan, :width => 42, :height => 42) 

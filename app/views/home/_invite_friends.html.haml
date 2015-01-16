@@ -1,0 +1,80 @@
+:javascript
+  function show_email_form(type){
+    var html = "";
+    html = "<form data-remote='true' action='fetch_contact' method='post' onsubmit=\"$('#loader').show();\">"+
+             "<input type='hidden' name='type' value='"+type+"'>" +
+             "<input type='text' placeholder='Enter email' name='email' id='email'> <br>"+
+             "<input type='password' placeholder='Enter "+type+" password' name='password' id='password'> <br>"+
+             "<input type='submit' value='Get "+type+" Contacts' class='btn btn-primary'>"+
+           "</form>";
+                 
+    html += "<div class='right'><img src='images/loading.gif' id='loader' style='display:none'></div>";
+
+    $("#rateModalLabel").html("Invite friends from "+type); 
+    $(".modal-body.rating").html("");
+    $(".modal-body.rating").html(html);
+  }
+
+#inviteModal.modal.fade.hide{:style => 'width:620px;'}
+  .modal-header
+    %button.close{:type => "button", "data-dismiss" => "modal" , "aria-hidden" => "true"}
+      x
+    %h4#rateModalLabel
+      Invite your friends!
+  .modal-body.rating
+
+%h4{:style => "color: #FF6600"}  Glad to have you on Muvi. Please complete a quick 3 step process and start using Muvi!
+
+.clear{:style => "height:20px"}
+
+%h4
+  %span{:style => "font-size:25px"}
+    Step 1:
+  Muvi is more fun with friends! Click on the following to invite friends from.  
+
+.clear{:style => "height:50px"}
+
+.left.icon_div
+  .left{:class => "icon_image"}
+    =link_to image_tag("gmail.png"), "#inviteModal", "data-toggle" => "modal", :onclick => "show_email_form('gmail');"
+  .clear
+  %h4 
+    = link_to "GMail", "#inviteModal", "data-toggle" => "modal", :onclick => "show_email_form('gmail');"
+
+.left.icon_div
+  .left{:class => "icon_image"}
+    =link_to image_tag("yahoo.png"), "#inviteModal", "data-toggle" => "modal", :onclick => "show_email_form('yahoo');"
+  .clear
+  %h4 
+    =link_to "Yahoo!", "#inviteModal", "data-toggle" => "modal", :onclick => "show_email_form('yahoo');"
+
+.left.icon_div
+  .left{:class => "icon_image"}
+    =link_to image_tag("hotmail.png"), "#inviteModal", "data-toggle" => "modal", :onclick => "show_email_form('hotmail');"
+  .clear
+  %h4 
+    =link_to "Hotmail", "#inviteModal", "data-toggle" => "modal", :onclick => "show_email_form('hotmail');"
+
+.left.icon_div
+  .left{:class => "icon_image"}
+    =image_tag("facebook.png")
+  .clear
+  %h4 Facebook
+
+.left.icon_div
+  .left{:class => "icon_image"}
+    =image_tag("twitter.png")
+  .clear
+  %h4 Twitter
+
+.clear{:style => "height:20px"}
+%h4
+  =link_to "OR email your own", "#"
+.clear{:style => "height:30px"}
+
+
+.right
+  /%input{:type => "button", :class => "btn btn-info btn-large", :onclick => "show('choose_language');", :value => "Back"}
+  %input{:type => "button", :class => "btn btn-primary btn-large", :onclick => "show('choose_language');", :value => "Skip"}
+.clear{:style => "height:150px"}
+                                  

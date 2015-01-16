@@ -1,0 +1,28 @@
+- @refer = @refer ? @refer : refer
+- @ctr = 0
+- @refer.discussions.order("id desc").limit(5).each do |discussion|
+  - @ctr = @ctr + 1
+  - if discussion.user
+    %div{:class=>'image left tip_hint tooltipbottom',:style=>"height:37px;width:37px;padding-bottom:15px;"}
+      - ub = UserBadge.find_by_user_id(discussion.user.id)
+      -if !ub.blank?
+        - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+        - if points >= 1 and points < 5
+          - level = "Level: Muvi Scraper"
+        - elsif points >= 5 and points < 10
+          - level = "Level: Muvi Junkie"
+        - elsif points >= 10
+          - level = "Level: Muvi Maniac"
+      =link_to image_tag(discussion.user.user_image,:alt =>discussion.user.display_name, :style=>"width:37px;height:37px;border: 1px solid #EEEEEE;"), "/profile/#{discussion.user.id}/#{discussion.user.display_name}"
+      .tooltip_description{:style =>'display:none'}
+        %b
+          = discussion.user.display_name
+        %br
+        = level
+    %div{:style=>"margin-left:45px;height:60px;"}
+      = "<span style='font-weight:normal;font-size:13px;'>#{discussion.question.truncate(60)}</span>".html_safe
+      .small_light_gray
+        %span{:id=>"time_#{discussion.id}",:style=>"margin-right:10px;"}  
+          = "<span style='font-weight:normal'> #{discussion.user.display_name} &nbsp;&nbsp;".html_safe + distance_of_time_in_words(Time.now,discussion.created_at) + " ago</span>".html_safe
+    .clear
+

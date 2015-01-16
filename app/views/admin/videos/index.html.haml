@@ -1,0 +1,40 @@
+= form_tag admin_videos_path, :method => :get do
+  Search by tag
+  %input{:type => "text", :name => "search_tag", :value => "#{params[:search_tag]}"}
+
+  = submit_tag "Search"
+
+%h3
+  New Video
+=render :partial => "form"
+
+%table
+  %tr
+    %th{:width => "20%", :align => "left"} Video
+    %th{:width => "30%", :align => "left"} Tags
+    %th{:width => "30%", :align => "left"}Video file
+    %th{:width => "5%", :align => "left"}Rank    
+    %th{:width => "15%", :align => "left"} Actions
+    -unless @all_videos.blank?
+      -@all_videos.each do |video|
+        %tr
+          %td= video.name
+          %td= video.tags.collect {|t| t.name }.join(", ")
+          %td
+            = video.trailer_file_name unless video.trailer_file_name.blank?
+            =video.video_remote_url unless video.video_remote_url.blank?
+
+          %td=video.rank
+          %td
+            = link_to "Edit", edit_admin_video_path(video)
+            |
+            = link_to "Delete", "/admin/videos/#{video.id}/delete", :confirm => 'Are you sure?'
+      = will_paginate @all_videos
+
+    -else
+      %tr
+        %td{:colspan => 4}
+          %p Sorry there is no videos
+
+
+ 

@@ -1,0 +1,73 @@
+-unless params[:count].blank?
+  -row = params[:count]
+-else
+  -row = 0
+
+-if @mov_cast.blank? and params[:action] != "edit"
+  %div{:id => "actor_crew_#{row}", :style=>"border:1px solid #bbbbbb;height:65px;margin-bottom:30px;background-color:#ffffff;padding:2px;font-size:12px"}
+    .clear
+    %div.col_one{:style => "width:30%"}
+      %label{:style => "width:70px"}  Cast/Crew
+      %input{:type => "hidden",:style => "width:100px", :name => "name[]"}
+
+      %input{:type=>"text",:name=>"castname[]",:id=>"name",:class=>"moviecastName ui-autocomplete-input", :autocomplete=>"off", :role=>"textbox", "aria-autocomplete"=>"list", "aria-haspopup"=>"true", :style => "width:150px"}
+
+
+    %div.col_one{:style => "width:24%"}
+      %label{:style => "width:70px"} Type
+      = select_tag 'cast_type['"#{row}"'][]', options_for_select(option_for_cast_type, [""]), { :multiple => true,:style => "width:100px;font-size:12px", :size => "3"}
+
+
+    %div.col_one{:style => "width:46%"}
+      %label{:style => "width:70px"} Character
+      %input{:type => "text",:style => "width:100px", :name => "characters[]"}
+
+
+      %span.delete
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        %a{:onclick => "javascript:delete_row('actor_crew_#{row}')"}Delete
+
+-else
+  -i=0
+  -unless @mov_cast.blank?
+    -@mov_cast.each do |mov_cast|
+      -selected_cast = []
+      -unless mov_cast.all_cast_type.blank?
+        -cast_type = mov_cast.all_cast_type.split(",")
+        -cast_type.each do |c|
+          -selected_cast << c
+
+      -celeb_name = ""
+      -unless mov_cast.all_celebrity_id.blank?
+        -celeb_name = Celebrity.find(:first, :conditions => ["id IN (#{mov_cast.all_celebrity_id.chop})"])
+
+   
+      -unless celeb_name.blank?
+        %div{:id => "actor_crew_#{i}", :style=>"border:1px solid #bbbbbb;height:65px;margin-bottom:30px;background-color:#ffffff;padding:2px; font-size:12px"}
+          .clear
+          %div.col_one{:style => "width:30%"}
+            %label{:style => "width:70px"}  Cast/Crew
+            -unless mov_cast.celebrity_id.blank?
+              %input{:type => "hidden",:style => "width:100px", :name => "name[]", :value => "#{mov_cast.celebrity_id}"}
+
+              %input{:type=>"text",:name=>"castname[]",:id=>"name",:class=>"moviecastName ui-autocomplete-input", :autocomplete=>"off", :role=>"textbox", "aria-autocomplete"=>"list", "aria-haspopup"=>"true", :style => "width:150px", :value => "#{celeb_name.name}"}
+            -else
+              %input{:type => "hidden",:style => "width:100px", :name => "name[]"}
+
+              %input{:type=>"text",:name=>"castname[]",:id=>"name",:class=>"moviecastName ui-autocomplete-input", :autocomplete=>"off", :role=>"textbox", "aria-autocomplete"=>"list", "aria-haspopup"=>"true", :style => "width:150px"}
+
+          %div.col_one{:style => "width:24%"}
+
+            %label{:style => "width:70px"} Type
+            = select_tag 'cast_type['"#{i}"'][]', options_for_select(option_for_cast_type, selected_cast), { :multiple => true,:style => "width:100px;font-size:12px", :size => "3"}
+
+          %div.col_one{:id => "role_name_div",:style => "width:46%"}
+            %label{:style => "width:70px"} Character
+            %input{:type => "text",:style => "width:100px", :name => "characters[]", :value => "#{mov_cast.all_role_name.chop}"}
+
+            %span.delete
+              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+              %a{:onclick => "javascript:delete_row('actor_crew_#{i}')"}Delete
+
+          -i = i + 1
+

@@ -1,0 +1,24 @@
+%div{:style=> "width: 700px;height:auto;", :id => "paid_subscription_modal_home", :class => "modal fade hide in", "aria-hidden" => "false"}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal", "aria-hidden" => "true"}
+      %img{:src => "/images/popup_close.png"}
+    #paid_subscription_label{:style => "color:#494949;font-size:20px;font-weight:bold;"}
+    .modal-body
+      #payment_div_home
+        %h2
+          Upgrade to Muvi Plus
+        .clear
+        %h3
+          Upgrade to Muvi Plus to watch unlimited movies and TV shows for just $1.99 per month. Cancel anytime.
+        .clear{:style => "height:40px"}
+        %div{:style => "text-align:center"}
+          = link_to "Yes".html_safe, "#yes" , :class => 'btn btn-primary bold_class', :style => 'border-radius:2px 2px 2px 2px;', :onclick => "show_creditcard_fields_home()"
+          &nbsp; &nbsp;
+
+          = link_to "Later".html_safe, "#later" , :class => 'btn btn-primary bold_class', :style => 'border-radius:2px 2px 2px 2px;', :onclick => "$('#paid_subscription_modal_home').modal('hide')"
+      #credit_card_fields_home{:style => "display:none"}
+        =render :partial => "/users/payment_form_home", :locals => {:movie_id => ""}
+
+        .clear
+        = link_to "Later".html_safe, "#later" , :class => 'btn btn-primary bold_class', :style => 'border-radius:2px 2px 2px 2px;', :onclick => "$('#paid_subscription_modal_home').modal('hide')"
+

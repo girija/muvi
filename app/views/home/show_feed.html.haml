@@ -1,0 +1,51 @@
+#myTrailer.modal.fade.hide{:style => 'width:640px;height:435px;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    #myModalLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+      Trailer
+  .modal-body{:style => 'max-height:290px'}
+    %a{:href => "#" , :id => 'video_player', :style => 'display:block;height:300px;width:610px;'}
+  .modal-footer
+    %button.btn.btn-primary.bold_class{"data-dismiss" => "modal", "aria-hidden" => "true" }
+      Done
+
+.row-fluid
+  .span12{:style => "background-color:#FFFFFF"}
+    .span3
+      =render :partial => "/home/left_sidebar"
+    .span9{:style => "border-left:4px solid #DFDFDF; margin-left:-2px;"}
+      %div{:class=>"main_content"}
+        = render '/shared/discovery'
+
+:javascript
+  function play_trailer(videourl,movie_name){
+    $("#myModalLabel").html(movie_name+" Trailer");
+    if (videourl == "") {
+      return false;
+    }
+    $('#video_player').remove();
+    var $video = $('<a />', {
+      href: videourl,
+      id: 'video_player',
+      style: 'display:block;height:290px;width:610px;'
+    });
+    $('#myTrailer .modal-body').append($video);
+    $('#myTrailer').modal("show");
+    flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+  }
+
+:javascript
+  $(function() {
+    var user_name = "#{current_user.display_name}";
+    if(user_name == ""){
+      window.location.href = "/users/edit";
+    }
+    var faye = new Faye.Client("#{FAYE_URL}/faye");
+    faye.disable('autodisconnect');
+
+    faye.subscribe("/show_feed/#{current_user.id}", function(res) {
+      parse_data(res);
+    });
+  });
+

@@ -1,0 +1,12 @@
+if("<%=params[:homepage_commit]%>" == ""){
+  $("#follow_form").attr("action","/connections/follow");
+  $('#follow_div').dialog('destroy');
+  $('#follow_div').html('<div class="actions left"><div style="width:110px" class="gradient-input-button ui-corner-all left"><div class="gradient-input-button ui-corner-all"><input type="submit" class="label" id="comment_submit" name="commit" value="Follow" style="background:none"></div></div></div>');
+
+  window.location.href = window.location;
+}
+else{
+  $("#follow_form").attr("action","/connections/follow");
+  $('#follow_div').dialog('destroy');
+  $('#follow_div').html('<div class="actions left"><div class="orange-gradient-input-button ui-corner-all"><div class="orange-gradient-input-button ui-corner-all"><input type="submit" class="label" id="comment_submit" name="homepage_commit" value="Follow"></div></div></div>');
+}

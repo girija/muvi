@@ -1,0 +1,52 @@
+- unless @myself.blank?
+  %h1= "Welcome #{@myself.first_name} #{@myself.last_name} - #{@myself.email}"
+
+%h3 Your recent posts 
+- unless @posts.blank?
+  - @posts.each do |post|
+    %b
+      %u
+        = post.name
+    %br
+    = image_tag(post.icon)
+    = post.description
+    %br
+    = post.message
+    %hr
+    %br   
+    
+%h3 Your likes   
+- unless @likes.blank?
+  - @likes.each do |like|
+    = like.inspect
+    = like.name 
+    %br
+
+%h3 Your friends     
+- unless @friends.blank?    
+  - @friends.each do |friend|
+    = "#{friend.id} - #{friend.first_name} #{friend.last_name} - #{friend.email}"
+    %br
+    
+- @movies.each do |movie|
+  %h3
+    = movie.name
+  %div{:style => "border: 1px solid #aaa; background: #f1f1f1; padding: 5px 10px;"}   
+    %h4 Comments
+    - movie.comments.each do |comment|
+      = comment.comment 
+    = render '/comments/form', {:movie => movie}  
+    %hr
+    %h4 Reviews
+    Average rating:
+    = movie.average_rating
+    %br  
+    - unless current_user.reviwed_movie?(movie)
+      = render '/reviews/form', {:movie => movie}
+    - else
+      = "Your rating #{current_user.my_rating(movie)}"
+    %hr  
+    %h4 Recommendations
+    = render '/recommendations/form', {:movie => movie}  
+  %br
+  %br        

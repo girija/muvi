@@ -1,0 +1,6 @@
+<% if @user.errors.empty? %>
+  location.href = "/";
+<% else %>
+   $('#error_container_id').html('<%= escape_javascript(render 'shared/error_display', {:error_object => @user}) %>');
+<% end %>
+

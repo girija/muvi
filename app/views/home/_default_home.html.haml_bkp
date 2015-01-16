@@ -1,0 +1,213 @@
+.container-fluid
+  .row-fluid
+    .span6
+      .span12.well-small.well{:style => "border: none; background: none; padding-top: 24px;"}
+        =image_tag("static_image.png")
+    .span6
+      %center
+        =image_tag("loading.gif", :style => "position: absolute; z-index: 2000; display: none;", :id => "loading_div")
+
+      .span12.well-small.well{:style => "border: none; background: none;"}
+        %div{:style => "min-height:190px;"}
+          %h3
+            Discover awesome movies!
+          No more wasting time in watching crappy movies.
+
+
+        #homepage-signin{:style => "float:left;"}
+          .fb-buffer-signin
+            %a{:class => "fb-signin-button facebook", :id => "facebook", :onclick => 'open_window();'}
+              %i
+              %span{:style => "font-weight:bold;"}
+                Join with Facebook
+
+            #fb_register_div
+              %div{:style => "text-align:center"}
+
+              %form{:action => "/fb_register", :id => "fb_register", :style => "display:", :onsubmit => "return validate_fb_signup();"}
+                %input{:type => "hidden", :id => "user_user_tokens_attributes_0_provider", :name => "user_user_tokens_attributes_0_provider"}
+                %input{:type => "hidden", :id => "user_user_tokens_attributes_0_uid", :name => "user_user_tokens_attributes_0_uid"}
+                %input{:type => "hidden", :id => "user_user_tokens_attributes_0_token", :name => "user_user_tokens_attributes_0_token"}
+                %input{:type => "hidden", :id => "user_user_tokens_attributes_0_secret", :name => "user_user_tokens_attributes_0_secret"}
+                =hidden_field_tag "act_refer_type","",:value=> "home"
+                .row
+                  %label{:style => 'width:100px'}
+                    Name
+                  %input{:type => "text", :readonly => true, :name => "user_user_profile_attributes_display_name", :id => "user_user_profile_attributes_display_name"}
+                .row
+                  %label{:style => 'width:100px'}
+                    Email
+                  %input{:type => "text", :readonly => true, :class => "reg_txtbox", :name => "fb_user_email", :id => "fb_user_email"}
+
+                .row
+                  %label{:style => 'width:100px'}
+                    Password
+                  %input{:type => "password", :class => "reg_txtbox", :id => "fb_password"}
+                  %input{:type => "hidden", :class => "reg_txtbox", :name => "hid_fb_password", :id => "hid_fb_password"}
+                .span6ubmit-actions
+                  %input{:class=>"simple", :type=>"submit", :value=>"SignUp", :id => "fb_submit"}
+
+
+          .email-buffer-signin
+            %a{:class => "email-signin-button buffer", :id => "form"}
+              %i
+              %span{:style => "font-weight:bold;"}
+                Join with Email
+
+            #email_reg_form
+              %form{:action => "/user_register", :onsubmit => "return validate_email_signup();"}
+                =hidden_field_tag "act_refer_type","",:value=> "home"
+                .row
+                  %label{:style => 'width:100px'}
+                    Name
+                  %input{:type => "text", :name => "name", :id => "name"}
+
+                .row
+                  %label{:style => 'width:100px'}
+                    Email
+                  %input{:type => "text", :name => "email", :id => "email"}
+
+                .row
+                  %label{:style => 'width:100px'}
+                    Password
+                  %input{:type => "password", :id => "password"}
+                  %input{:type => "hidden", :name => "hid_password", :id => "hid_password"}
+
+                .span6ubmit-actions
+                  %input{:class=>"simple", :type=>"submit", :value=>"SignUp", :id => "email_submit"}
+
+
+          .buffer-signin
+            %a{:href => "#", :class => "signin-button buffer", :id => "signin", :style => "width:100%", :onclick => "check_fb_login();"}
+              %i
+              %span{:style => "font-weight:bold;"}
+                Login
+
+            %div{:id => "login_div"}
+              - resource = User.new
+              - resource_name = 'user'
+              =form_for(resource, :as => resource_name, :url => session_path(resource_name), :remote => true, :html => {:onsubmit => "return disable_btn('user_submit');"}) do |f|
+                =hidden_field_tag "act_refer_type","",:value=> "home"
+                .row
+                  =f.label :email, 'Email Address', :style => 'width:100px'
+                  =f.email_field :email
+
+                .row
+                  = f.label :password, 'Password', :style => 'width:100px'
+                  = f.password_field :password
+
+                .span6ubmit-actions
+                  = f.submit 'Login', :class => "simple"
+                  /or
+                  /%input{:type => "button", :class => "simple", :value => "Create Account", :onclick => "show_hide_div('login_div', 'register_div', 'fb_register_div', 'email_reg_form');"}
+                  %br
+                  /=link_to "Forget Password", "forgot_password", :target => "blank", :style => "color: #FFFFFF;"
+                  = link_to "Forgot password?", "/forgot_password" , :style=>"color: #FFFFFF; font-size: 11px !important; font-weight: normal; text-shadow: none; text-decoration: underline;", "target" => "_blank"
+
+
+
+        #errors{:style => "float:left; min-height:120px;"}
+
+  .row-fluid
+    .span12
+
+      -cnt = 1
+      -unless @bottom_blocks.blank?
+        -@bottom_blocks.each do |h|
+          -@type = h.subject_type
+          -if @type == "Movie"
+            -type = "movie"
+          -if @type == "Celebrity"
+            -type = "star"
+          -if @type == "Video"
+            -type = "video"
+          -if @type == "Poster"
+            -type = "poster"
+
+          -unless h.flag_detail.blank?
+            -flag_detail = h.flag_detail.gsub(" ", "%20")
+          -else
+            -flag_detail = ""
+          - if 1 == 2
+            - @block = ActiveSupport::JSON.decode(RestClient.get "#{SERVICE_URL}/muvi/#{type}/#{h.subject_id}?flag=&current_user=", :content_type => :json)
+            %div{:style => " margin-top: 10px; height: 160px; position: relative; float:left; width:250px;"}
+              %div{:style => "position: absolute; bottom: 0px; height:160px; overflow:hidden", :id => "div_#{cnt}"}
+                %h4
+                  =h.heading
+                =display_homepage_block(@block[0])
+            -cnt = cnt + 1
+
+      -unless @todays_user.blank?
+        -user_profile = User.find_by_id(@todays_user.user_id).user_profile
+        -unless user_profile.blank?
+          %div{:style => " margin-top: 10px; height: 160px; position: relative; float:left; width:250px;"}
+            %div{:style => "position: absolute; bottom: 0px; height:160px; overflow:hidden", :id => "div_5"}
+              %h4
+                Today's Movie Lover
+              = image_tag("#{POSTER_URL}/system/profile_images/#{user_profile.id}/small/#{user_profile.profile_image_file_name.gsub(' ', '%20')}",:height => "285", :width => "188") unless user_profile.profile_image_file_name.blank?
+
+
+:javascript
+  $(document).ready(function() {
+    $("#user_new").submit(function(){
+      $("#user_password").val(Base64.encode($("#user_password").val()));
+    });
+
+    self.setInterval("show_fb_reg()", 1000);
+
+    $('.fb-signin-button.facebook').click(function(){
+      $("#loading_div").hide();
+      self.setInterval("show_fb_form()", 1000);
+    });
+
+    /*$('.signin-button.buffer').delegate('click', function(){
+      check_fb_login();
+    });*/
+
+  });
+
+
+  var f = 0;
+  var f1 = 0;
+
+  function show_fb_form(){
+    if($('#user_user_tokens_attributes_0_provider').val() != ""){
+      var $signin = $('.fb-buffer-signin');
+      var expanded = $signin.hasClass('expanded');
+      //$signin.addClass('expanded').animate({height: '270px'}, 500);
+      if(f1 == 0){
+        $signin.addClass('expanded').animate({height: '270px'}, 500);
+        f1 = 1;
+      }else{
+        $signin.removeClass('expanded').animate({height: '40px'}, 500);
+        f1 = 0;
+      }
+    }
+    f = 0;
+    $('.buffer-signin').removeClass('expanded').animate({height: '40px'}, 500);
+    $('.email-buffer-signin').removeClass('expanded').animate({height: '40px'}, 500);
+  }
+
+  function expand_login(){
+    var $signin = $('.buffer-signin');
+    var expanded = $signin.hasClass('expanded');
+    //$signin.addClass('expanded').animate({height: '270px'}, 500);
+    if(f == 0){
+      $signin.addClass('expanded').animate({height: '270px'}, 500);
+      f = 1;
+    }else{
+      $signin.removeClass('expanded').animate({height: '40px'}, 500);
+      f = 0;
+    }
+    f1 = 0;
+    $('.fb-buffer-signin').removeClass('expanded').animate({height: '40px'}, 500);
+    $('.email-buffer-signin').removeClass('expanded').animate({height: '40px'}, 500);
+    $("#loading_div").hide();
+  }
+
+  function remove_extended(th){
+    $("#"+th.id).removeClass('expanded').animate({
+      height: '160px'
+    });
+  }
+

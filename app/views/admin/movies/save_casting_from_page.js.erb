@@ -1,0 +1,19 @@
+var html = '<div style="width:200px; font-size:12px; margin-bottom:10px; margin-right:10px;" id="cast_div_<%=@movie_casts_id%>" class="left">'+
+              '<div style="margin-right: 5px" class="left">'+
+                '<a href="/stars/<%=@celeb.permalink%>"><img style="width:35px; height:35px;" src="<%= @celeb.thumb_image%>"></a>'+
+              '</div>'+
+              '<div style="width:130px" class="left">'+
+                 '<span style="font-size:12px" class="movie_block_title">'+
+                    '<a style="color:#3F3F3F; font-family:verdana" href="/stars/<%=@celeb.permalink%>"><%=@cast_name%></a>'+
+                    '<div class="clear"></div>'+
+                    '<span style="color: #A6A6A6; font-size:11px;"><%=@cast_type%></span>'+
+                '</span>'+
+              '</div>'+
+              '<div style="width: 15px; height:15px; cursor: pointer; background: url(/images/popup_close.png) no-repeat scroll 0% 0% transparent;" onclick=\'remove_movie_casts("cast_div_<%=@movie_casts_id%>", <%=@movie_casts_id%>);\' class="pull-right"></div>'+
+          '</div>';
+
+$("#cast_crew_container").append(html)
+//$("#cast_crew_div").show().slideUp();
+$("#cast_crew_div").hide();
+$('#cast_crew_div').html('');
+

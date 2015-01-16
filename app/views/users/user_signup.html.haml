@@ -1,0 +1,187 @@
+%center{:style => "background-color:#FFFFFF; border: 2px solid #CCCCCC; padding:40px 100px"}
+  %div{:style => "width:500px"}
+    %h1 
+      Join the network of movie lovers
+    .clear{:style => "height:20px"}
+    %div{:style => "font-size:12px; font-weight:bold;"}
+      it takes 5 seconds, literally!
+    .clear{:style => "height:20px"}
+    %hr
+
+    =link_to image_tag("/images/fb_join.png"), "#", :onclick => 'open_window();'
+    .clear{:style => "height:20px"}
+  
+    #err_message
+    /#errors
+
+    %form{:action => "/fb_register", :id => "fb_register", :style => "display:none", :onsubmit => "return validate_fb_form();"}
+      %input{:type => "hidden", :id => "user_user_tokens_attributes_0_provider", :name => "user_user_tokens_attributes_0_provider"}
+      %input{:type => "hidden", :id => "user_user_tokens_attributes_0_uid", :name => "user_user_tokens_attributes_0_uid"}
+      %input{:type => "hidden", :id => "user_user_tokens_attributes_0_token", :name => "user_user_tokens_attributes_0_token"}
+      %input{:type => "hidden", :id => "user_user_tokens_attributes_0_secret", :name => "user_user_tokens_attributes_0_secret"}
+  
+      %table{:style => "width:550px; font-weight:bold; border-spacing:5px;"}
+        %tr
+          %td{:class => "reg_label"} Name
+          %td
+            %input{:type => "text", :readonly => true, :class => "reg_txtbox", :name => "user_user_profile_attributes_display_name", :id => "user_user_profile_attributes_display_name"}
+        %tr
+          %td{:class => "reg_label"} Email Address
+          %td
+            %input{:type => "text", :readonly => true, :class => "reg_txtbox", :name => "fb_user_email", :id => "fb_user_email"}
+        %tr
+          %td{:class => "reg_label"} Password
+          %td
+            %input{:type => "password", :class => "reg_txtbox", :id => "fb_password"}
+            %input{:type => "hidden", :class => "reg_txtbox", :name => "hid_fb_password", :id => "hid_fb_password"}
+        %tr
+          %td &nbsp;
+          %td
+            .left{:style => "width:80%"}
+              By clicking 'Join', you are indicating that you have read and agreed to the
+              = link_to "Terms of service", user_agreement_path, "data-remote" => true 
+
+            .right
+              /= link_to image_tag("/images/join_btn.png"), "#", :remote => true, :onclick => "register()"
+              %input{:type => "image", :src => "/images/join_btn.png"}
+     
+ 
+    %div{:style => "font-size:12px; font-weight:bold"}
+      Join with facebook to share your movie ratings and interest with your friends
+    .clear{:style => "height:20px"}
+    %div{:style => "font-size:12px; font-weight:bold; width:600px;"}
+      By using your Facebook credentials to log in, your basic data(first and last name) will be accessed. We will not use this data for any other purposes. 
+      =link_to "Click here", "/muvi_agreement" 
+      to read our Privacy Statement.
+
+    .clear{:style => "height:25px"}
+    %div{:style => "font-size:12px; font-weight:bold"}
+      Don't have a Facebook account? 
+      %a{:onclick => "show_email_reg();", :style => "cursor:pointer"}
+        Click here 
+
+    #email_reg_form{:style => "display:none"}
+      %form{:action => "/user_register", :onsubmit => "return validate_email_form();"}
+        %table{:style => "width:550px; font-weight:bold; border-spacing:5px;"}
+          %tr
+            %td{:class => "reg_label"} Name
+            %td 
+              %input{:type => "text", :class => "reg_txtbox", :name => "name", :id => "name"}
+          %tr
+            %td{:class => "reg_label"} Email Address
+            %td
+              %input{:type => "text", :class => "reg_txtbox", :name => "email", :id => "email"}
+          %tr
+            %td{:class => "reg_label"} Password
+            %td 
+              %input{:type => "password", :class => "reg_txtbox", :id => "password"}
+              %input{:type => "hidden", :class => "reg_txtbox", :name => "hid_password", :id => "hid_password"}
+          %tr
+            %td &nbsp;
+            %td
+              .left{:style => "width:80%"}
+                By clicking 'Join', you are indicating that you have read and agreed to the 
+                = link_to "Terms of service", user_agreement_path, "data-remote" => true
+
+              .right
+                /= link_to image_tag("/images/join_btn.png"), "#", :remote => true, :onclick => "register()"
+                %input{:type => "image", :src => "/images/join_btn.png"}
+           
+    .clear{:style => "height:25px"}
+    /%a{:name => "widget"}
+    /  //%script{:src => "//www.punchtab.com/mast/9038/giveaway_widget.js"}
+    /  %script{:src => "//www.punchtab.com/mast/9383/giveaway_widget.js"}
+
+ 
+    .clear{:style => "height:70px", :id => "bgap"}
+    %hr
+
+    .clear{:style => "height:20px"}
+    %div{:style => "font-size:12px; font-weight:bold"} 
+      Already have an account? 
+      %a{:onclick => "check_login();", :style => "cursor:pointer"} 
+        Click here to login
+
+:javascript
+  function show_email_reg(){
+    $("#email_reg_form").slideDown();
+    $("#bgap").hide();
+    $("#fb_register").hide();
+  }
+
+  function validate_fb_form(){
+    if($("#fb_password").val() == ""){
+      $("#err_message").show();
+      $("#err_message").html("Please enter password");
+      $('#err_message').css("float", "none");
+      $('#err_message').css("color", "red");
+      $('#err_message').css("background", "none");
+      $('#err_message').css("display", "inline");
+      return false;          
+    }else{
+      var hid_fb_pw = base64_encode($("#fb_password").val());
+      $("#hid_fb_password").val(hid_fb_pw);
+      $("#err_message").hide();
+    }
+  }
+
+  function validate_email_form(){
+    var err_msg = "";
+    if($("#name").val() == ""){
+      err_msg += "Please enter name <br>";
+    }    
+    if($("#email").val() == ""){
+      err_msg += "Please enter email address <br>";
+    } else if(!validateEmail($("#email").val())){
+      err_msg += "Oops! seems an invalid email! <br>";
+    }
+    if($("#password").val() == ""){
+      err_msg += "Please enter password <br>";
+    }
+
+    if(err_msg != ""){
+      $("#err_message").show();
+      $("#err_message").html(err_msg);
+      $('#err_message').css("float", "none");
+      $('#err_message').css("color", "red");
+      $('#err_message').css("background", "none");
+      $('#err_message').css("display", "inline");
+      $('#err_message').css("font-weight", "bold");
+      $('#err_message').css("font-size", "12px");
+      return false;
+    }else{
+      var hid_pw = base64_encode($("#password").val());
+      $("#hid_password").val(hid_pw);
+      $("#err_message").hide();
+    }
+  }
+
+
+  
+  self.setInterval("show_fb_reg()", 1000);
+  var tmp = 0;
+  function show_fb_reg(){
+    if(tmp == 0){
+      if($("#user_user_profile_attributes_display_name").val() != ""){
+        $("#fb_register").show();
+        $("#err_message").show();
+        $("#err_message").html("Enter a password and click on Join");
+        $('#err_message').css("float", "none");
+        $('#err_message').css("color", "red");
+        $('#err_message').css("background", "none");
+        $('#err_message').css("display", "inline");
+        $('#err_message').css("font-weight", "bold");
+        $('#err_message').css("font-size", "12px");
+        $("#email_reg_form").hide();
+        tmp = 1;
+      }
+    }
+  }
+
+</script>
+
+
+
+
+
+

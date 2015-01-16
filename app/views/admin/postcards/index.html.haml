@@ -1,0 +1,36 @@
+%table.listing
+  %tr
+    %th= check_box_tag('check_all')
+    %th Poster 
+    %th Sender Name
+    %th Greeting Text
+    %th Name
+    %th Address 1
+    %th Address 2
+    %th City
+    %th State
+    %th Zip Code
+    %th Order date
+
+  - unless @card_requests.blank?
+    = form_tag(delete_celebrities_admin_celebrities_path) do
+      - @card_requests.each do |card_request|
+        %tr
+          %td= check_box_tag("request_id[]", card_request.id, false)
+          %td= image_tag ("/system/posters/#{card_request.poster.id}/medium/#{card_request.poster.poster_file_name.gsub(" ", "%20")}")
+          %td{:valign => "top"}= card_request.user.display_name
+          %td{:valign => "top"}= card_request.greeting
+          %td{:valign => "top"}= card_request.name
+          %td{:valign => "top"}= card_request.address_1
+          %td{:valign => "top"}= card_request.address_2
+          %td{:valign => "top"}= card_request.city
+          %td{:valign => "top"}= card_request.state
+          %td{:valign => "top"}= card_request.zip
+          %td{:valign => "top"}= card_request.created_at
+  -else
+    %tr
+      %td{:colspan => 10}
+        %p Sorry there are no results for your filter request(s)
+
+= will_paginate @card_requests
+

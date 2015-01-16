@@ -1,0 +1,45 @@
+var json_arr = "<%= @movie_list %>";
+//document.write(json_arr);
+
+var html = "";
+var host = ""
+html += "<div class='parent chrome23 single1 customcontainer black'>";
+html += "  <div class='heading alignright' style='display:block;'>";
+html += "    <span class='text'>Muvimeter: Latest Movie Reviews</span>";
+html += "  </div>";
+html += "  <div class='content'>";
+html += "    <div style='font-family:lucida grande, tahoma, verdana, arial, sans-serif;font-size: 12px;background-color:#FFFFFF; padding:12px 4px 4px 0px'>";
+  
+<% @movie_list.each do |movie_list| %>
+  host = "<%=movie_list["host"]%>";
+  html += "  <DIV style='float:left'>";
+  html += "    <div style='float:left;width:45px;'><a href='<%=movie_list["host"]%>/movies/<%= movie_list["link"]%>' target = '_blank'><img style='border:0px; height:35px; height:35px;' src='<%=movie_list["host"]%><%=movie_list["image"]%>' /></a>&nbsp;</div>";
+
+  html += "    <div style='float:left;width:100px;margin-right:4px;margin-margintop:-4px;'><a href='<%=movie_list["host"]%>/movies/<%= movie_list["link"] %>' target = '_blank' style='text-decoration:none'><%= movie_list["name"] %></a></div>";
+
+  if(<%= movie_list["meter"].to_i %> >= 60){
+      html += "  <div style='background-color: #D8D8D8; border: 1px solid #BECBD4;border-radius: 6px; height: 15px; padding: 2px 3px 4px; width: 90px;float:left;margin-right:2px'>";
+
+      html += "    <div style='width:<%=movie_list["meter"].to_i %>%; background:url(\"http://www.muvi.com/images/G-RatingBar.jpg\") repeat-x scroll 0 0 transparent; border-radius:6px; height:17px;'>&nbsp;</div>";
+      html += "  </div>";
+  }
+  else if(<%= movie_list["meter"].to_i %> < 60){
+    html += "  <div style='background-color: #D8D8D8; border: 1px solid #BECBD4;border-radius: 6px; height: 15px; padding: 2px 3px 4px; width: 90px;float:left;margin-right:3px'>";
+    html += "    <div style='width:<%=movie_list["meter"].to_i %>%; background:url(\"http://www.muvi.com/images/R-RatingBar.jpg\") repeat-x scroll 0 0 transparent; border-radius:6px; height:17px;'>&nbsp;</div>";
+    html += "  </div>";
+  }
+
+  html += "    <div style='float:left;'><%=movie_list["meter"]%>%</div>";
+  html += " </DIV>";
+  html += "  <div style='clear:both;height:5px'></div>";
+ 
+<% end %>
+
+html += "    <div style='color:gray;font-size:11px;'>Muvimeter is based on critics and twitter rating <div style='float:right;margin-top:-5px;'><a href='http://www.muvi.com' target = '_blank'><img src='"+host+"/images/logo_small.png' ></a></div><div style='clear:both;height:4px'></div>";
+
+html += "  </div>";
+html += " </div>";
+html += "</div>";
+
+
+document.write(html);

@@ -1,0 +1,96 @@
+- if !current_user.blank?
+  %input{:type => 'hidden', :name=> 'logged_in_user_id' , :id => 'logged_in_user_id', :value => current_user.id}
+  - @my_wanna_see_movies = []
+  - @my_seen_movies = []
+  - list = ListOfMovie.find_by_user_id(current_user.id)
+  - if list && !list.wanna_see_lists.blank?
+    - wannasee_list = ActiveSupport::JSON.decode(list.wanna_see_lists)
+    - wannasee_list.each do |wanna_see|
+      - @my_wanna_see_movies << wanna_see["object"]["id"].to_i
+  - if list && !list.seen_lists.blank?
+    - seen_list = ActiveSupport::JSON.decode(list.seen_lists)
+    - seen_list.each do |seen|
+      - unless seen["object"].blank?
+        - @my_seen_movies << seen["object"]["id"].to_i
+  - @my_rated_movies = []
+  - rated =  UserMovieList.where(:user_id => current_user.id)
+  - if rated
+    - rated.each do |rate|
+      - if !rate.movie_id.blank?
+        - rated_list = ActiveSupport::JSON.decode(rate.movie_id)
+        - rated_list.each do |movie|
+          - @my_rated_movies << movie.to_i
+  - @my_rated_movies.uniq!
+
+.row-fluid
+  .span11.well-small.discover{:style => 'position:relative'}
+  - movie_list = ["top_rated","in_theater","upcoming"]
+  -movie_list.each do |m_list|
+    -@movie_lists = []
+
+    -sel_lang = ["English"]
+    -if current_user.language.nil? || current_user.language.blank? || current_user.language == "[]"
+      -sel_lang = ["English"]
+    -else
+      -begin
+        -sel_lang = ActiveSupport::JSON.decode(current_user.language)
+      -rescue
+
+    -sel_lang.each do |lang|
+      -list_movie = HomeMovielist.where("list_type = '#{m_list}' and lang = '#{lang}'")
+      -@movie_lists += list_movie
+    .container-fluid
+      .row-fluid
+        .row-list-header.media{:class => 'movie_list', "data-id" => "#{m_list}",:style=>"width:98.6%;border:1px solid #E5E5E5;padding:5px;margin:3px 0;margin-bottom:-1px;margin-top:8px;background:#f9f9f9;min-height:110px;cursor:pointer;",:id=>"list_header_#{m_list}",:onclick=>"open_movie_list('#{m_list}')"}
+          %a.pull-left{:id=>"poster_#{m_list}"}
+            - last_movie = @movie_lists.last.movie if !@movie_lists.blank?
+            -if last_movie
+              = image_tag "#{POSTER_URL}#{last_movie.banner_image_medium}", :class => 'media-object list_poster' if last_movie
+          .media-body
+            %div.media-heading.pull-left{:style => 'color:#494949;font-size:28px;font-weight:bold;padding-top:10px;line-height:26px;'}
+              -if m_list == "in_theater"
+                Now In Theaters
+              -elsif m_list == "upcoming"
+                Upcoming Movies
+              -elsif m_list == "top_rated"
+                Top New Movies
+            .clear{:style => 'padding-top: 10px;'}
+              -movie_names = ""
+              -@movie_lists.each do |muvi_list|
+                -muvi = muvi_list.movie
+                -if movie_names.blank?
+                  -movie_names += "#{muvi.name}"
+                -else
+                  -movie_names += ", #{muvi.name}"
+              .pull-left{:style=>"width:675px;"}
+                =movie_names.html_safe
+              .pull-right{:style => 'font-size:20px;width:48px;margin-top:-30px'}
+                = "<i class='icon-chevron-down' id='marker_#{m_list}'></i>".html_safe
+        .media{:style => 'display:none',:id=>"movie_list_back_#{m_list}"}
+          =render template: "user_movie_lists/show_list", :locals=>{:@list=>@movie_lists,:@list_type=>"#{m_list}"}
+            
+        .clear{:style=>"height:15px;"}
+%input{:type => 'hidden', :name=> 'flip_back' , :id => 'flip_back'}
+:javascript
+  var back;
+  function open_movie_list(list_id){
+    var front = document.getElementById('list_header_'+list_id)
+    , back_content = document.getElementById('movie_list_back_'+list_id).innerHTML;
+    $("#flip_back").val('#movie_list_back_'+list_id);
+    back = flippant.flip(front, back_content, 'modal');
+    $(".close_list").show();
+  }
+  $(document).keyup(function(e) {
+    if (e.keyCode == 27) {
+      var recent_content = $(".flippant-back").html();
+      $($("#flip_back").val()).html(recent_content);
+      back.close();
+    }
+  });
+
+  function close_movie_list(){
+    var recent_content = $(".flippant-back").html();
+    $($("#flip_back").val()).html(recent_content);
+    back.close();
+  }
+

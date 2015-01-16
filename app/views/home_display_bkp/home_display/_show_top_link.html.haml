@@ -1,0 +1,34 @@
+%div
+  .left
+    =image_tag("muvi_text.png")
+
+  %div{:style => "text-align:right; margin-right:32px;font-size:17px;"}
+    
+    - if request.fullpath =~ /\/recommended/
+      %b
+        Recommended
+    - else
+      - if current_user
+        = link_to("Recommended", "/recommended")
+      - else 
+        = link_to("Recommended", "#", :onclick => "check_login();")
+    
+    %b
+      &nbsp; | &nbsp;
+    
+    -if request.fullpath =~ /\/released/
+      %b
+        All
+    -else
+      =link_to("All", "/released")
+  
+    %b
+      &nbsp; | &nbsp;
+
+    -if request.fullpath =~ /\/upcoming/
+      %b
+        Upcoming
+    -else
+      =link_to("Upcoming", "/upcoming")
+
+  .clear{:style => "height:10px"}

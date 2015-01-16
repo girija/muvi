@@ -1,0 +1,34 @@
+=sidebar_content(:heading => "Upcoming", :class => "GrayHeaderBox", :second_heading => "<div style='float: right; margin-top: -25px;'><a href='/upcoming'>More Upcoming > </a></div>")
+-count = 1
+-total_block = 5
+
+/-cache "sidebar_upcoming_cache",:expires_in => 30.minutes do
+-@upcoming.each do |movie|
+  -if @upcoming.size > total_block
+    -last_item = total_block
+  -else
+    -last_item = @upcoming.size
+  -actor_name = ""
+  -actor_link = ""
+  -actors = get_actor_name(movie)
+  -unless actors.blank?
+    -i=0
+    -actors.each do |act|
+      - unless act.celebrity.blank?
+        -if i == 2
+          -break
+        -if actor_name.blank?
+          -actor_name = act.celebrity.name
+          -actor_link = star_path(act.celebrity.permalink)
+        -else
+          -actor_name = actor_name + ","+ act.celebrity.name
+          -actor_link = actor_link + "," + star_path(act.celebrity.permalink)
+        -i=i+1
+  -if count == last_item
+    =sidebar_detail(movie.banner_image_thumb, :name => movie.name, :link_on_name => "/movies/#{movie.permalink}", :width => 42, :height => 42,:subtexts => actor_name, :sublink => actor_link, :end => 1, :second_subtext => movie.release_date)
+    -break
+  -else
+    -count = count + 1
+    =sidebar_detail(movie.banner_image_thumb, :name => movie.name, :link_on_name => "/movies/#{movie.permalink}", :width => 42, :height => 42,:subtexts => actor_name, :sublink => actor_link, :second_subtext => movie.release_date)
+
+

@@ -1,0 +1,5 @@
+$('#registration').dialog('destroy');
+$('#registration').html('<%= escape_javascript(render "new") %>');
+$('#registration').modal({/*minHeight: 434, minWidth:631,*/ containerId: 'login_from'});
+$('#user_email').focus();
+

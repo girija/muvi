@@ -1,0 +1,56 @@
+%div{ :style => "margin-top:12px;width:100%", :class => "moviRatingBox left"}
+  -count = 0
+  -@activities.each do |activity|
+
+    -if activity.secondary_subject_type == "Movie" or activity.subject_type == "Watch" or activity.subject_type == "Not watch"
+      -movie = Movie.find_by_id(activity.secondary_subject_id)
+      .image_35_35.left{:style => "margin-right:4px"}
+        %a{:href => movie_path(movie)}
+          =activity_image(activity)
+
+    -elsif activity.secondary_subject_type == "Celebrity" or activity.subject_type == "Fan" or activity.subject_type == "Unfan"
+      -celeb = Celebrity.find_by_id(activity.secondary_subject_id)
+      -unless celeb.blank?
+        .image_35_35.left{:style => "margin-right:4px"}
+          %a{:href => star_path(celeb)}
+            =activity_image(activity)
+
+    -elsif activity.secondary_subject_type == "Follow" or activity.subject_type == "Follow" or activity.subject_type == "Unfollow"
+      -user = UserProfile.find_by_user_id(activity.secondary_subject_id)
+      -user_fb_id = User.find_by_id(activity.secondary_subject_id)
+      -unless user.blank?
+        .image.left{:style => "margin-right:5px; margin-bottom:5px;"}
+          -unless user.profile_image_file_name.blank?
+            =link_to image_tag(user.profile_image.url(:small), :width => "35", :height =>"35"), "/profile/#{user.user_id}/#{user.display_name}"
+          -else
+            -unless user_fb_id.facebook_id.blank?
+              =link_to image_tag("http://graph.facebook.com/#{user_fb_id.facebook_id}/picture?type=large",:width => "35", :height =>"35"),"/profile/#{user.user_id}/#{user.display_name}"
+            -else
+              =link_to image_tag('no-profile.png', :width => "35", :height =>"35"), "/profile/#{user.user_id}/#{user.display_name}"
+
+    -elsif activity.secondary_subject_type == "Video" or activity.subject_type == "Likes" or activity.subject_type == "Dislikes" and activity.secondary_subject_type !=  "Discussion"
+      .image_35_35.left{:style => "margin-right:4px"}
+        -link = activity.action.split("<a href='")
+        -new_link = link[1].split("'>")
+        %a{:href => "#{new_link[0]}"}
+          =activity_image(activity)
+    -elsif activity.secondary_subject_type ==  "Discussion"
+      .image_35_35.left{:style => "margin-right:4px"}
+        %a{:href => "#"}
+          =link_to image_tag(activity.user.user_profile.profile_image.url(:small), :width => "35", :height =>"35"), "/profile/#{activity.user.id}/#{activity.user.display_name}"
+    .names
+      =raw(activity.action)
+      -count = count + 1    
+      -@activity = activity
+
+      %div{:id => "activity_comments_#{activity.id}"}
+        %div{:style => "height:10px"}
+        -activity.comments.to_level.includes(:user).each do |comment|
+          = render '/shared/activity_comment', { :comment => comment}
+
+    
+      -unless current_user.blank?
+        -if (UserConnection.check_connection(current_user, params[:user_id].to_i) == true)  or (current_user.id == @user_profile.user_id)
+          = render '/comments/activity_form', {:activity => activity}
+              
+    .clear{:style => "height:20px"}

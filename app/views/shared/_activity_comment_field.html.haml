@@ -1,0 +1,13 @@
+%li{:style => "list-style:none; margin-left:45px"}
+  .user_image{:style => "float:left"}
+    =link_to image_tag(comment.user.user_image, :width => "30", :heigh => "30"), "/profile/#{comment.user.id}/#{comment.user.display_name}"
+  
+  %div{:style => "float:left;margin-left:5px"}
+    = comment.comment
+    .small_light_gray
+      = link_to comment.user.display_name, "/profile/#{comment.user.id}/#{comment.user.display_name}", :class => "small_light_gray"
+      , 
+      = comment.created_at.strftime('%d %B %Y')
+  .clear
+  %br
+

@@ -1,0 +1,25 @@
+-cache "celebrity_in_theatre",:expires_in => 30.minutes do
+  -unless @celeb_theater.blank?
+    =render "/shared/show_celeb_theater"
+  .connectionborderDiv{:style => "padding:0px"}
+  .clear
+-cache "celebrity_nextweek",:expires_in => 30.minutes do
+  -unless @celeb_nextweek.blank?
+    =render "/shared/show_celeb_nextweek"
+-cache "celebrity_trending",:expires_in => 30.minutes do
+  -unless @celeb_trending.blank?
+    =render "/shared/show_celeb_trending"
+  .connectionborderDiv{:style => "padding:0px"}
+  .clear
+-cache "celebrity_latest_trailers",:expires_in => 30.minutes do
+  -unless @celeb_latest_trailers.blank?    
+    .left{:style => "width:418px; border:0px solid #dddddd; height:250px;padding-bottom:5px;margin-left:5px;margin-right:10px;"}
+      =render :partial => "/shared/show_celeb_latest_trailer"
+//////////////////////////////////////
+/Latest Picture
+-cache "celebrity_latest_pictures",:expires_in => 30.minutes do
+  -unless @celeb_latest_pictures.blank?
+    .left{:style => "width:390px; border:0px solid #dddddd; height:250px;"}
+      =render :partial => "/shared/show_celeb_latest_pictures"
+
+  .clear

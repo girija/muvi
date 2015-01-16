@@ -1,0 +1,36 @@
+<% muvimeter = "#{@movie.muvimeter || 0}%" %>
+
+<div style='clear: both;'></div><div style='margin-top:12px;padding-bottom: 5px;width: 310px;float:left; border:1px solid #4F4F4F; background-color:#EDF0F5; -moz-border-radius:6px; -webkit-border-radius:6px; -border-radius:6px;border-color:#CCCCCC; padding:0px 5px;'>
+
+     <div style='height: 62px; margin-bottom: 8px; padding: 0; width: 310px;'>
+
+       <span style='font-weight: bold;'>
+         <a href='http://<%= @host %>/movies/<%= @movie.permalink %>#critics' style='color: #4F4F4F;font-size: 12px; text-decoration: none;'>Muvimeter</a>
+       </span>
+
+       <div style='clear: both;'></div>
+
+       <div style='background-color: #D8D8D8; border: 1px solid #BECBD4; border-radius: 6px 6px 6px 6px; height: 25px; margin-bottom: 0; margin-top: 2px; padding: 3px 3px 2px; width: 180px; float:left'>
+          <% if @movie.muvimeter >= 60 %>
+           <div class='positive' style='width:<%=muvimeter%>;-moz-border-radius:6px;-webkit-border-radius:6px;height:23px;background:url(http://www.muvi.com/images/long-G-RatingBar.jpg) repeat-x'>&nbsp;</div>
+          <% else %>
+           <div class='negative' style='width:<%=muvimeter%>;-moz-border-radius:6px;-webkit-border-radius:6px;height:23px;background:url(http://www.muvi.com/images/long-R-RatingBar.jpg) repeat-x'>&nbsp;</div>
+          <% end %>
+       </div>
+
+       <div style='color: #53555F; font-size: 20px; letter-spacing: -1px; margin-left: 5px;  padding: 0; text-align: left; width: 35px; margin-top:5px; float:left'>
+         <a href='http://<%= @host %>/movies/<%= @movie.permalink %>#critics' style='font-size:20px; color:#4F4F4F;text-decoration: none;font-weight:bold'><%=muvimeter%></a>
+       </div>
+
+       <div style='float:right'>
+
+            <% if @movie.muvimeter >= 60 %>
+              <img src='http://www.muvi.com/images/thumbUp.png' title='Jhakaas' alt='Jhakaas'>
+            <% else %>
+              <img src='http://www.muvi.com/images/thumbDown.png' title='Bakwaas' alt='Bakwaas'>
+            <% end %>
+
+       </div>
+     </div>
+   </div>
+

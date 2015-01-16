@@ -1,0 +1,18 @@
+= form_for :celeb_tweets, :url => tweet_updates_admin_new_tweets_path, :html => {:method => :post} do |f|
+  %br
+  %table.listing
+    %tr
+      %th= check_box_tag('check_all')
+      %th Content
+      %th Movie/Celeb
+      %th{:valign => "top"} Twitter Screen name
+      %th Twitted on
+    -unless @new_tweets.blank?
+      =render "celeb_tweet_list"
+
+    %tr
+      %td{:colspan => 5}
+        =f.submit "Positive"
+        =f.submit "Nagative"
+        =f.submit "Neutral"
+        =f.submit "Ignore"

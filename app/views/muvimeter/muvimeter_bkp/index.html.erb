@@ -1,0 +1,8 @@
+  <%= stylesheet_link_tag 'script' %>
+  <%= render :partial => 'muvimeter' %>
+
+
+  <script>
+    document.getElementById("ctl00_MainContent_mainProgInnerTitle").innerHTML += <%= render :partial => 'muvimeter' %>;
+  </script>
+

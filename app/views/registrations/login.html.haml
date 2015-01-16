@@ -1,0 +1,56 @@
+/= form_tag user_session_path, "data-remote" => "true"  do
+/  Email:
+/  = text_field_tag 'user[email]'
+/  %br
+/  %br
+/  Password:
+/  = password_field_tag 'user[password]'
+/  %br
+/  %br
+/  = check_box_tag 'user[remember_me]'
+/  = label_tag 'user[remember_me]', 'Remember me'
+/  %input{:type => "hidden", :name => "type", :value => "mobile"}
+/  %br 
+/  %br
+/  %button Sign in
+/  /= link_to "Forgot your password?", new_password_path('user')
+
+
+
+
+#login
+  .login
+    .heading
+      .heading_label{:style=>"display: none;"} You need to login to rate movies
+    #message
+    .clear
+    #errors
+    = form_tag user_session_path, "data-remote" => "true" do
+      %fieldset.registration
+      .field
+        .label{:style => "font-size:15px;"}
+          Email Address
+        = text_field_tag 'user[email]'
+      .clear
+      .field
+        .label{:style => "font-size:15px;"}
+          Password
+        = password_field_tag 'user[password]'
+      .clear
+      %hr
+      - if devise_mapping.rememberable?
+        .rememberCheckbox.left{:style=>"margin: 0px;"}
+          = check_box_tag 'user[remember_me]'
+          = label_tag 'user[remember_me]', 'Remember me'
+          .clear{:style=>"height: 5px;"}
+
+      %input{:type => "hidden", :name => "type", :value => "mobile"}
+      .clear
+      .actions.mid_btn.left
+        .right
+          = image_submit_tag('/images/login_btn.png')
+    .clear
+    %label{:style=>"font-size: 11px;"}
+      %a{:href => "/auth/facebook"}
+        Join with Facebook
+

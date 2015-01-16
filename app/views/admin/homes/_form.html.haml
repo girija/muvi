@@ -1,0 +1,50 @@
+.form
+  =form_for "home", :url => create_settings_admin_homes_path do |f|
+    .admin_home_page_div
+      %h3
+        In Theatres
+      =render "muvimeter"
+
+    .admin_home_page_div
+      %h3
+        Upcoming
+      =render "tweeterbuzz"
+
+    .admin_home_page_div
+      %h3
+        Trending Now
+      =render "trendingnow"
+
+    /.admin_home_page_div
+    /  %h3
+    /    Hot Today
+    /  =render "hot_today"
+
+    .admin_home_page_div
+      %h3
+        Featured Celebrity
+      =render "featured_celebrity"
+
+    .admin_home_page_div
+      %h3
+        Celebrity Tweet
+      =render :partial => "manage_celebrity_tweet" 
+
+    .admin_home_page_div
+      %h3
+        Featured Movie
+      =render :partial => "manage_featured_movie"
+    
+    .admin_home_page_div
+      %h3
+        Featured Member
+      =render :partial => "manage_featured_member"
+  
+    .admin_home_page_div
+      %h3
+        Fetured Top 10
+      =render :partial => "manage_featured_topten"
+
+    .clear
+    = f.submit "Save Home Page Settings", :style => "margin-left:45%"
+

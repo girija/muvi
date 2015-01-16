@@ -1,0 +1,5 @@
+<% if params[:block] == "top" %>
+   $("#TopMovie_detail").html("<%= escape_javascript(render :partial => 'shared/show_muvi_detail',:locals => {:item => @movie,:type=>params[:block] }) %>");
+<%else%>
+   $("#UpMovie_detail").html("<%= escape_javascript(render :partial => 'shared/show_muvi_detail',:locals => {:item => @movie,:type=>params[:block] }) %>");
+<%end%>

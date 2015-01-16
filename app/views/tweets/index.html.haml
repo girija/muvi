@@ -1,0 +1,45 @@
+:javascript
+  $(document).ready(function($) {
+    set_critics_review();
+    //setTimeout("set_critics_review()",3000);
+  });
+  function set_critics_review(){
+    $('#mas_container_tweets').masonry({
+      itemSelector : '.mas_item'
+    });
+  }
+
+-if !params[:by].blank?
+  - unless @celebrity_tweets.blank?
+    - if params[:by] == "user"
+      #tweets
+        .right
+          #pagination
+            = will_paginate(@celebrity_tweets, :entry_name => 'review',:params => {:controller => "tweets" , :action => "index", :id => @celebrity.id, :by => "user" })
+        .clear
+        = render '/shared/celebrity_tweets'
+    - else
+      #celeb_tweets
+        .right
+          #pagination
+            = will_paginate(@celebrity_tweets, :entry_name => 'review',:params => {:controller => "tweets" , :action => "index", :id => @celebrity.id, :by => @celebrity.permalink })
+        .clear
+        = render '/shared/celebrity_tweets'
+  -else
+    - if params[:by] == "user"
+      %h4 Tweets are  not present for this celebrity
+    -else 
+      %h4 Tweets are  not present by this celebrity
+
+-else
+  -unless @movie_user_reviews.blank?
+    #user_reviews
+      .clear
+      = render '/shared/reviews'
+  -unless @movie_tweets.blank?
+    #movie_tweets
+      .right
+        #pagination
+          = will_paginate(@movie_tweets, :entry_name => 'review',:params => {:controller => "tweets" , :action => "index", :id => @movie.id })
+      .clear
+      = render '/shared/movie_tweets'

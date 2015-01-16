@@ -1,0 +1,63 @@
+- @my_wanna_see_movies = []
+- @my_seen_movies = []
+- @my_rated_movies = []
+
+-unless current_user.blank?
+  - list = ListOfMovie.find_by_user_id(current_user.id)
+  - if list && !list.wanna_see_lists.blank?
+    - wannasee_list = ActiveSupport::JSON.decode(list.wanna_see_lists)
+    - wannasee_list.each do |wanna_see|
+      - @my_wanna_see_movies << wanna_see["object"]["id"].to_i
+  - if list && !list.seen_lists.blank?
+    - seen_list = ActiveSupport::JSON.decode(list.seen_lists)
+    - seen_list.each do |seen|
+      - unless seen["object"].blank?
+        - @my_seen_movies << seen["object"]["id"].to_i
+
+  - rated =  UserMovieList.where(:user_id => current_user.id)
+  - if rated
+    - rated.each do |rate|
+      - if !rate.movie_id.blank?
+        - rated_list = ActiveSupport::JSON.decode(rate.movie_id)
+        - rated_list.each do |movie|
+          - @my_rated_movies << movie.to_i
+  - @my_rated_movies.uniq!
+
+- @seen_movies = []
+- if @all_seen && !@all_seen.seen_lists.blank?
+  - all_seen_movies = ActiveSupport::JSON.decode(@all_seen.seen_lists)
+  - all_seen_movies.each do |all_movie|
+    - @seen_movies  << all_movie["object"]["id"].to_i
+- unless @seen_movies.blank?
+  .row-list-header.media{:style => 'cursor:pointer;border:1px solid #E5E5E5;padding:5px;margin:3px 0;margin-bottom:-1px;margin-top:8px;background:#f9f9f9', "data-id" => @all_seen.id,:id=>"list_header_#{@all_seen.id}",:onclick=>"open_movie_list('#{@all_seen.id}', 0)"}
+    %a.pull-left{:id=>"poster_#{@all_seen.id}"}
+      - movie = Movie.find_by_id(ActiveSupport::JSON.decode(@seen_movies.to_json).last.to_i)
+      = image_tag "#{POSTER_URL}#{movie.banner_image_medium}", :style => 'height:90px;width:60px;', :class => 'media-object list_poster' if movie
+    .media-body
+      .media-heading.pull-left{:style => 'color:#494949;font-size:28px;font-weight:bold;padding-top:10px;line-height:26px;'}
+        All seen movies
+      .clear{:style => 'padding-top: 25px;'}
+        .pull-left
+          =image_tag("/images/share.png",:id=>"share_#{@all_seen.id}",:style=>"display:none;")
+          - unless current_user.blank?
+            - if current_user.id.to_i !=  params[:user_id].to_i
+              - if !@all_seen.followed_by?(current_user)
+                = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow-all btn-primary bold_class btn-medium tip_hint', "data-id" => @all_seen.id, :id => "btn-follow-#{@all_seen.id}", :style => 'border-radius:2px 2px 2px 2px;width:60px',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+              - else
+                = link_to "Following".html_safe, "#" , :class => 'btn btn-following-all btn-primary bold_class disabled btn-medium', "data-id" => @all_seen.id, :id => "btn-follow-#{@all_seen.id}", :style => 'border-radius:2px 2px 2px 2px;width:65px'
+          - else
+            = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow-login btn-primary bold_class btn-medium tip_hint', "data-id" => @all_seen.id, :id => "btn-follow-#{@all_seen.id}", :style => 'border-radius:2px 2px 2px 2px;width:60px',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+        .pull-left{:id => "followers-all-#{@all_seen.id}"}
+          = render "followers_all_seen", :@tagged => @all_seen
+        .pull-right{:style => 'font-size:20px;width:48px;margin-top:-30px; cursor:pointer;'}
+          = "<i class='icon-chevron-down' id='marker#{@all_seen.id}'></i>".html_safe
+
+  .media{:style => 'display:none',:id=>"movie_list_back_#{@all_seen.id}", :class=>"movie_list_back_#{@all_seen.id}"}
+    =render template: "user_movie_lists/show_list", :locals=>{:@list=>@all_seen}
+    
+  :javascript
+    $(document).ready(function($) {
+      if(document.URL.indexOf("/all_seen_list") != -1){              
+        open_movie_list('#{@all_seen.id}', 0)
+      }
+    });

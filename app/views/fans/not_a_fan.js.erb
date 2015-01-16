@@ -1,0 +1,21 @@
+if("<%= params[:fans][:type] %>" == "profile"){
+  window.location.href = window.location;
+}  
+else{
+  <% if params[:block_type] == "fan" || params[:block_type] == "unfan" %>
+    <% if @count.is_fan == false %>
+      successMessage("You are not a fan of <%= @celeb.name%>");
+      badgePoints('for not becoming a fan',1);
+    <%else%>
+      successMessage("You became a fan of <%= @celeb.name%>");
+      badgePoints('for becoming a fan',1);
+    <%end%>
+    $("#<%= params[:block_type]%>_celeb_detail").html("<%= escape_javascript(render 'user_profiles/profile_celeb_detail',:item=>@celeb,:type => params[:block_type],:prev_item => @prev_item, :next_item => @next_item) %>");
+
+  <%else%>
+    $("#fan_btn").attr('src','/images/fan_big.png');
+    $("#not_fan_btn").attr('src','/images/no_fan_hover_big.png');
+    successMessage("You are not a fan of <%= @celeb.name %>");
+    badgePoints('for becoming a fan',1);
+  <%end%>
+}

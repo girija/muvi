@@ -1,0 +1,35 @@
+<script type="text/javascript">
+<%- unless @next_movie.blank? %>
+  $("#movie_id").val("<%= @next_movie.id %>");
+  $("#movie_name").html('<%= @next_movie.name %>');
+  $("#movie_cast").html('<%= @next_movie.get_first_two_actors  %>');
+  $("#movie_story").html('<%= @next_movie.story.truncate(100) if @next_movie.story %>');
+  $("#movie_add_info").html('<%= @next_movie.additional_info.truncate(100) if @next_movie.additional_info %>');
+  $("#movie_image").attr({src : '<%= @next_movie.banner_image %>', alt : '<%= @next_movie.name %>'})
+  $("#movie_link").val("/movies/<%= @next_movie.permalink %>");
+  
+<% end %>
+$("#next_movie_id").val("<%= @next_movie_pass.id %>");
+$("#next_movie_title").val("<%= @next_movie_pass.name %>");
+$("#next_movie_cast").val("<%= @next_movie_pass.get_first_two_actors %>");
+$("#next_movie_image").val("<%= POSTER_URL %><%= @next_movie_pass.banner_image %>");
+$("#next_movie_story").val("<%= @next_movie_pass.story.truncate(100) if @next_movie_pass.story %>");
+<% if !@next_movie_pass.additional_info.blank? %>
+  $("#next_movie_add_info").css("background-color","#f7f7f7");
+  $("#next_movie_add_info").val("<%= @next_movie_pass.additional_info.truncate(100) %>");
+<% else %>
+  $("#next_movie_add_info").css("background-color","");
+  $("#next_movie_add_info").val("");
+<% end %>
+$("#next_movie_link").val("/movies/<%= @next_movie_pass.permalink %>");
+<%- if @trailer != false %>
+  $("#next_movie_trailer_url").val("<%= VIDEO_URL %>/system/trailers/<%= @trailer.id %>/original/<%= @trailer.trailer_file_name.to_s %>");
+  $("#next_movie_trailer_title").val("<%= @trailer.trailer.url.to_s %>");
+<%- else %>
+  $("#next_movie_trailer_url").val("");
+  $("#next_movie_trailer_title").val("");
+<%- end %>
+
+$("#movie_block").fadeTo(3000,1);
+enableButtons();
+</script>

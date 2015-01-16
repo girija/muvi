@@ -1,0 +1,21 @@
+.left
+  -@lists.each do |list|
+    -tagged = UserMovieList.find(list.list_id)
+    .left{:style => "width:320px"}
+      .container-fluid
+        .row-fluid
+          .row-list-header.media{:style => 'cursor:pointer;border:1px solid #E5E5E5;padding:5px;margin:3px 0;margin-bottom:-1px;margin-top:8px;background:#f9f9f9;height:90px;', "data-id" => tagged.id,:id=>"list_header_#{tagged.id}",:onclick=>"open_movie_list('#{tagged.id}', 1)"}
+            %a.pull-left{:id=>"poster_#{tagged.id}"}
+              - movie = Movie.find_by_id(ActiveSupport::JSON.decode(tagged.movie_id).last.to_i)
+              = image_tag "#{POSTER_URL}#{movie.banner_image_medium}", :class => 'media-object list_poster' if movie
+            .media-body{:style => "margin: 0px 30px 0px 0px; text-align: left;"}
+              %div.media-heading.pull-left{:style => 'color:#494949;font-weight:bold; font-size:14px;height:50px;'}
+                = tagged.tag
+              .clear
+                - unless current_user.blank?
+                  - if !tagged.followed_by?(current_user)
+                    = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow btn-primary bold_class btn-medium tip_hint', "data-id" => tagged.id, :id => "btn-follow-#{tagged.id}", :style => 'border-radius:2px 2px 2px 2px;width:60px;float:left;',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+
+
+.clear{:style => "height:30px"}
+

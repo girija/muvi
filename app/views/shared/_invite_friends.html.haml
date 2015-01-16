@@ -1,0 +1,42 @@
+.GrayHeaderBox
+  .sidebar_header
+    %h3 Invite Friends
+  .row
+    %span#message{:style => 'margin-left:0px'}
+    .clear
+    = form_tag '/connections/email_invite',:remote => true, :onsubmit => "return validate_email();", :id => "email_invite_form" do
+      Muvi is more fun with friends!
+      .clear{:style => "height:5px"}
+
+      = text_field_tag "email_invite" , "" , :style => "width:180px; font-weight:normal;font-size:11px;", :placeholder => "Enter email address of friends"
+      = submit_tag "Invite"
+    .clear{:style => 'height:10px'}
+    /= link_to("Invite friends from Facebook", "/connections#invite")
+    /= link_to("Invite friends from Facebook", "/connections/list/invite#invite")
+    = link_to("Invite Facebook Friends", "#", :onclick => "invite();", :style => "font-weight:normal")
+
+
+:javascript
+  function invite(){
+    $('#registration').html('');
+    $('#registration').modal({
+        minHeight:500,
+        minWidth:700,
+        containerId:'register_from',
+        onShow: function(model){
+            //for(var i=0; i<5; i++)
+            var t=setTimeout("$.modal.setContainerDimensions()", 1000);
+        }
+    });
+    $.modal.setContainerDimensions();
+    var t=setTimeout("enableLoginErrorHide();", 5000);
+
+
+    $.post('/connections/invite_friends', function(data) {
+      var html = '<div id="login"><div class="login">'+ data +'</div></div>';
+      $('#registration').html(html);
+    });
+    return false;
+
+  }
+

@@ -1,0 +1,6 @@
+//location.reload(true);
+if("<%= params[:movie_id] %>" == ""){
+	window.location = "/show_trailer";
+}else{
+	window.location = "/play_fullmovie/<%= params[:movie_id]%>?ads=false";
+}

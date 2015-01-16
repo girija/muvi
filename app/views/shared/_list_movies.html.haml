@@ -1,0 +1,64 @@
+- unless @movies.blank?
+  - @movies.in_groups_of(2) do |group|
+    - group.each do |movie|
+      - unless movie.blank?
+        .box.left
+          .moviBox.left
+            = link_to image_tag(movie.banner_image) , movie_path(movie)
+          .title.left
+            = link_to "<h3> #{movie.name} </h3>".html_safe, movie_path(movie)
+
+            .clear{:style => "height:3px"}
+            -actors = get_actor_name(movie)
+            -actor_name = ""
+            - unless actors.blank?
+              -i=0
+              - actors.each do |actor|
+                -if i == 2
+                  -break
+                -unless actor.celebrity.blank?
+                  - unless actor.celebrity.name.blank?
+                    -if actor_name.blank?
+                      -actor_name = (link_to actor.celebrity.name,star_path(actor.celebrity.permalink),:class => "small_orange_font", :style => "font-weight:normal")
+                    -else
+                      -actor_name = actor_name + ", "+ (link_to actor.celebrity.name,star_path(actor.celebrity.permalink),:class => "small_orange_font", :style => "font-weight:normal")
+                  -i = i + 1
+
+            %span{:class => "small_orange_font"}
+              =actor_name  
+         
+          .home_page_rating.left
+            %div{:class => "video_div", :id => "video_div_#{movie.id}", :style => "visibility:hidden"}
+              =render "/shared/trailers", :movie_id => movie.id, :movie_permalink => movie.permalink
+
+            /-default_video = get_default_video(movie)
+            /-if default_video != false
+            /  .video_div
+            /    %a{:href => "#", :id => "movie_link_#{movie.id}", :class => 'MovieTrailerLink' }
+            /      View Trailer
+            /  %div{:id => "movie_#{movie.id}", :class => 'hidden'}
+            /    %a{:id => "movie_video_#{movie.id}",  :href => "#{default_video.trailer.url.to_s}", :style => "display:block;width:520px;height:330px"}
+            /-else
+            /  .video_div{:style => "visibility:hidden"}
+       
+            -if !movie.release_date.nil? and !movie.release_date.blank? and movie.release_date <= Date.today or !movie.critics_reviews.blank?
+              %span.gray_bold
+                = link_to "Muvimeter", movie_path(movie, :anchor => "critics")
+              .home_rating_bar.left
+                = ratingbar(movie.muvimeter)
+              -if movie.muvimeter != 0 and !movie.muvimeter.blank? and !movie.muvimeter.nil?
+                .home_ratingvalue.left
+                  -muvimeter = "#{movie.muvimeter || 0}%"
+                  = link_to muvimeter, movie_path(movie, :anchor => "critics")
+            -else
+              %span.gray_bold
+                = link_to 'Muvibuzz', movie_path(movie, :anchor => "tweets")
+              .clear
+              .home_rating_bar.left
+                = ratingbar(movie.tweet_percent)
+              -if movie.tweet_percent != 0 and !movie.tweet_percent.blank? and !movie.tweet_percent.nil?
+                .home_ratingvalue.left
+                  -user = "#{movie.tweet_percent || 0}%"
+                  = link_to user, movie_path(movie, :anchor => "tweets"),:style => "color:#4F4F4F"
+-else
+  %h3 No Movies Found

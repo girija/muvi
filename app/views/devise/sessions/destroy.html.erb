@@ -1,0 +1,16 @@
+<script>
+
+$.ajax({
+  url: "http://54.165.82.244/site/logout",
+  dataType: "jsonp",
+  success: function(){
+alert("Aa");
+             window.location = "http://www.muvi.com";
+           }
+});
+
+
+function jsonpcallback(data){
+                alert(data);
+        }
+</script>

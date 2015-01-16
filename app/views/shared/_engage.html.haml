@@ -1,0 +1,44 @@
+:javascript
+  $(document).ready(function() {
+  });
+%div{:style=>"padding-top:1px;width:642px;"}
+  -@refer = @movie ? @movie : @celebrity
+  = form_for "discussion",:url => "/discussion/save_discussion", :remote => true, :html => {:id => "discussion",:onsubmit=>"return append_new_discussion('#{@refer.permalink}');"} do |f|
+    - user_id = current_user ? current_user.id : ""
+    - secondary_id = @refer.id
+    - secondary_type = @refer.class.to_s
+    = f.hidden_field :user_id, :value => user_id
+    = hidden_field_tag :reference_id, secondary_id
+    = hidden_field_tag :reference_type, secondary_type
+    %div{:style => 'width:45%;float:left'}
+      .actions.left
+        %table
+          %tr
+            %td
+              Comment/question
+            %td{:style=>"padding-left:10px;"}
+              =f.text_area "question",:size=>"70px",:onclick=>"show_full_discussion_form();",:onblur=>"hide_full_discussion_form();",:class=>"discussion_text"
+            %td
+              .gradient-input-button.ui-corner-all{:style=>"padding-top:2px;"}
+                - if current_user
+                  %input{:type => "submit", :value => "Submit", :style=>"width:60px;", :class => "login_link"}
+                - else
+                  %input{:type => "button", :value => "Submit",:onclick=>"call_login('discussion');", :style=>"width:60px;", :class=>"login_link"}
+        .clear
+  .clear{:style=>"height:20px;"}
+  -if @refer.class.to_s == "Celebrity"
+    %div{:class=>"right"}
+      %span{:style=>"small_light_gray"}
+        From &nbsp;&nbsp;
+      =select_tag :flag, options_for_select([["All", "All"], "Star"],"#{params[:filter]}"), :id=>"engage_filter", :onchange => "filter_engage('#{@refer.id}','#{@refer.permalink}');"
+    .clear{:style=>"height:10px;"}
+  %a{:href=>'#', :id=>'hidden_reply_login', :class=>'gradient-button2 left', :href=>"#{new_user_session_path}?refer_type=#{@refer.class.to_s}", "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' ,:style=>"width:60px;display:none;"}
+
+  - user_id = current_user ? current_user.id : ""
+  %input{:type => "hidden", :id => "user_id",:name=>"user_id", :value => user_id}
+  %div{:id => "discussion_data", :style=>"border-top: 1px solid #C0C3C8;"}
+    - @engage_items.each do |item|
+      %div{:id => "discussion_list_#{item.id}"}
+        = render '/shared/discussion', { :item => item, :refer => @refer}
+      .clear
+

@@ -1,0 +1,31 @@
+-if @movie_tweets.blank?
+  %h4 Tweets are  not present for this movie.
+-else
+  %div{:id=>"mas_container_tweets"}
+    - @movie_tweets.in_groups_of(2) do |group|
+      - group.each do |tweet|
+        - unless tweet.blank?
+          %div{ :style => "margin:0px 0px 8px 8px; width:260px", :class => "left mas_item"}
+            %div.reviewBox.left
+              %div.image.left
+                %a{:href=>"http://www.twitter.com/#!/#{display_name(tweet)}", :target=>"_blank"}
+                  %img{:src => "http://api.twitter.com/1/users/profile_image?screen_name=#{display_name(tweet)}&size=normal"}
+              %div.reviewIcon.right
+                = thumb_class_for_union_result(tweet)
+              %div.names{:style => "min-height:56px"}
+                %p
+                  - unless tweet[2].blank?
+                    = truncate(tweet[2].html_safe, :length => 100)
+                  - else
+                    = "Rated #{@movie.name} #{tweet[3]} stars."
+                .clear
+              .clear
+  
+              %div{:class => "bottom_tab_texts", :style => "width:250px"}
+                %a{:href=>"http://www.twitter.com/#!/#{display_name(tweet)}", :target=>"_blank",:style => "color:#B0B0B0;"}
+                  =display_name(tweet)
+                  ,
+                = Time.parse(tweet[6]).strftime('%d %B %Y').to_s rescue ''
+
+    .clear
+

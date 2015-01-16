@@ -1,0 +1,32 @@
+= form_for([activity, Comment.new], :remote => true, :html => {:id => "comment_form_#{activity.id}"})  do |f|
+  
+  #error_container_id
+    = render '/shared/error_display', {:error_object => f.object }
+
+
+  %ul
+    %li{:style => "list-style:none; margin-left:45px"}
+      %div{:style => "float:left",:class => "user_image"}
+      %div{:style => "float:left;margin-left:5px"}
+        %textarea{:id => "comment_#{activity.id}",:name => "comment_#{activity.id}", :rows => 1, :cols => 60, :class => "textarea_class", :onkeypress => "check_event_and_submit(event, '#{activity.id}');", :placeholder => "Write a comment"}
+        =f.text_area :comment, :style => "display:none"
+
+        -if(defined? comment)
+          %input{:type => "hidden", :id => "parent_id_#{activity.id}", :value => comment.id}
+          = f.hidden_field "parent_id"
+        %input{:type => "hidden", :name => "activity_comment", :value => "#{activity.id}" }
+        = f.hidden_field :user_id, :value => "#{params[:user_id]}"
+
+
+  /.field
+  /  %div{:style => 'width:400px;float:left;margin-top:10px;'}
+  /    %textarea{:id => "comment_#{activity.id}",:name => "comment_#{activity.id}", :rows => 1, :cols => 40, :style => "height:15px", :onkeypress => "check_event_and_submit(event, '#{activity.id}');"}
+  /    =f.text_area :comment, :style => "display:none"
+
+  /    -if(defined? comment)
+  /      %input{:type => "hidden", :id => "parent_id_#{activity.id}", :value => comment.id}
+  /      = f.hidden_field "parent_id"
+  /  %input{:type => "hidden", :name => "activity_comment", :value => "#{activity.id}" }
+
+  .clear
+

@@ -1,0 +1,48 @@
+-if current_user.nil?
+  -cache "page_cache",:expires_in => 30.minutes do
+    =render :partial => "before_login"
+  
+  -chat = Chat.find(:first)
+  -session[:first_visit] == ""
+  -if session[:first_visit].blank?
+    -if cookies[:first_time_visit] != "yes"
+      -session[:first_visit] = 1
+
+  :javascript
+    //if ($.cookie("first_time_visit") == null) {
+    if(#{session[:first_visit].to_i} == 1){
+      if("#{chat.is_enabled}" == "true"){
+        (function() {
+          var se = document.createElement('script'); se.type = 'text/javascript'; se.async = true;
+          se.src = '//commondatastorage.googleapis.com/code.snapengage.com/js/192c2413-58ab-436c-a729-30286150d3ad.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(se, s);
+        })();
+      }
+      $.cookie("first_time_visit", 'yes', { expires: 365, path : "/"});
+    }
+
+-else
+  :javascript
+    $.cookie('has_logged_in', '1', { expires: 365, path : "/"});
+
+  =render :partial => "index"
+  /-if current_user.sign_in_count == 0 #or current_user.sign_in_count == 1
+  /  :javascript
+  /    window.location.href = "/show_invite"
+  /-else
+  /  =render :partial => "index"
+
+  /.left{:id => "invite"}
+  /  =render :partial => "invite_friends"
+  /.clear
+
+  /.left{:id => "choose_language", :style => "display:none"}
+  /  =render :partial => "choose_language"
+  /.clear
+
+  /.left{:id => "show_movie", :style => "display:none"}
+  /  =render :partial => "show_movie"
+  /.clear
+
+  /%div{:id => "feed", :style => "display:none"}
+  /  =render :partial => "feed"

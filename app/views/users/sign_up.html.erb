@@ -1,0 +1,33 @@
+<div id="fb-root"></div>
+  <script src="https://connect.facebook.net/en_US/all.js#appId=<%= FACEBOOK_APPID %>&xfbml=1"></script>
+
+<div id="register_div" style="display:none">
+  <fb:registration
+    redirect-uri="http://<%= request.env["HTTP_HOST"] %>/register"
+    fields='[{"name":"name"}, {"name":"email"}, {"name":"password"}]' width="530">
+  </fb:registration>
+
+  
+</div>
+
+<script>
+  FB.init({
+      appId      : <%= FACEBOOK_APPID %>, 
+      status     : true, 
+      cookie     : true, 
+      xfbml      : true  
+  });
+
+  FB.getLoginStatus(function(response) {
+    if (response.status === 'connected') {
+      $.post('/check_user_login?user_id='+response.authResponse.userID, function(data) {
+        if(data == 0){
+          $("#register_div").show();
+        }  
+      });
+    }else{
+      $("#register_div").show();
+    }
+  }, true);
+
+</script>

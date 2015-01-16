@@ -1,0 +1,35 @@
+= render 'menu'
+%br
+%br
+= form_for @search, :url => admin_updates_admin_reports_path, :html => {:method => :get} do |f|
+  = f.label :activity_date_gteq, 'Date From'
+  = f.text_field :activity_date_gteq , :id => 'release_date_lt', :size => 10
+  = f.label :activity_date_lteq, 'to'
+  = f.text_field :activity_date_lteq, :id => 'release_date_gt',  :size => 10
+  = f.submit "Search"
+  .clear
+
+%br
+
+%table.listing
+  %tr
+    %th Date
+    %th Type
+    %th Number
+    %th Description
+
+  - unless @admin_updates.blank?
+    - @admin_updates.each do |activity|
+      %tr
+        %td= activity.activity_date
+        %td= activity.activity_type
+        %td= activity.number
+        %td= activity.description
+
+  -else
+    %tr
+      %td{:colspan => 3}
+        %p Sorry there are no results for your filter request(s)
+
+= will_paginate @admin_updates
+

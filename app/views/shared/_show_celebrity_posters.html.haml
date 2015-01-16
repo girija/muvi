@@ -1,0 +1,47 @@
+%script
+  var poster_id_arr = new Array;
+
+%div{:style => "width:650px"}
+  #poster_div{:style => "display:none;"}
+    -poster_list = Poster.get_poster(@celebrity.id, "Celebrity", "Poster")
+    - unless poster_list.blank?
+      - poster_list.each do |poster|
+        %div{:id => "full_poster_image_#{poster.id}", :class => "poster_list", :style => "display:none;"}
+          =image_tag poster.poster.url(:original), :style => "max-width:520px; max-height:600px"
+        %script
+          poster_id_arr.push("#{poster.id}");  
+    %script
+      if("#{poster_list.size}" == 0){
+      $("#display_celebrity_picture").hide();
+      }
+
+  #poster_list.left
+    -poster_list = Poster.get_poster(@celebrity.id, "Celebrity", "Poster")
+    - unless poster_list.blank?
+      - poster_list.each do |poster|
+        %div{:id => "poster_image_#{poster.id}", :style => "width:100px;margin-right:4px; height:164px", :class => "left"}
+          .left
+            =image_tag ("/system/posters/#{poster.id}/medium/#{poster.poster_file_name.gsub(" ", "%20")}"), :width => "80px", :height => "114px",:onclick => "javascript:show_poster('#{poster.id}');", :style => "cursor:pointer"
+            .clear
+            %h4
+              =truncate(poster.name.html_safe, :length => 40) unless poster.name.blank?
+
+
+:javascript
+  function show_poster(poster_id){
+    $("#poster_div").show();
+    for(var i = 0; i < poster_id_arr.length; i++){
+
+      if(poster_id_arr[i] == poster_id){
+        $("#full_poster_image_"+poster_id).show();
+      }
+      else{
+        $("#full_poster_image_"+poster_id_arr[i]).hide();
+      }
+    }
+    $("#poster_list").addClass("right_side_video");
+    $("#poster_list").css("height", "500px");  
+    $("#poster_list").css("width", "124px");
+    $("#poster_list").css("float", "right");
+  }
+ 

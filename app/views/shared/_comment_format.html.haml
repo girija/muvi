@@ -1,0 +1,26 @@
+%div{:id => "comment_#{comment.id}"}
+  %div{:style => "float:left;width:240px;color:#C0C0C0;"}
+    %div{:class => "image left tip_hint tooltipbottom",:style=>"height:32px;width:32px;"}
+      - ub = UserBadge.find_by_user_id(comment.user.id)
+      - if !ub.blank?
+        - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+        - if points >= 1 and points < 5
+          - level = "Level: Muvi Scraper"
+        - elsif points >= 5 and points < 10
+          - level = "Level: Muvi Junkie"
+        - elsif points >= 10
+          - level = "Level: Muvi Maniac"
+      =link_to image_tag(comment.user.user_image, :style=>"width:30px;height:30px;border: 1px solid #EEEEEE;"), "/profile/#{comment.user.id}/#{comment.user.display_name}"
+      .tooltip_description{:style =>'display:none'}
+        %b
+          = comment.user.display_name
+        %br
+        = level
+    %div{:style => "margin-left:35px"}
+      %h4{:style => 'font-weight:normal;font-size:13px;color:#848484'}
+        = comment.comment
+        %br
+        %span{:style => 'font-size:10px', :class => "small_light_gray" , :style => "color:#4d4d4d;font-size:10px"}
+          = link_to comment.user.display_name, "/profile/#{comment.user.id}/#{comment.user.display_name}", :class => "small_light_gray", :style => "color:#4d4d4d;font-size:10px"
+          = " " + distance_of_time_in_words(Time.now, comment.created_at.to_time) + " ago"
+.clear{:style=>"height:5px;"}

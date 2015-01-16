@@ -1,0 +1,50 @@
+:javascript
+  function set_language(lang){
+    //$.cookie(lang, 'yes');
+    $.cookie('language', lang);
+    show('movie');
+  }
+
+%h4
+  %span{:style => "font-size:25px"}
+    Step 2: 
+  Select the regions you are interested in
+.clear{:style => "height:30px"}
+
+.left.map{:onclick => "set_language('english');"}
+  .left{:class => "map_image", :style => "width:320px;"}
+    =image_tag("hollywood.png")
+  .clear
+  .left{:style => "margin-left:40px"}
+    %h4 Hollywood
+
+
+.left.map{:onclick => "set_language('hindi');"}
+  .left{:class => "map_image"}
+    =image_tag("bollywood.png")
+  .clear
+  .left{:style => "margin-left:40px"}
+    %h4 Bollywood
+
+
+.left.map{:onclick => "set_language('tamil');"}
+  .left{:class => "map_image"}
+    =image_tag("bollywood.png")
+  .clear
+  .left{:style => "margin-left:40px"}
+    %h4 Tamil
+
+
+.left.map{:onclick => "set_language('telugu');"}
+  .left{:class => "map_image"}
+    =image_tag("bollywood.png")
+  .clear
+  .left{:style => "margin-left:40px"}
+    %h4 Telugu
+
+.clear{:style => "height:30px"}
+
+.right
+  %input{:type => "button", :class => "btn btn-info btn-large", :onclick => "show('invite');", :value => "Back"}
+  %input{:type => "button", :class => "btn btn-primary btn-large", :onclick => "show('movie');", :value => "Skip"}
+.clear{:style => "height:150px"}

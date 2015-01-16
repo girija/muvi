@@ -1,0 +1,235 @@
+-unless @celebrity.blank?
+  .containerIn.borderDiv
+    .left{:style => "border:1px solid #d2d6d9"}
+      .moviBanner.left
+        .moviImage
+          = image_tag(@celebrity.image, :width => "125", :height => "200")
+      
+        /%h4
+        /  -if @celebrity.celebrity_type.kind_of?(Array) == true
+        /    -profession_type=""
+        /    -@celebrity.celebrity_type.each do |profession|
+        /      -profession_type += profession.capitalize+", "
+        /    -unless profession_type.blank?
+        /      =profession_type.chop.chop
+        /  -else
+        /    =@celebrity.celebrity_type
+        /.clear
+    
+        /- if current_user
+        /  = link_to "Comment", '#comments' , :id => 'comment_count'
+        /-else
+        /  = link_to "Comment", new_user_session_path(:login => 'comment'), :remote => true, :onclick => "enableLoginError(registration(), 'You need to login to add comment')"
+
+      .clear
+      .left_side_vertical_tab{:style => "margin-bottom:0px"}
+        =link_to "Tweets", "#users", :onclick => "go_to_tab(1);"
+    .moviDetail.left
+      -if params[:extra_arg].nil?
+        .detail
+          %h3
+            %span Celebrity
+            Popularity
+          .clear
+       
+          .clear
+          %div{ :style => "margin-top:12px;", :class => "moviRatingBox left"}
+            .rating
+              = link_to 'POPULARITY INDEX', '#users', :onclick => "go_to_tab(1);", :style => "color:#4F4F4F"
+              .clear
+              .ratingBar.left
+                = ratingbar(@celebrity.popularity)
+
+              .ratingvalue.left
+                -if !@celebrity.popularity.blank? and @celebrity.popularity != 0
+                  -popularity = "#{@celebrity.popularity || 0}%"
+                  = link_to popularity, '#users', :onclick => "go_to_tab(1);", :style => "font-size:20px;color:#4F4F4F"
+              .clear
+          .friendsLink.right{:style=>"height:80px;"}
+            = render '/shared/fan'
+          .clear{:style=>"height:10px;"}
+          -if !current_user
+            -if !@celebrity_fans.blank?
+              %div{:style=>"height:25px;"}
+                -@celebrity_fans.each_with_index do |fan,i|
+                  -if i < 1
+                    =link_to fan.user.display_name, "/profile/#{fan.user.id}/#{fan.user.display_name}"
+                -if @celebrity_fans.count <= 1
+                  %span{:style=>"padding-left: 5px;position: absolute;font-size:10px;font-weight:normal;"}
+                    ="fan. #{link_to 'Login', new_user_session_path, :remote => true, :onclick => 'registration()'} to see who in your connections are fans.".html_safe
+                -else
+                  %span{:style=>"padding-left: 5px;position: absolute;font-size:10px;font-weight:normal;"}
+                    ="and #{link_to (@celebrity_fans.count-1).to_s+' others','javascript:void(0);',:onclick=>'show_all_other("other_fans_content")'} are fans. #{link_to 'Login', new_user_session_path, :remote => true, :onclick => 'registration()'} to see who in your connections are fans.".html_safe
+          -else
+            -if !@celebrity_fans.blank?
+              %div{:style=>"height:45px;"}
+                %div{:style=>"width:215px;",:class=>"left"}
+                  -@celebrity_fans.each_with_index do |fan,i|
+                    -if i < 2
+                      =link_to image_tag(fan.user.user_image,:alt =>fan.user.display_name,:title =>fan.user.display_name, :style=>"width:35px;height:35px;border: 1px solid #EEEEEE;"), "/profile/#{fan.user.id}/#{fan.user.display_name}"
+                  -if @celebrity_fans.count <= 2
+                    %span{:style=>"padding-top:20px;padding-left: 5px;position: absolute;font-size:10px;font-weight:normal;"}
+                      ="fan.".html_safe
+                  -else
+                    %span{:style=>"padding-top:20px;padding-left: 5px;position: absolute;font-size:10px;font-weight:normal;"}
+                      ="and #{link_to (@celebrity_fans.count-2).to_s+' others','javascript:void(0);',:onclick=>'show_all_other("other_fans_content")'} are fans.".html_safe         
+          .clear
+
+        %a{:href => "#", :name => "video"}
+        .detail{:id => "display_celebrity_video"}
+          %h3
+            %span Celebrity
+            Videos
+          .clear
+
+          .clear{:style => "height:10px"}
+          =render "/shared/show_celebrity_videos"
+          .clear
+
+        %a{:href => "#", :name => "poster"}
+        .detail{:id => "display_celebrity_picture"}
+          %h3
+            %span Celebrity
+            Pictures
+          .clear
+
+          .clear{:style => "height:10px"}
+          =render "/shared/show_celebrity_posters"
+          .clear
+
+        -@upcoming_movies = upcoming_movies(@celebrity)
+        -unless @upcoming_movies.blank?
+          .detail
+            %h3
+              %span Muvis
+              Upcoming
+            .clear
+
+            = render '/shared/upcomming_movie', {:from => 'movies'}
+            .clear
+      -if params[:extra_arg].nil? || params[:extra_arg] == "filmography"
+        %div{:id=>"top_rated_movies"}
+          -@top_rated_movies = top_rated_movies(@celebrity)
+          -unless @top_rated_movies.blank?  
+            .detail
+              %h3
+                %span Muvis
+                Top rated
+                %span{:style=>"float:right;"} 
+                  =link_to "Full Filmography","javascript:void(0);", :onclick=>"show_full_filmography()", :style=>"font-weight:normal;text-transform:capitalize; "
+              .clear
+    
+              = render '/shared/top_rated_movie', {:from => 'movies'}
+              .clear
+        %div{:id=>"full_filmography",:style=>"display:none;"}
+          .detail
+            %h3
+              %span Full Filmography
+              %span{:style=>"float:right;"}
+                =link_to "Top Movies","javascript:void(0);", :onclick=>"show_top_movies()", :style=>"font-weight:normal;text-transform:capitalize; "
+            .clear
+            %div{:id=>"all_movies"}
+            .clear
+            -@all_movie = full_filmography(@celebrity)
+            = render '/shared/full_filmography', {:from => 'movies'}
+            .clear
+      -if params[:extra_arg].nil?   
+        .detail.personal-info
+          %h3
+            %span Personal
+            Info
+          .clear
+
+          %h5.cast{:id=>'personal-info-cast'} 
+            Bio:
+            %span.personal-info-cast-bio
+              =@celebrity.summary
+          %div{:class => "moviCasts left"}
+            %h5
+              Birth Date:
+              %span
+                -unless @celebrity.birthdate.blank?
+                  =@celebrity.birthdate.strftime('%d %B %Y')
+  
+          %div{:class => "moviCasts left"}
+            %h5
+              Birth Place:
+              %span
+                =@celebrity.birthplace
+
+          .clear
+        /%div{ :style => "margin-top:12px;", :class => "moviRatingBox left"}
+      %a{:href => "#", :name => "news"}
+      -if params[:extra_arg].nil? || params[:extra_arg] == "news" 
+        -unless @news.blank?
+          .detail
+            %div{:id => "latest_news"}
+              -if params[:extra_arg] != "news" 
+                %h3
+                  %span Latest
+                  News
+                  %span{:style=>"float:right;"}
+                    =link_to "See All", "javascript:void(0);", :onclick => "show_all_news('#{@celebrity.permalink}','celebrity');", :style => "font-weight:normal;text-transform:capitalize;"
+                .clear{:style => "height:10px"}
+              -else
+                %h3
+                  %span All
+                  News
+              .clear{:style => "height:10px"}
+              -check = []
+              -@news.each do |n|
+                -if !check.include?n.taggable_id
+                  -check << n.taggable_id
+                  -feed = Feed.get_news_feed(n.taggable_id)
+                  -unless feed.blank?
+                    %h1{:style => "font-size:13px"}= link_to feed.entry_title.html_safe, "/news/celebrity/#{@celebrity.permalink}/#{n.id}", :style => "color:#4F4F4F;"
+                    %i
+                      =feed.source
+                      =feed.created_at.strftime('%B %d, %Y')
+
+                    .clear
+                    =feed.summary.html_safe unless feed.summary.blank?
+                    =link_to "More", "/news/celebrity/#{@celebrity.name}/#{n.id}", :class => "right"
+                .clear{:style => "height:20px"}
+            %div{:id => "all_news"} 
+            /.clear
+      -if  params[:extra_arg].nil?
+        #reviews
+          %ul
+            %li= link_to "Tweets from #{@celebrity.name}<span>&nbsp;</span>".html_safe, tweets_path(:id => @celebrity.id,:by => @celebrity.permalink)
+            %li= link_to "Tweets about #{@celebrity.name}<span>&nbsp;</span>".html_safe, tweets_path(:id => @celebrity.id ,:by => "user")
+            /%li= link_to "Fun Facts" 
+
+      %br
+      - unless current_user.blank?
+        /= render '/comments/celeb_form', {:celebrity => @celebrity}
+      %br
+      /#comments
+      /  -@celebrity.comments.to_level.includes(:user).each do |comment|
+      /    = render '/shared/celeb_comment', { :comment => comment }
+#other_fans_content{:class=>"other_content", :style=>"display:none"}
+  %a{:title => "Close",:class => "modalCloseImg simplemodal-close"}
+  %div{:class=>"inner_modal"}
+    -if !@celebrity_fans.blank?
+      -@celebrity_fans.each_with_index do |fan,i|
+        %div{:class=>"other_div left"}
+          %div{:class=>"other_icon left"}
+            =link_to image_tag(fan.user.user_image,:alt =>fan.user.display_name, :style=>"width:35px;height:35px;border: 1px solid #EEEEEE;"), "/profile/#{fan.user.id}/#{fan.user.display_name}"
+          %div{:class=>"other_name right"}
+            = link_to fan.user.display_name,"/profile/#{fan.user.id}/#{fan.user.display_name}"
+
+
+:javascript
+  var argument = "#{params[:extra_arg]}";
+  if(argument == "filmography"){
+    show_full_filmography();
+  }
+  function show_full_filmography(){
+    var all_movies =  $("#all_movies").html();
+    $("#full_filmography").show();
+    $("#top_rated_movies").hide();
+  }
+  function show_top_movies(){
+    $("#full_filmography").hide();
+    $("#top_rated_movies").show();
+  }

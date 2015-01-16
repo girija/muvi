@@ -1,0 +1,111 @@
+.fbPhotoSnowlift.fbxPhoto.fullScreenAvailable.pagingReady{:style => 'overflow-x:auto;overflow-y:scroll' }
+  .fbPhotoSnowliftOuter
+    .fbPhotoSnowliftInner
+      .fbPhotoSnowliftContainer.uiContextualLayerParent
+        .clearfix.fbPhotoSnowliftPopup{:style => 'width: 1000px; height: 520px;clear:both'}
+          #title_popup{:style => 'height:50px'}
+            .left{:style => 'color:#f3f3f3;font-size:18px;font-family:Arial, Helvetica, sans-serif;padding-top:15px;width:550px'}
+              = @video.name
+            - if params["hide_link"].blank? or  params["hide_link"] == ''
+              .left{:style=> 'cursor:pointer;color:#529bdc;font-weight:bold;padding-top:15px;font-size:13px', :onclick => '$.fancybox.close();$("body").css("overflow", "auto");' }
+                %a{:href => "#{movie_path(params['object_id'])}"}
+                  GO TO MOVIE PAGE
+            .right{:style => 'text-align:center;cursor:pointer', :onclick => '$.fancybox.close();$("body").css("overflow", "auto");'}
+              = image_tag('close.png')
+              %br
+              %span{:style => "font-family:Arial, Helvetica, sans-serif;font-size:9px;color:#747474"} CLOSE
+          #video_block{:style => 'width:944px;'}
+            %div{:style => 'height:470px'}
+              .left{:style => 'display:block;width:640px;'}
+                - unless @video.video_remote_url.blank?
+                  - video_id_arr = @video.video_remote_url.split("/")
+                  - video_id = video_id_arr[video_id_arr.size.to_i - 1]
+                  - video_src = 'http://www.youtube.com/embed/'+ video_id.to_s+'?wmode=opaque&autoplay=1'
+                  %iframe{:width => "640", :height => "390", :src => video_src, :frameborder => "0"}
+                  .video_player_overlay{:style => 'margin-left:546px'}
+                - else
+                  /- video_src = @video.trailer.url.to_s
+                  -video_src = "#{VIDEO_URL}/system/trailers/#{@video.id}/original/#{@video.trailer_file_name.gsub(" ", "%20")}"
+                  %a{:href => video_src , :id => 'video_player', :style => 'display:block;height:390px;width:640px;'}
+                = render "/shared/show_like_dislike"
+              = render "/shared/show_comments"
+          %div{:style => 'padding-bottom:10px'}
+            = image_tag('arrow_popup.png')
+            %span{:style => 'color:#e4e4e4;font-size:12px'}
+              MORE VIDEO TRAILERS FROM MOVIE
+          %div{:style => 'border:1px solid #222;border-left:0;border-right:0;height:150px;width:930px;overflow:auto'}
+            %div{:style => 'height:20px'}
+            %input{:type => "hidden", :id => "counter", :value => "0"}
+            .left{:style => "margin-top:-25px;margin-right:12px;margin-left:352px"}
+            - if @video_list.size > 9
+              .sc{:style => "height:15px"}
+                .right_arrow.right{:id => "right", :onclick => "scroll_list('right');"} &nbsp;
+                .left_arrow.right{:id => "left", :onclick => "scroll_list('left');"} &nbsp;
+            .clear
+            - count = 0
+            - @video_list.each do |video|
+              - if params[:id].to_i == video.id.to_i
+                - bg = 'background:url("'"#{URL}"'/images/video_bg.png")'
+              - else
+                - bg = ''
+              .left{:style => "width:98px;height:104px;padding:7px;margin-right:7px;cursor:pointer;#{bg}"}
+                - unless video.video_remote_url.blank?
+                  - video_id_arr = video.video_remote_url.split("/")
+                  - video_id = video_id_arr[video_id_arr.size.to_i - 1]
+                  %div{:style => "background:url('http://img.youtube.com/vi/#{video_id}/1.jpg');width:99px;", :onclick => "javascript:show_video(#{video.id},'movie','#{@movie.permalink}');"}
+                    %img{:src => "#{URL}/images/play_button.png", :style => "padding-left:75px;padding-top:55px"}
+                - else
+                  %div{:style => "background:url('#{URL}/system/trailer_thumbnails/#{video.id}/1.jpg');width:99px;", :onclick => "javascript:show_video('#{video.id}','movie','#{@movie.permalink}');"}
+                    %img{:src => "#{URL}/images/play_button.png", :style => "padding-left:75px;padding-top:55px"}
+                .clear
+                  %h4
+                    = truncate(video.name.html_safe, :length =>18) unless video.name.blank?
+                .clear
+              %script
+                if("#{count.to_i}" >= 9){
+                $("#di#{count}").hide();
+                }
+              -count = count + 1
+
+%script
+  flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+
+:javascript
+  $(document).ready(function(){
+    $(".fbPhotoSnowliftPopup").height($(window).height());
+    $("body").css("overflow", "hidden");
+  });
+  function scroll_list(p){
+    if(p == "left"){
+      if($("#counter").val() == 0){
+        return false;
+      }
+      if(parseInt($("#counter").val()) > 0){
+        $("#counter").val(parseInt($("#counter").val()) - 3);
+      } else {
+        $("#counter").val(0);
+      }
+      var start = $("#counter").val();
+      var end = parseInt($("#counter").val()) + 9;
+      for(var i = 0; i < "#{@video_list.size}"; i++){
+        $("#di"+i).hide();
+      }
+      for(var i = start; i < end; i++){
+        $("#di"+i).show();
+      }
+    } else {
+      if(parseInt($("#counter").val()) + 3 >= "#{@video_list.size}"){
+        return false;
+      }
+      $("#counter").val(parseInt($("#counter").val()) + 3);
+      var start = $("#counter").val();
+      var end = parseInt($("#counter").val()) + 3;
+      for(var i = 0; i < "#{@video_list.size}"; i++){
+        $("#di"+i).hide();
+      }
+      for(var i = start; i < end; i++){
+        $("#di"+i).show();
+      }
+    }
+  }
+

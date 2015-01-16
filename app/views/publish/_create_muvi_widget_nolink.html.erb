@@ -1,0 +1,57 @@
+
+<% host = "http://www.muvi.com" %>
+<div style='background-color:#FFFFFF;'>
+	<div style='margin-left:3px;font-family:lucida grande, tahoma, verdana, arial, sans-serif;font-size: 12px;background-color:#FFFFFF; padding:12px 4px 4px 0px'>
+  
+	<% cnt = 1 %>
+	<% @movie_list.each do |movie_list| %>
+		<% if cnt == @movie_list.size %>
+			<% border = "" %>
+		<% else %>
+			<% border = 'border-bottom: 1px dashed #D3D3D3' %>
+			<% cnt = cnt + 1 %>
+		<% end %>
+
+		<% link = movie_list[:link]%>
+		<input type='hidden' id='link_<%=cnt%>' value='<%=link%>'>
+		<input type='hidden' id='host' value='<%=host%>'>
+
+		<DIV id='main_muvi_div' style='float:left; width:100%; <%= border%>'>
+			<div style='float:left;width:19%;height:40px; margin-right:2px'><img style='border:0px; height:35px; height:35px;' src='<%=host%><%=movie_list[:image]%>' />&nbsp;</div>
+				<% if movie_list[:name].length.to_i > 16 %>
+				   <div style='float:left;width:33%;margin-right:4px; color:#000000; font-size:11px; font-weight:normal;'><%=movie_list[:name]%></div>
+				<% else %>
+				  <div style='float:left;width:33%;margin-right:4px; margin-top:7px; color:#000000; font-size:11px; font-weight:normal;'><%=movie_list[:name]%></div>
+				<% end %>
+
+			  <% if movie_list[:meter].to_i >= 60 %>
+				   <div style='background-color: #D8D8D8; border: 1px solid #BECBD4;border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; height: 15px; padding: 0px 2px 2px 1px; width: 26%;float:left;margin-right:4px'>
+
+					 <div style='width:<%=movie_list[:meter].to_i %>%; background:url(\"<%=host%>/images/G-RatingBar.jpg\") repeat-x scroll 0 1px transparent; border-radius:7px; -moz-border-radius: 7px; -webkit-border-radius: 7px; height:17px;'>&nbsp;</div>
+
+				   </div>
+			  <% elsif movie_list[:meter].to_i < 60 %>
+				 <div style='background-color: #D8D8D8; border: 1px solid #BECBD4;border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; height: 15px; padding: 0px 2px 2px 1px; width: 26%;float:left;margin-right:4px;'>
+
+				   <div style='width:<%=movie_list[:meter].to_i %>%; background:url(\"<%=host%>/images/R-RatingBar.jpg\") repeat-x scroll 0 1px transparent; border-radius:7px; -moz-border-radius: 7px; -webkit-border-radius: 7px; height:17px;'>&nbsp;</div>
+
+				 </div>
+			  <% end %>
+			<div style='float:left; margin-top: 2px; color:#000000; font-size:11px; font-weight:normal;'><%=movie_list[:meter]%>%</div>
+		</DIV>
+		<div style='clear:both;height:5px'></div>
+ 
+		<% end %>
+
+		<div style='clear:both; height:10px'></div>
+		<div id='logo_div' style='width:100%;float:left;margin-top:-5px;'>
+			<span style='color:#ABABAB; font-size:10px; font-weight:bold'>Powered by </span> 
+			<div style='clear:both; height:4px'></div>
+			<div style='border-top:1px solid #d3d3d3; float:left; width:74%'>&nbsp;</div>
+			<div style='float:left;margin-top:-12px; margin-left:2px'>
+			   <a href='<%=host%>' target='_blank'><img border='0' src='<%=host%>/images/logo_small.png'></a>
+			</div>
+		</div>
+		<div style='clear:both'></div>
+	</div>
+</div>

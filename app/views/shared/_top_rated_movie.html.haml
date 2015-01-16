@@ -1,0 +1,47 @@
+= @top_rated_movie
+- unless @top_rated_movies.blank?
+  %h4
+    &nbsp;
+  - count = 0
+  - @top_rated_movies.each do |movie|
+    
+    -count = count + 1
+    -if count > 8 
+      -break
+    -begin
+      -actors = get_actor_name(movie)
+    -rescue
+
+    -actor_name = ""
+    -actor_link = ""
+    -unless actors.blank?
+      -i=0
+      -actors.each do |act|
+        - unless act.celebrity.blank?
+          -if i == 2
+            -break
+          -if actor_name.blank?
+            -actor_name = act.celebrity.name
+            -actor_link = act.celebrity.permalink
+          -else
+            -actor_name = actor_name + ","+ act.celebrity.name
+            -actor_link = actor_link + "," + act.celebrity.permalink
+          -i=i+1
+    =muvilayout_detail(movie.banner_image_thumb, :name => movie.name, :link_on_name => movie_path(movie), :width => 45, :height => 45, :subtexts => actor_name, :sublink => actor_link)
+    /=muvilayout_detail(movie.banner_image_thumb, :name => movie.name, :link_on_name => movie_path(movie), :width => 45, :height => 45, :subtexts => "", :sublink => "")
+:javascript
+  function play_trailer(videourl,movie_name){
+    $("#myModalLabel").html(movie_name+" Trailer");
+    if (videourl == "") {
+      return false;
+    }
+    $('#video_player').remove();
+    var $video = $('<a />', {
+      href: videourl,
+      id: 'video_player',
+      style: 'display:block;height:290px;width:610px;'
+    });
+    $('#myTrailer .modal-body').append($video);
+    $('#myTrailer').modal("show");
+    flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+  }

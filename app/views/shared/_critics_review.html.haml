@@ -1,0 +1,25 @@
+= form_for(CriticsReview.new, :url => my_reviews_path) do |ff|
+  = render '/shared/error_display', { :error_object => ff.object }
+  %div.critic_review
+    = ff.label :rating, "Rate",:class => 'rate'
+    - ['0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'].each do |rate|
+      %input.star{:class => "{split:2}", :name => "critics_review[rating]", :value => "#{rate}", :type => "radio"}/
+  .clear
+  %div.critic_review.reviewField
+    = ff.label :summary, "Review"
+    = ff.text_area :summary
+    %span#test
+  .clear
+  %div.critic_review
+    = ff.label :link, "Link To full Review"
+    = ff.text_field :link
+    = ff.hidden_field :state, :value => 'publish'
+    = ff.hidden_field :user_id, :value => current_user.id
+    = ff.hidden_field :movie_id, :value => movie.id
+    = ff.hidden_field :film_critic_id, :value => current_user.film_critic.id
+  .clear
+  %br
+  .right.reviewBtn
+    = ff.submit "Add Review"
+    .clear
+

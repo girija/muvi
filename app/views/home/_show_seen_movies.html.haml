@@ -1,0 +1,16 @@
+/.items.scrollx-pane{:style => 'height:766px;overflow:auto;width:280px'}
+.items.scroll-pane
+  %ul.media-list{:style => 'width:280px;margin-left:5px'}
+  
+    -unless movie_lists.blank?
+      - unless movie_lists.seen_lists.blank?
+        - seen_it =  ActiveSupport::JSON.decode(movie_lists.seen_lists).reverse
+        - seen_it.each do |seen|
+          -if !seen.nil?
+            %li.media
+              = link_to image_tag("#{POSTER_URL}#{seen['object']['image']['url'].sub! 'thumb', 'medium'}", :alt => '', :style => 'height:64px;'), "#{seen['object']['url']}" , :class => 'pull-left', :style => 'padding-right:4px;'
+              .media-body
+                %h5{:style => 'margin-top:0'}
+                  = link_to seen['object']['displayName'], "#{seen['object']['url']}"
+                =render "/shared/movie_rating", movie_name: seen['object']['displayName'], movie_image: seen['object']['image']['url'], movie_id:seen['object']['id']
+

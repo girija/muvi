@@ -1,0 +1,116 @@
+-if @trailer != false
+  -video_url = "#{VIDEO_URL}/system/trailers/#{@trailer.id}/original/#{@trailer.trailer_file_name.to_s}"
+-else
+  -video_url = ""
+#myTrailer.modal.fade.hide{:style => 'width:640px;height:435px;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    #myModalLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+      -unless @movie.blank?
+        =@movie.name
+        trailer
+      -else
+        Trailer
+  .modal-body{:style => 'max-height:290px'}
+    %a{:href => "#" , :id => 'video_player', :style => 'display:block;height:300px;width:610px;'}
+  .modal-footer
+    %button.btn.btn-primary.bold_class{"data-dismiss" => "modal", "aria-hidden" => "true" }
+      Done
+
+
+- if request.env["REQUEST_URI"] =~ /msn_embed/
+  :javascript
+    $(document).ready(function($) {
+      $(".container").css("background-color", '#FFFFFF');
+      $(".container").css("border", '1px solid #d2d6d9');
+    });
+    var $stickyHeight = 600;
+    var $padding = 10;
+    var $topOffset = 100;
+    var $footerHeight = 83;
+
+    function scrollSticky(){
+      if($(window).height() >= $stickyHeight) {
+        var aOffset = $('#sticky').offset();
+        if($(window).scrollTop() + $padding > $topOffset) {
+          $('#sticky').attr('style', 'position:fixed;margin-top: -99px;');
+        }else{
+          $('#sticky').attr('style', 'position:relative;margin-top: 17px;');
+        }
+      }
+    }
+
+    $(window).scroll(function(){
+      scrollSticky();
+    });
+-else
+  :javascript
+    var $stickyHeight = 600;
+    var $padding = 10;
+    var $topOffset = 100;
+    var $footerHeight = 83;
+
+    function scrollSticky(){
+      if($(window).height() >= $stickyHeight) {
+        var aOffset = $('#sticky').offset();
+        if($(window).scrollTop() + $padding > $topOffset) {
+          $('#sticky').attr('style', 'position:fixed;margin-top: -22px;');
+        }else{
+          $('#sticky').attr('style', 'position:relative;margin-top: 17px;');
+        }
+      }
+    }
+    $(window).scroll(function(){
+      scrollSticky();
+    });
+    //$(document).ready(function($) {
+    //$(window).load(function() {
+      if(document.URL.indexOf("#trailer") != -1){
+      //setTimeout(function(){$(".btn_view_trailer_inside").click()},5000);
+      var movie_name = "#{@movie.name}";
+      //$("#myModalLabel").html(movie_name+" Trailer");
+      videourl = "#{video_url}";
+      $('#video_player').remove();
+      var $video = $('<a />', {
+        href: videourl,
+        id: 'video_player',
+        style: 'display:block;height:290px;width:610px;'
+      });
+      $('#myTrailer .modal-body').append($video);
+      $('#myTrailer').modal('show');
+      flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+    }
+    //});
+= render 'shared/meta_title_and_keywords', { :object => @movie }
+= render 'shared/fb_metatags', { :object => @movie }
+
+- if request.env["REQUEST_URI"] =~ /msn_embed/
+
+
+-else
+  .row-fluid
+    .span12{:style => "background-color:#FFFFFF"}
+      .span3
+        =render :partial => "/home/left_sidebar"
+
+      .span9{:style => "border-left: 4px solid #DFDFDF; margin-left: -2px;"}
+        %div{:class=>"main_content"}
+          
+          /= render '/shared/new_movie', {:from => 'movies'}
+          -unless current_user.blank?
+            -if current_user.is_admin == true
+              = render '/shared/edit_movie', {:from => 'movies'}
+            -else
+              = render '/shared/new_movie', {:from => 'movies'}
+          -else
+            = render '/shared/new_movie', {:from => 'movies'}
+
+          =render 'shared/movie_macrodata'
+:javascript
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+

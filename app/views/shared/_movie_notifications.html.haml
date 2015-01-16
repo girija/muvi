@@ -1,0 +1,148 @@
+-@all_notifications.each_with_index do |notification,i|
+  -if notification.class.to_s == "Review" && !notification.description.blank?
+    %div{:class=>"activity_block", :style => "border:none; width: 370px; height:120px;margin:0px;"}
+      %div{:style=>"float:left;width:100px;position:absolute;z-index:500;"}
+        = link_to image_tag(notification.user.user_image, :style=>"border-radius:100px;width:100px;height:100px;border: 1px solid #EEEEEE;"), "/#{notification.user.user_profile.permalink}"
+
+      %div{:style=>"float: left; background-color: #F9F9F9; margin-left: 50px; padding-left: 60px; width: 260px; height: 130px; margin-top: -12px;position:absolute;"}
+        .left{:style => "width:230px;"}
+          = link_to notification.user.display_name, "/#{notification.user.user_profile.permalink}",:class=>"user_display_name"
+          /%div{:style=>"color:#ABABAB;font-size:11px;"}
+          /  = distance_of_time_in_words(Time.now, notification.created_at.to_time) + " ago"
+          .clear
+          %div
+            = notification.description.truncate(100) if notification.description
+            -if notification.description && notification.description.length > 100
+              .clear
+              =link_to "see more", "#reviewModal", :onclick => "prefill_review('#{notification.description}');", "data-toggle" => "modal"
+        
+          %div{:style=>"float:right;bottom:5px;right:5px;position:absolute;"}
+            -unless current_user.nil? && current_user.blank?
+              -if current_user.id != notification.user.id
+                =link_to '<i class="icon-play-circle"></i>Send Kudos'.html_safe,"javascript:void(0);",:class=> "bold_class",:onclick=>"add_kudos('#{current_user.id}','#{notification.user.id}','#{@movie.id}','')"
+            -else
+              =link_to '<i class="icon-play-circle"></i>Send Kudos'.html_safe,"javascript:void(0);",:class=> "bold_class",:onclick=>"is_logged_in('default')"
+
+        %div{:style=>"float:right;height:20px;margin-right: 5px; margin-top: 5px;"}
+          = display_egg(notification)
+      .clear
+
+  -elsif notification.class.to_s == "CriticsReview"
+    -critics_review = notification
+    -fc = critics_review.film_critic
+    -unless fc.blank?
+      %div{:class=>"activity_block", :style => "border:none; width: 370px; height:120px;margin:0px;"}
+        %div{:style=>"float:left;width:100px;position:absolute;z-index:500;"}
+          -unless fc.profile_image.blank?
+            -unless fc.thumbnail_image_file_name.blank?
+              =image_tag("/system/thumbnail_images/#{fc.id}/small/#{fc.thumbnail_image_file_name.gsub(" ", "%20")}", :style => "border-radius:100px; width:100px; height:100px;")
+            -else
+              %img{:src => "#{POSTER_URL}/images/no-profile.png"}
+          -else
+            %img{:src => "#{POSTER_URL}/images/no-profile.png"}
+
+        %div{:style=>"float: left; background-color: #F9F9F9; margin-left: 50px; padding-left: 60px; width: 260px; height: 130px; margin-top: -12px;position:absolute;"}
+          .left{:style => "width:230px;"}
+            %div{:class=>"user_display_name"}
+              =critics_review.film_critic.name rescue ''  
+            /%div{:style=>"color:#ABABAB;font-size:11px;"}
+            /  = distance_of_time_in_words(Time.now, notification.created_at.to_time) + " ago"
+
+            .clear
+            %div.names
+              = truncate(critics_review.summary, :length => 100) if critics_review
+            %div{:style=>"bottom:5px;right:5px;position:absolute;"}
+              = link_to "see more", critics_review.link, :target => '_blank', :class => "bold_class"
+
+
+          %div{:style=>"float:right; height:20px; margin-right: 5px; margin-top: 5px;"}
+            = image_tag((critics_review.critic_image),:style=>"height:20px;")
+        .clear
+
+
+  -elsif notification.class.to_s == "AllActivity" && !notification.user.nil?
+    -is_asked = false
+    -if current_user
+      -activity = AllActivity.where("movie_id=#{@movie.id} and user_id = '#{current_user.id}' and target_user_id = #{notification.user.id}")
+      -if !activity.blank?
+        -is_asked = true
+    %div{:class=>"activity_block", :style => "border:none; width: 370px; height:120px;margin:0px;"}
+      -if notification.activity_type == "saw"
+        %div{:style=>"float:left;position:absolute;z-index:500;"}
+          = link_to image_tag(notification.user.user_image, :style=>"border-radius:100px;width:100px;height:100px;border: 1px solid #EEEEEE;"), "/#{notification.user.user_profile.permalink}"
+
+          /= link_to image_tag(notification.user.user_image, :style=>"width:50px;height:50px;border: 1px solid #EEEEEE;"), "/profile/#{notification.user.id}/#{notification.user.display_name}"
+
+        %div{:style=>"float: left; background-color: #F9F9F9; margin-left: 50px; padding-left: 60px; width: 260px; height: 130px; margin-top: -12px;position:absolute;"}
+          = link_to notification.user.display_name, "/#{notification.user.user_profile.permalink}",:class=>"user_display_name"
+
+          /%div{:style=>"color:#ABABAB;font-size:11px;"}
+          /  = distance_of_time_in_words(Time.now, notification.created_at.to_time) + " ago"
+          .clear
+          %div
+            /{:style=>"padding-top:15px;height:30px;font-size:11px;"}
+            Saw the movie, added to 
+            =link_to "seen list","/#{notification.user.user_profile.permalink}/all_seen_list"
+            \. 
+            Ask for recommendation
+          %div{:style=>"float:right;bottom:5px;right:5px;position:absolute;"}
+            -if !is_asked
+              =link_to '<i class="icon-question-sign"></i><span>Ask</span>'.html_safe,"javascript:void(0);",:class=> "btn btn-primary", :id => "ask_#{notification.id}",:onclick=>"activity_insidepage('#{notification.id}','#{notification.user_id}','#{@movie.id}','asked')"
+            -else
+              =link_to '<i class="icon-question-sign"></i><span>Asked</span>'.html_safe,"javascript:void(0);",:class=> "btn btn-primary"
+
+
+      -elsif notification.activity_type == "has recommended" || notification.activity_type == "has not recommended" 
+        %div{:style=>"float:left;width:100px;position:absolute;z-index:500;"}
+          = link_to image_tag(notification.user.user_image, :style=>"border-radius:100px; width:100px;height:100px;border: 1px solid #EEEEEE;"), "/#{notification.user.user_profile.permalink}"
+
+        %div{:style=>"float: left; background-color: #F9F9F9; margin-left: 50px; padding-left: 60px; width: 260px; height: 130px; margin-top: -12px;position:absolute;"}
+          = link_to notification.user.display_name, "/#{notification.user.user_profile.permalink}",:class=>"user_display_name"
+
+          /%div{:style=>"color:#ABABAB;font-size:11px;"}
+          /  = distance_of_time_in_words(Time.now, notification.created_at.to_time) + " ago"
+          .clear
+          %div
+            /{:style=>"padding-top:15px;height:30px;font-size:11px;"}
+            -if notification.activity_type == "has recommended"
+              Recommended to
+            -else
+              Not recommended to
+            =link_to notification.target_user.display_name,"/#{notification.target_user.user_profile.permalink}"
+          %div{:style=>"float:right;bottom:5px;right:5px;position:absolute;"}
+            -if !is_asked
+              =link_to '<i class="icon-question-sign"></i><span>Ask</span>'.html_safe,"javascript:void(0);",:class=> "btn btn-primary", :id => "ask_#{notification.id}",:onclick=>"activity_insidepage('#{notification.id}','#{notification.user_id}','#{@movie.id}','asked')"
+            -else
+              =link_to '<i class="icon-question-sign"></i><span>Asked</span>'.html_safe,"javascript:void(0);",:class=> "btn btn-primary"
+      
+
+
+      -elsif notification.activity_type == "added movie to list"
+        %div{:style=>"float:left;width:100px;position:absolute;z-index:500;"}
+          = link_to image_tag(notification.user.user_image, :style=>"border-radius:100px; width:100px;height:100px;border: 1px solid #EEEEEE;"), "/#{notification.user.user_profile.permalink}"
+
+        %div{:style=>"float: left; background-color: #F9F9F9; margin-left: 50px; padding-left: 60px; width: 260px; height: 130px; margin-top: -12px;position:absolute;"}
+          = link_to notification.user.display_name, "/#{notification.user.user_profile.permalink}",:class=>"user_display_name"
+
+          /%div{:style=>"color:#ABABAB;font-size:11px;"}
+          /  = distance_of_time_in_words(Time.now, notification.created_at.to_time) + " ago"
+          .clear
+          %div
+            /{:style=>"padding-top:15px;height:30px;font-size:11px;"}
+            Added to the list
+            -json_data = ActiveSupport::JSON.decode(notification.activity)
+            -list_id = json_data[0]["target"]["id"]
+            -list_name = json_data[0]["target"]["displayName"]
+            = link_to list_name,"#{json_data[0]["target"]["url"]}/#{list_id}"
+            -is_following = false
+            -if current_user
+              -movie_list = UserMovieList.where("user_id = #{notification.user.id} and tag = '#{list_name}'").first
+              -if !movie_list.blank? and movie_list.followed_by?(current_user)
+                -is_following = true
+
+          %div{:style=>"float:right;bottom:5px;right:5px;position:absolute;"}
+            -if !is_following
+              =link_to '<i class="icon-heart"></i><span>Follow</span>'.html_safe,"javascript:void(0);",:class=> "btn btn-primary",:onclick => "follow_list('#{list_id}','#{notification.id}');",:id=>"follow_#{notification.id}"
+            -else
+              =link_to '<i class="icon-heart"></i><span>Following</span>'.html_safe,"javascript:void(0);",:class=> "btn btn-primary"
+

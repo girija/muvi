@@ -1,0 +1,48 @@
+%h1.heading Edit News
+.form
+  = form_for([:admin, @news], :url => "/admin/news/#{@news.id}") do |f|
+    %input{:type => "hidden", :name => "redirect_url", :value => "#{request.env["HTTP_REFERER"]}"}
+    - if @news.errors.any?
+      #error_explanation
+        %h2
+          = pluralize(@news.errors.count, "error")
+          prohibited this page from being saved:
+        %ul
+          -@news.errors.full_messages.each do |msg|
+            %li= msg
+
+    -feed = Feed.find_by_id(@news.id)
+    #news_div{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:10px 2px; font-size:12px"}
+      .left
+        = f.label :entry_title, "News Title"
+        = f.text_field :entry_title ,:class => 'large'
+      .clear
+      = f.label :movie_tag, 'Movie Tag'
+      %input{:type => "text", :name => "movie_tag", :value => "#{feed.tags.find(:all, :conditions => ["taggings.tagger_type='Movie'"]).collect {|t| t.name }.join(", ")} ", :class => "movieAutocompleteMulti"}
+      .clear
+      = f.label :celebrity_tag, 'Celebrity Tag'
+      %input{:type => "text", :name => "celebrity_tag", :value => "#{feed.tags.find(:all, :conditions => ["taggings.tagger_type='Celebrity'"]).collect {|t| t.name }.join(", ")} ", :class => "starAutocompleteMulti"}
+      .clear
+
+      /= f.label :tag_list, 'Tag List'
+      /= f.text_field :tag_list ,:class => 'large', :value => "#{feed.tags.collect {|t| t.name }.join(", ")}"
+      =f.label :rank, 'Rank'
+      = f.text_field :rank
+      .clear
+      = label_tag "Difference Score"
+      = text_field_tag :diff_score,"", :value => (@news.score - @news.history_score)
+      .clear
+      = label_tag "Add Score"
+      = text_field_tag :add_score
+      .clear
+      = label_tag "Set Flag"
+      =select_tag :flag, options_for_select([["Select One", ""], "Breaking News","Promoted"],"#{@news.flag}")
+      %hr
+      .actions
+        = f.submit 'Save'
+        \- or -
+        = link_to 'Cancel', '/admin/news/'
+
+  .clear
+
+

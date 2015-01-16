@@ -1,0 +1,139 @@
+:javascript  
+
+  function setLanguage(elm){
+    page = 1;
+    loading = false;
+
+    if ($(elm).attr('checked')) {
+      $.cookie($(elm).val().toLowerCase(), 'yes', { expires: 365, path : "/"});
+      $.cookie('muvi_language_selected', 'yes', { expires: 365, path : "/"});
+    }else
+    {
+      $.cookie($(elm).val().toLowerCase(), null, {path : "/"});
+      $.cookie('muvi_language_selected', 'yes', { expires: 365, path : "/"});
+    }
+
+    var cont = "#{request.env['action_dispatch.request.parameters']['controller']}";
+    var act = "#{request.env['action_dispatch.request.parameters']['action']}";
+    
+
+    if(cont == "home_display"){
+      if(act == "index"){
+        var current_page = "/movies";
+      }else if (act == "released"){
+        var current_page = "/released"
+      }else if (act == "upcoming"){
+        var current_page = "/upcoming"
+      }
+    }else if (cont == "celebrities" & act == "index"){
+      var current_page = "/stars"
+    }else if (cont == "videos" & act == "trailers"){
+      var current_page = "/trailers"
+    }else if (cont == "posters" & act == "pictures"){
+      var current_page = "/picture"
+    }else if (cont == "top_ten" & act == "index"){
+      var current_page = "/top_ten"
+    }else if (cont == "news" & act == "index"){
+      var current_page = "/news"
+    }
+
+    var languages  = '';
+    var url = "";
+
+    if ($.cookie('hindi') == 'yes') {
+      languages  = languages + "hindi,";
+    }
+    if ($.cookie('telugu') == 'yes') {
+      languages  = languages + "telugu,";
+    }
+    if ($.cookie('tamil') == 'yes') {
+      languages  = languages + "tamil,";
+    }
+    if ($.cookie('english') == 'yes') {
+      languages  = languages + "english,";
+    }
+    if ($.cookie('kannada') == 'yes') {
+      languages  = languages + "kannada,";
+    }
+    language = languages.slice(0, languages.length - 1);
+    //if(current_url == '/news'){
+    if(current_page == "/news"){
+      var news_url = "/news";
+      $("#news_loader").fadeIn();
+      $.post(news_url,{ajax:"1"},function(res){
+        $("#news_container").html("");
+        $("#news_container").html(res);
+        $("#news_loader").fadeOut();
+      });
+      return;
+    }
+
+    //if(current_url == '/top_ten'){
+    if(current_page == "/top_ten"){
+      var news_url = "/top_ten";
+      $("#topten_loader").fadeIn();
+      $.post(news_url,{ajax:"1"},function(res){
+        $("#topten_container").html("");
+        $("#topten_container").html(res);
+        $("#topten_loader").fadeOut();
+      });
+      return;
+    }
+
+    //if (current_url == '/' || current_url == '/released' || current_url == '/upcoming' || current_url == '/stars' || current_url == '/trailers' || current_url == '/msn_embed/home' || current_url == '/msn_embed/stars' || current_url == '/msn_embed/released' || current_url == '/msn_embed/upcoming' || current_url == '/msn_embed/trailers') {
+     
+    if(current_page == "/movies" || current_page == "/released" || current_page == "/upcoming" || current_page == "/stars" || current_page == "/trailers" || current_page == "/picture"){
+
+      /*if(current_url == '/' || current_url == '/msn_embed/home'){
+        url = '/movies';
+      }else if(current_url == '/msn_embed/stars'){
+        url = '/stars'
+      }else if(current_url == '/msn_embed/released'){
+        url = '/released'
+      }else if(current_url == '/msn_embed/upcoming'){
+        url = '/upcoming'
+      }else if(current_url == '/msn_embed/trailers'){
+        url = '/trailers'
+      }else{
+        url = current_url;
+      }*/
+      url = current_page;
+
+      if(language == ""){
+        language = "hindi"
+      }
+
+      var post_url = "/load_language" + url + "?lang=" + language
+
+      $("#loading_div").fadeIn();
+
+      $.post(post_url, function(data) {
+        $('#home_page_container').html("");
+        $('#home_page_container').append(data);
+        $("#loading_div").fadeOut();
+
+        for(var i = 0 ; i < 2; i++){
+          page++;
+          var post_url = "/load_page"+url
+
+          var param = "";
+          if(language != ""){
+            param = 'page=' + page + '&lang=' + language;
+          }else{
+            param = 'page=' + page
+          }
+
+          $.ajax({
+            url: post_url +'?' + param,
+            type: 'post',
+            dataType: 'script',
+            success: function() {
+              //$(window).sausage('draw');
+              $('#home_page_container').masonry("reload");
+              $(".glow").FontEffect({outline:true});
+            }
+          });
+        }
+      });
+    }
+  }

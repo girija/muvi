@@ -1,0 +1,23 @@
+-unless @users.blank?
+  -@users.each do |user_data|
+    -user = user_data.user_profile
+    -if user
+      .search_box.user_search_box
+        .celebrityImage.left
+          -unless user.profile_image_file_name.blank?
+            =link_to image_tag(user.user.user_image, :style=>"border-radius:100px;height:45px;width:45px;"),"/profile/#{user.user_id}/#{user.display_name}"
+          -else
+            -user_fb_id = User.find(user.user_id)
+            -unless user_fb_id.facebook_id.blank?
+              =link_to image_tag("http://graph.facebook.com/#{user_fb_id.facebook_id}/picture?type=normal",:style=>"border-radius:100px;height:45px;width:45px;"), "/profile/#{user.user_id}/#{user.display_name}"
+            -else
+              =link_to image_tag("/images/no-profile.png", :width => "45", :height => "45",:style=>"border-radius:100px;height:45px;width:45px;"),"/profile/#{user.user_id}/#{user.display_name}"
+  
+        .left{:style=>"padding-left:10px;max-width:320px;"}
+          = link_to user.display_name, "/profile/#{user.user_id}/#{User.convert_to_seo_url(user.display_name)}",:class=>"movie_block_title" 
+          .movie_block_cast
+            =user.location if user.location != "nil"
+
+
+  .clear
+

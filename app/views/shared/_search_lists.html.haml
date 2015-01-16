@@ -1,0 +1,28 @@
+-unless @lists.blank?
+  - @lists.in_groups_of(2) do |group|
+    - group.each do |list|
+      - unless list.blank?
+        .search_box
+          .moviBox.left
+            - last_movie = Movie.find_by_id(ActiveSupport::JSON.decode(list.movie_id).last.to_i)
+            - img_path = "#{POSTER_URL}#{last_movie.banner_image_medium}"
+            = image_tag("#{img_path}", :style=>"height:83;width:55px;")
+          .left{:style=>"padding-left:10px;max-width:320px;"}
+            =link_to list.tag, "/movie_list/#{list.id}/#{User.convert_to_seo_url(list.tag)}",:class=>"movie_block_title"
+            %div{:class => "movie_block_cast"}
+              -created_by = User.find_by_id(list.user_id)
+              -unless created_by.blank?
+                %a{:href => "/profile/#{created_by.id}/#{User.convert_to_seo_url(created_by.display_name)}"}
+                  By
+                  =created_by.display_name
+
+            .clear{:style => "padding-top:10px"}
+            .left
+              - unless current_user.blank?
+                - if !list.followed_by?(current_user)
+                  = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow btn-medium tip_hint', "data-id" => list.id, :id => "btn-follow-#{list.id}", :style => 'border-radius:2px 2px 2px 2px;width:60px;float:left;border:1px solid #999; color:#000; background-color:#D8D8D8;',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+                -else
+                  = link_to "Following".html_safe, "#" , :class => 'btn btn-following btn-medium', "data-id" => list.id, :id => "btn-follow-#{list.id}", :style => 'border-radius:2px 2px 2px 2px;width:65px;float:left;border:1px solid #999; color:#000; background-color:#D8D8D8;'
+              -else
+                = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow-login btn-medium tip_hint', "data-id" => list.id, :id => "btn-follow-#{list.id}", :style => 'border-radius:2px 2px 2px 2px;float:left;border:1px solid #999; color:#000; background-color:#D8D8D8;',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+

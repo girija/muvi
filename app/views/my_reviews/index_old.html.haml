@@ -1,0 +1,9 @@
+%h1 My reviews
+.clear
+-@pending_reviews.each do |pen_review|
+  .left
+    = image_tag pen_review.movie.banner_image, :size => "125x200"
+  .right
+    = render :partial => 'critics_review', :locals => { :critics_review => pen_review }
+  .clear
+

@@ -1,0 +1,40 @@
+= form_for :videos, :url => add_video_admin_videos_path, :html => { :multipart => true } do |f|
+  -unless @video.blank?
+    -if @video.errors.any?
+      #error_explanation
+        %h2
+          = pluralize(@video.errors.count, "error")
+          prohibited this page from being saved:
+        %ul
+          -@video.errors.full_messages.each do |msg|
+            %li= msg
+
+
+  .form{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:10px 2px; font-size:12px"}
+    .left
+      = f.label :Title, "Title"
+      = f.text_field :name ,:class => 'large'
+
+    .clear
+    = f.label :remote_link, "Video link"
+    = f.text_field :video_remote_url
+
+    &nbsp; &nbsp;
+    OR
+    &nbsp; Video
+    = f.file_field :trailer
+    .clear
+    = f.label :movie_tag, 'Movie Tag'
+    %input{:type => "text", :name => "movie_tag", :class => "movieAutocompleteMulti"}
+    .clear
+    = f.label :celebrity_tag, 'Celebrity Tag'
+    %input{:type => "text", :name => "celebrity_tag", :class => "starAutocompleteMulti"}
+    .clear
+    = f.label :other_tag, 'Context Tag'
+    %input{:type => "text", :name => "other_tag", :class => "video"}
+    .clear
+    = f.label :rank, "Rank"
+    = select_tag 'videos[rank]', options_for_select([['0','0'],['1', '1'], ['2','2'],['3', '3'],['4', '4'],['5', '5'],['6', '6'],['7', '7'],['8', '8'],['9', '9'],['10', '10']])
+    .clear
+    = f.submit "Save Video"
+

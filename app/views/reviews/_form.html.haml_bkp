@@ -1,0 +1,45 @@
+#login{:style=>"background: none;"}
+    - if current_user && current_user.reviwed_movie?(movie)
+        .rating{:style => "width: 243px; height: auto; background-color: #aaa; color: #ffffff"}
+            .field
+                %label{:class => (review == false)?"rate":"express", :style => "font-size: 13px; color: #ffffff; width: auto; line-height: 17px; font-weight: bold;"}
+                    = (review == false)? 'My rating' : 'Interest level'
+                - ['0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'].each do |rate|
+                    - if current_user.my_rating(movie).to_s == rate
+                        %input.star{:class => "{split:2}", :name => "review[rating]", :value => "#{rate}", :type => "radio", :checked=>true, :disabled=>"disabled" }
+                    - else
+                        %input.star{:class => "{split:2}", :name => "review[rating]", :value => "#{rate}", :type => "radio", :disabled=>"disabled" }
+                %br{:style=>"width: 0px; height:0px"}
+    - else
+        #rating-steps
+            %a{:href=>'#', :id=>'want-to-see', :class=>'gradient-button2 left'}
+                .gradient-button2
+                    .label Want to see
+            - if !@movie.release_date.blank? and @movie.release_date <= Date.today
+                %a{:href=>'#', :id=>'seen_already', :style=>'line-height: 33px; font-size: 17px; color: #aaa; padding-left: 10px;; text-decoration: none;'} Seen already
+        .post_reply{:style=>"width: auto; padding-left: 0px; padding-top: 0px"}
+            = form_for [movie, Review.new], :remote => true do |f|
+                #rate_movie.rating{:style => "width: 243px; height: auto; background-color: #aaa"}
+                    = render '/shared/error_display', {:error_object => f.object}
+                    = f.hidden_field :review, :value => ( review || false  )
+                    .field
+                        %label{:class => (review == false)?"rate":"express", :style => "font-size: 13px; color: #ffffff; width: auto; line-height: 17px; font-weight: bold;"}
+                            = (review == false)? 'My rating' : 'Interest level'
+                        - ['0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'].each do |rate|
+                            - if current_user.my_rating(movie).to_s == rate
+                                %input.star{:class => "{split:2}", :name => "review[rating]", :value => "#{rate}", :type => "radio", :checked=>true }
+                            - else
+                                %input.star{:class => "{split:2}", :name => "review[rating]", :value => "#{rate}", :type => "radio" }
+                        %br{:style=>"width: 0px; height:0px"}
+                    .clear{:style => "height: 3px;"}
+                    .auto-height-div
+                        - content = current_user.my_rating_text(movie)
+                        = f.text_area :description, :class=>"auto-height ui-widget ui-widget-content ui-state-disabled ui-corner-all",:rows => 1,:id=>"review_area_1", :placeholder=>"Write your review..."
+                        #my_rating_text
+                            = "#{content}"
+                        .clear{:style => "height: 3px;"}
+                        %div{:align => "right"}
+                            .actions.gradient-input-button.ui-corner-all
+                                .gradient-input-button.ui-corner-all
+                                    = f.submit 'Submit', :class => 'label'
+                            -#= image_submit_tag('submit.png')

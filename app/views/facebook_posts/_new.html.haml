@@ -1,0 +1,31 @@
+#login{:style => "background: none; border-radius: 0px 0px 0px 0px;"}
+  .post_reply{:align=>"center"}
+    .field
+      %label.send_message{:style=>"padding-left: 52px;"}
+        Send a Message to
+        = @post.facebook_name
+
+    = form_tag('/facebook_posts', :remote => true)  do
+      .field
+        = text_area_tag "reply"
+        = hidden_field_tag "id", @post.id
+      #errors{:style=>"position: absolute;"}
+      %br
+      .actions.mid_btn{:style => "padding-left: 52px;"}
+        .left
+          = image_submit_tag('senBtn.png')
+        .left
+          \- or -
+          = link_to "Cancel", "#", :onclick => "$.modal.close();return false;"
+:javascript
+  $(document).ready(function(){
+    $("#post_reply").find("form").submit(function(){
+        if(jQuery.trim($("#post_reply").find("form").find("textarea").val()) == ""){
+            $("#errors").html("<div align='center' style='color: #ff0000; padding-left: 52px;'>Oops! It's a blank message!</div>");
+            return false;
+        }else{
+            return true;
+        }
+    });
+    $("#post_reply > a.modalCloseImg").css({"background": "url(/images/x.png) no-repeat scroll 5px 7px transparent"});
+  });

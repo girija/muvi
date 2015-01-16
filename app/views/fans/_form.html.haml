@@ -1,0 +1,43 @@
+- user_id = current_user ? current_user.id : ""
+-celebrity = celebrity ? celebrity : @celeb
+- if defined? type
+  -block_name = type
+-else
+  -block_name = ""
+%input{:type => 'hidden', :id => 'user_id', :name => 'user_id', :value => user_id}
+.left
+  %div{:style => "height:33px;width:122px"}
+    -if @count_fan.blank?
+      = form_for "fans",:url => "/fans", :html => {:id => "fan_form_#{block_name}"},  :remote => true do |f|
+        = f.hidden_field :celebrity_id, :value => celebrity.id
+        = hidden_field_tag "block_type","",:value=>block_name
+        %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+          %input{:type => "image", :src => '/images/fan_normal.png', :value => "Be a fan", :name => "commit", :id => "fan_btn", :style => "float:left;padding-top:1px;padding-left:1px", :onclick => "check_login_be_a_fan('#{FACEBOOK_APPID}','#{celebrity.id}','fan');" }
+          =generate_tooltip_block("fan","profile_page")
+      = form_for "fans",:url => "/fans/not_a_fan",  :html => {:id => "not_fan_form_#{block_name}"},  :remote => true do |f|
+        = f.hidden_field :celebrity_id, :value => celebrity.id
+        = hidden_field_tag "block_type","",:value=>block_name
+        %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+          %input{:type => "image", :src => '/images/no_normal.png', :value => "Not a fan", :name => "commit", :id => "not_fan_btn", :style => "float:left;padding-top:1px;padding-right:1px", :onclick => "check_login_be_a_fan('#{FACEBOOK_APPID}','#{celebrity.id}','unfan');"  }
+          =generate_tooltip_block("unfan","profile_page")
+    -else
+      - if @count_fan[0]['is_fan']
+        - is_fan_btn = "fan_pressed.png"
+        - is_no_fan_btn = "no_normal.png"
+      - else
+        - is_fan_btn = "fan_normal.png"
+        - is_no_fan_btn = "no_pressed.png"
+
+      = form_for "fans",:url => "/fans", :html => {:id => "fan_form_#{block_name}"},  :remote => true do |f|
+        = f.hidden_field :celebrity_id, :value => celebrity.id
+        = hidden_field_tag "block_type","",:value=>block_name
+        %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+          %input{:type => "image", :src => "/images/#{is_fan_btn}", :value => "Be a fan", :name => "commit", :id => "fan_btn", :style => "float:left;padding-top:1px;padding-left:1px", :onclick => "check_login_be_a_fan('#{FACEBOOK_APPID}','#{celebrity.id}','fan');"  }
+          =generate_tooltip_block("fan","profile_page")
+      = form_for "fans",:url => "/fans/not_a_fan",  :html => {:id => "not_fan_form_#{block_name}"},  :remote => true do |f|
+        = f.hidden_field :celebrity_id, :value => celebrity.id
+        = hidden_field_tag "block_type","",:value=>block_name
+        %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+          %input{:type => "image", :src => "/images/#{is_no_fan_btn}", :value => "Not a fan", :name => "commit", :id => "not_fan_btn", :style => "float:left;padding-top:1px;padding-right:1px", :onclick => "check_login_be_a_fan('#{FACEBOOK_APPID}','#{celebrity.id}','unfan');"  }
+          =generate_tooltip_block("unfan","profile_page")      
+    

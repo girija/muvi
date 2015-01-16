@@ -1,0 +1,70 @@
+= render 'shared/meta_title_and_keywords', { :object => @topten }
+
+/= content_for :heading do
+/  %div{:style => "width:575px; float:left; font-weight:bold;"}
+/    %span Top 10s:
+/    = @topten.name.to_s + " by " + UserProfile.find_by_user_id(@topten.user_id).display_name
+
+/= content_for :breadcrumb do
+/  %span
+/    = link_to "Home &#187;".html_safe, root_path
+/    = link_to "Top 10s &#187;".html_safe, top_ten_path
+/    = @topten.name
+
+.clear
+
+  
+#top_ten
+- unless @topten.blank?
+  .homeContainerIn.homeborderDiv
+    .sliderWrapper
+      #slider.slider
+        %ul
+          - ctr = @movies_array.size + 1
+          - ntr = 0
+          - @movies_array.each do |movie|
+            %li
+              .album
+                - if @topten.item_type == 0
+                  - @movie = Movie.find(movie)
+                  = link_to image_tag("#{@movie.full_image}" , :size=>'260x400'), movie_path(@movie)
+                - else
+                  - @celeb = Celebrity.find(movie)
+                  = link_to image_tag("#{@celeb.large_image}", :size=>'260x400'), star_path(@celeb)
+                .desc
+                  %h2
+                    %span
+                      = ctr - 1
+                    - if @topten.item_type == 0
+                      = link_to get_movie_name(movie) , movie_path(@movie)
+                    - else
+                      = link_to get_celebrity_name(movie), star_path(@celeb) 
+
+                  %span.notes
+                    = @movies_notes[ntr]
+            - ctr = ctr - 1
+            - ntr = ntr + 1
+      -if params[:msn_embed] != "msn_embed"
+        - if current_user
+          - if current_user.id == @topten.user_id
+            .actions
+              %a{:href=> "/top_ten/edit/#{@topten.id}/#{@topten.name}", :class=>'gradient-button2'}
+                .gradient-button2
+                  .label Update
+          - else
+            .left{:style => 'font-size:17px;line-height:1.5em'}  Don't agree with this list?&nbsp;  
+            .actions.left
+              %a{:href=> "/top_ten/edit/#{@topten.id}/#{@topten.name}", :class=>'gradient-button2'}
+                .gradient-button2
+                  .label Remix
+            .left{:style => 'font-size:17px;line-height:1.5em'}   &nbsp;Show for other users
+        - else
+          .left{:style => 'font-size:17px;line-height:1.5em'}  Don't agree with this list?&nbsp;
+          .actions.left
+            /%a{:href=>'#', :id=>'remix', :class=>'gradient-button2', :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+            %a{:id=>'remix', :class=>'gradient-button2', :onclick => "check_login();", :style => "cursor:pointer"}
+              .gradient-button2
+                .label Remix
+          .left{:style => 'font-size:17px;line-height:1.5em'}   &nbsp;Show for other users
+
+    .clear{:style=> 'height:20px'}

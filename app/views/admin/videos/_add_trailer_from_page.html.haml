@@ -1,0 +1,44 @@
+= form_for :videos, :url => "/add_video_from_page", :html => { :multipart => true, :onsubmit => "$('#loading').show();" } do |f|
+  -unless @video.blank?
+    -if @video.errors.any?
+      #error_explanation
+        %h2
+          = pluralize(@video.errors.count, "error")
+          prohibited this page from being saved:
+        %ul
+          -@video.errors.full_messages.each do |msg|
+            %li= msg
+
+
+  .form{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:10px 2px; font-size:12px"}
+    %input{:type => "hidden", :name => "video_id", :value => "#{params[:video_id]}"}
+    %input{:id=>"new_trailer", :type => "hidden", :name => "new_trailer", :value => "#{params[:new_trailer]}"}
+
+    .left
+      = f.label :Title, "Title", :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+      = f.text_field :name ,:class => 'large', :value => "#{params[:movie_name]} trailer"
+
+    .clear
+    = f.label :remote_link, "Video link", :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+    = f.text_field :video_remote_url
+    &nbsp; &nbsp;
+    OR
+    &nbsp; Video
+    = f.file_field :trailer
+    .clear
+    = f.label :movie_tag, 'Movie Tag', :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+    %input{:type => "text", :name => "movie_tag", :class => "movieAutocompleteMulti", :value => "#{params[:movie_name]}"}
+    .clear
+    = f.label :celebrity_tag, 'Celebrity Tag', :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+    %input{:type => "text", :name => "celebrity_tag", :class => "starAutocompleteMulti"}
+    .clear
+    = f.label :other_tag, 'Context Tag', :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+    %input{:type => "text", :name => "other_tag", :class => "video", :value => "Trailer"}
+    .clear
+    = f.label :rank, "Rank", :style => "float: left;  margin-bottom: 10px;  padding: 5px 0;  width: 110px;"
+    = select_tag 'videos[rank]', options_for_select([['0','0'],['1', '1'], ['2','2'],['3', '3'],['4', '4'],['5', '5'],['6', '6'],['7', '7'],['8', '8'],['9', '9'],['10', '10']], 1)
+    .clear
+    = f.submit "Save Video", :class => "btn btn-primary bold_class", :style => "margin-left:110px;"
+    =image_tag("/images/loading.gif", :style => "display:none", :id => "loading")
+
+

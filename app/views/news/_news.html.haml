@@ -1,0 +1,75 @@
+-total = 0
+-unless @all_news.blank?
+  -@all_news.each do |feed|
+    -@news = feed.taggings
+    -unless @news.blank?
+      -@news.each do |news|
+        -if news.default_tag == true
+          -total = total + 1
+          -if news.tagger_type == "Celebrity"
+            -unless news.tagger_id.blank?
+              -@celebrity = Celebrity.find_by_id(news.tagger_id)
+            -unless @celebrity.blank?
+              -unless @celebrity.name.blank?
+                .news_box.left.tip_trigger{:id => "celeb_news_div_#{total}"}
+                  %div{:style => "height:260px"}
+                    = link_to image_tag(@celebrity.large_image, :width => "190", :height => "260"), "/news/star/#{@celebrity.permalink}/#{news.id}"
+                  .news_heading{:id => "celeb_news_content_#{total}"}
+                    %h5
+                      = link_to raw(truncate(feed.entry_title, :length => 50)), "/news/star/#{@celebrity.permalink}/#{news.id}", :style => "color:#FFFFFF; font-size:14px", :id => "link_#{feed.id}", :onmouseover => "javascript:$(this).css('color', '#F1238D');$(this).css('text-decoration', 'none')", :onmouseout => "javascript:$(this).css('color', '#FFFFFF');"
+                    -unless feed.summary.blank?
+                      %span{:id => "celeb_news_span_#{total}", :style => "display:none; color:#FFFFFF;text-transform:capitalize;"}
+
+                        = link_to truncate(raw(feed.summary.gsub(/<img .*?>/i, '')).html_safe, :length =>270), "/news/star/#{@celebrity.permalink}/#{news.id}", :style => "color:#FFFFFF; text-decoration:none; font-weight:normal;"
+
+                  /-unless feed.summary.blank?
+                  / .tip
+                  /   =raw(feed.summary)
+
+                  .clear{:style => "height:20px"}
+                :javascript
+                  $("#celeb_news_div_#{total}").hover(function() {
+                    $("#celeb_news_content_#{total}").stop().animate({ height: "172px", "margin-top": "-175px"}, 500);
+                    $("#celeb_news_span_#{total}").show();
+                  }, function() {
+                    $("#celeb_news_content_#{total}").stop().animate({ height: "62px", "margin-top": "-66px" }, 500);
+                    $("#celeb_news_span_#{total}").hide(100);
+                  });
+          -elsif news.tagger_type == "Movie"
+            -unless news.tagger_id.blank?
+              -@movie = Movie.find_by_id(news.tagger_id)
+
+            -unless @movie.blank?
+              -unless @movie.name.blank?
+                .news_box.left.tip_trigger{:id => "movie_news_div_#{total}"}
+                  %div{:style => "height:260px"}
+                    = link_to image_tag(@movie.full_image, :width => "190", :height => "260"), "/news/movie/#{@movie.permalink}/#{news.id}"
+
+                  .news_heading{:id => "movie_news_content_#{total}"}
+                    %h5
+                      = link_to raw(truncate(feed.entry_title, :length => 50)), "/news/movie/#{@movie.permalink}/#{news.id}", :style => "color:#FFFFFF; font-size:14px", :id => "link_#{feed.id}", :onmouseover => "javascript:$(this).css('color', '#F1238D');$(this).css('text-decoration', 'none')", :onmouseout => "javascript:$(this).css('color', '#FFFFFF');"
+                    -unless feed.summary.blank?
+                      %span{:id => "movie_news_span_#{total}", :style => "display:none; color:#FFFFFF;text-transform:capitalize;"}
+                        =link_to truncate(raw(feed.summary).html_safe, :length =>270), "/news/movie/#{@movie.permalink}/#{news.id}", :style => "color:#FFFFFF; text-decoration:none; font-weight:normal;"
+
+                  /-unless feed.summary.blank?
+                  /  .tip
+                  /    =raw(feed.summary)
+                  .clear
+                :javascript
+                  $("#movie_news_div_#{total}").hover(function() {
+                    $("#movie_news_content_#{total}").stop().animate({ height: "172px", "margin-top": "-175px"}, 500);
+                    $("#movie_news_span_#{total}").show();
+                  }, function() {
+                    $("#movie_news_content_#{total}").stop().animate({ height: "62px", "margin-top": "-66px" }, 500);
+                    $("#movie_news_span_#{total}").hide(100);
+                  });
+
+  -if total == 0
+    %h3
+      No current news
+
+-else
+  %h3
+    No current news
+

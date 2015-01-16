@@ -1,0 +1,14 @@
+<% if !params[:by].blank? %>
+  if ("<%= params[:by]%>" == "user"){
+      $('#tweets').html("");
+      $('#tweets').html("<%= escape_javascript(render '/shared/tweets') %>");
+  }else{
+      $('#celeb_tweets').html("");
+      $('#celeb_tweets').html("<%= escape_javascript(render '/shared/tweets') %>");
+  }
+<% elsif !params[:user].blank? %>
+ $('#user_reviews').html("<%= escape_javascript(render '/shared/tweets') %>");
+<% else %>  
+  $('#movie_tweets').html("<%= escape_javascript(render '/shared/tweets') %>");
+<% end %>
+

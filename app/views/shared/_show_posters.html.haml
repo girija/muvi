@@ -1,0 +1,61 @@
+.clear{:style => 'height:5px'}
+%div{:style => 'float:right;padding-right:5px;height:13px'}
+  - if @poster_list.size > 4
+    %div{:class => 'pprev', :style => 'background:#ffffff url("'"#{URL}"'/images/previous.png") no-repeat;height:13px;width:8px;cursor:pointer;float:left'}
+    %div{:style => 'width:4px;float:left'}
+    %div{:class => 'pnext', :style => 'background:url("'"#{URL}"'/images/next.png");height:13px;width:8px;cursor:pointer;float:right'}
+.clear{:style => 'height:5px;'}
+.poster_scroll
+  %ul
+    - count = 0
+    - if object_type == "celebrity"
+      -hid_link = "stars"
+    -else
+      -hid_link = "movies"
+
+    - unless @poster_list.blank?
+      - @poster_list.each do |poster|
+        =link_to "#{poster.name}","/#{hid_link}/#{params[:id]}/poster/#{poster.id}#poster",:style=>"display:none;"
+        %li
+          %div{:id => "poster_image_#{count}", :style => "margin-right:4px;", :class => "left"}
+            .left
+              = image_tag ("/system/posters/#{poster.id}/medium/#{poster.poster_file_name.gsub(" ", "%20")}"), :width => "80px", :height => "114px",:onclick => "javascript:show_poster('#{poster.id}','#{object_type}','#{params[:id]}');", :style => "cursor:pointer", :id => "poster#{poster.id}"
+
+              .clear 
+:javascript
+  $(function() {
+    $(".poster_scroll").jCarouselLite({
+      btnNext: ".pnext",
+      btnPrev: ".pprev",
+      speed: 800,
+      visible: 4,
+      mouseWheel: true,
+      circular: false
+    });
+  });
+
+  function show_poster(poster_id,object_type, object_id){
+     $.fancybox({
+       'type' : 'ajax',
+       'centerOnScroll' : true,
+       'opacity' : true,
+       'hideOnOverlayClick' :true,
+       'overlayOpacity' : 1,
+       'overlayColor' : '#0e0e0e',
+       'showCloseButton': false,
+       'autoScale' : true,
+       'padding' : 0,
+       'transitionIn': 'elastic',
+       'transitionOut': 'elastic',
+       'onClosed' : function(){
+         $("body").css("overflow", "auto");
+       },
+       'onComplete': function() {
+         $("#fancybox-wrap").css({'top':'10px', 'bottom':'auto'});
+       },
+       'href': "/posters/"+object_type+"/"+object_id+"/"+poster_id+"?hide_link=yes"
+    });
+    var stateObj = { foo: "bar" };
+    history.pushState(stateObj, "", "/"+object_type+"s/"+object_id+"/poster/"+poster_id);
+
+  }

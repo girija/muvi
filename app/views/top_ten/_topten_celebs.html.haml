@@ -1,0 +1,14 @@
+- unless @topten_celebs.blank?
+  - @topten_celebs.each do |celeb|
+    .box.left
+      .moviBox.left
+        - @celeb_image = TopTen.last_item(celeb)
+        = image_tag(@celeb_image.large_image, :width => "130", :height => "174")
+      .title.left
+        = link_to raw("<h3>#{celeb.name}</h3>"), "/top_ten/#{celeb.id}/#{celeb.name}" , :style => 'font-size:15px'
+        .clear
+        %h4.small_orange_font{:style => 'font-weight:normal'}
+          by
+          = link_to UserProfile.find_by_user_id(celeb.user_id).display_name , "/profile/#{celeb.user_id}/#{UserProfile.find_by_user_id(celeb.user_id).display_name}", :style => 'font-weight:normal'
+  .clear
+

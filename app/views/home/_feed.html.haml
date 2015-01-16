@@ -1,0 +1,43 @@
+.container-fluid
+  .row-fluid
+    .span6
+      .row-fluid
+        .span6.space3
+          #seen_activity.well.well-small{:style => 'height:800px;padding:0px'}
+            .media{:style => "background-color:#D8D8D8"}
+              %p.lead.p_class.dark_gradient_class.main_wanna_see_block
+                Seen
+              .items.scroll-pane.gradient_class{:style => 'overflow:auto;height:766px;'}
+
+        .span6.space3
+          #wanna_see_activity.well.well-small{:style => 'height:800px;padding:0px'}
+            .media{:style => "background-color:#D8D8D8"}
+              %p.lead.p_class.dark_gradient_class.main_wanna_see_block
+                Wanna See
+              .items.scroll-pane.gradient_class{:style => 'overflow:auto;height:766px;'}
+
+    .span6
+      = render :partial => "/shared/discovery"
+
+%input{:type => "hidden", :id => "logged_user_movie"}
+
+/=subscribe_to "/home/index"
+:javascript
+  $(function() {
+    var user_name = "#{current_user.display_name}";
+    if(user_name == ""){
+      window.location.href = "/users/edit";
+    }
+    var faye = new Faye.Client("#{FAYE_URL}/faye");
+    faye.disable('autodisconnect');
+
+  });
+
+
+:javascript
+  $(document).ready(function() {
+    $("#current_user_id").val('#{@current_user_id}');
+    parse_data('#{@all_activity.to_json.gsub(/[']/, '\\\\\'')}');
+  });
+
+

@@ -1,0 +1,83 @@
+.clear{:style=>"height:15px;"}
+-if type == "critics_reviews"
+  -@critics_reviews.each do |critics_review|
+    - unless critics_review.blank?
+      %div{ :style => "margin:5px 0 8px 8px; width:490px;font-size:12px;", :class => "left"}
+        %div
+          %div.image.left
+            /= image_tag((critics_review.film_critic.profile_image rescue '/images/no-profile.png'))
+            -fc = critics_review.film_critic
+            -unless fc.blank?
+              -unless fc.profile_image.blank?
+                -unless fc.thumbnail_image_file_name.blank?
+                  =image_tag("/system/thumbnail_images/#{fc.id}/thumb/#{fc.thumbnail_image_file_name.gsub(" ", "%20")}")
+                -else
+                  %img{:src => "#{POSTER_URL}/images/no-profile.png"}                                                                             
+              -else
+                %img{:src => "#{POSTER_URL}/images/no-profile.png"}
+
+          %div.reviewIcon.right{:style=>"width:0px;"}
+            = image_tag((critics_review.critic_image),:style=>"height:20px;")
+          %div.names{:style => "min-height:56px;padding-left:55px;"}
+            = truncate(critics_review.summary, :length => 150)
+            .clear
+            %div{:class=>"bottom_tab_texts",:style=>"width:470px;margin-top:-5px;color:#8b8484;font-size:10px;"}
+              %div{:style=>"width:130px;float:left;",:id => "like_com_info_#{critics_review.id}"}
+                = render '/shared/review_links', {:review => critics_review}
+              &nbsp;&nbsp;&nbsp;
+              = "#{critics_review.film_critic.name rescue ''}, #{critics_review.film_critic.organization.truncate(30) rescue ''}"
+              = link_to "full review", critics_review.link, :target => '_blank', :style => "float:right;font-size:10px;top:5px;font-weight:normal;color:#8b8484;"
+            .clear
+          %div{:id => "info_item_likes_#{critics_review.id}", :class=>"discussion_child", :style=>"display:none;margin-left:5px;"}
+            %div{:id=>"list_like_#{critics_review.id}"}
+              = render '/shared/like_dislike', {:review => critics_review,:type=>"all"}
+          .clear
+        .clear{:style=>"height:15px;"}
+-if type == "tweet"
+  -cnt = 0
+  -@tweets.each do |tweet|
+    - unless tweet.blank? 
+      -if  cnt >= 3
+        -break
+      %div{ :style => "width:490px", :class => "left mas_item"}
+        %div
+          %div.image.left
+            %a{:href=>"http://www.twitter.com/#!/#{tweet.twitter_screen_name}", :target=>"_blank"}
+              %img{:src => "http://api.twitter.com/1/users/profile_image?screen_name=#{tweet.twitter_screen_name}&size=normal"}
+          %div.names{:style => "min-height:56px;padding-left:55px;"}
+            %p
+              = truncate(tweet.content, :length => 100)
+            %div{:style=>"width:210px;margin-top:2px;float:left;",:id => "like_com_info_#{tweet.id}", :class=>"bottom_tab_texts"}
+              = render '/shared/review_links', {:review => tweet}
+            %div{:style=>"float:left;margin-top:3px;", :class=>"bottom_tab_texts"}
+              = tweet.twitter_screen_name rescue ''
+              ,
+              = tweet.tweeted_on.strftime('%d %B %Y').to_s rescue ''
+            .clear
+          %div{:id => "info_item_likes_#{tweet.id}", :class=>"discussion_child", :style=>"display:none;margin-left:5px;"}
+            %div{:id=>"list_like_#{tweet.id}"}
+              = render '/shared/like_dislike', {:review => tweet,:type=>"all"}
+          .clear
+          -cnt += 1
+        .clear{:style=>"height:5px;"}
+
+-if type == "news"
+  -check = []
+  -cnt = 0
+  -@news.each do |n|
+    -if !check.include?n.taggable_id
+      -check << n.taggable_id
+      -feed = Feed.get_news_feed(n.taggable_id)
+      -unless feed.blank?
+        -if cnt < 3
+          %div{ :style => "padding-bottom:10px;", :class => "left"}
+            %h4{:style => "font-size:13px",:rel=>"nofollow"}= link_to feed.entry_title.truncate(70).html_safe, "/news/star/#{@p_item.permalink}/#{n.id}",:rel=>"nofollow", :style => "color:#4F4F4F;"
+            .clear
+            -summary = feed.summary.gsub(/<\/?[^>]*>/, "") unless feed.summary.blank?
+            =truncate(summary, :length => 105).html_safe unless feed.summary.blank?
+            .clear
+            %i
+              =feed.source
+              =feed.created_at.strftime('%B %d, %Y')
+            -cnt += 1
+          .clear

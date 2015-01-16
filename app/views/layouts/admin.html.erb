@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Muvi- Admin</title>
+  <%= stylesheet_link_tag 'admin_packaged', 'modal' %>
+  <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js" type="text/javascript"></script-->
+
+  <%#= javascript_include_tag 'jquery.min.js', 'jquery-ui.min.js','admin_packaged','ajax' , 'jquery.lazyload.min', 'bootstrap'%>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="/javascripts/jquery_ujs.js?1378817551" type="text/javascript"></script>
+
+<script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js' type='text/javascript'></script>
+<%=javascript_include_tag 'ajax', 'admin_packaged', 'vendor/bootstrap' %>
+
+<!--[if IE]>
+<link rel="stylesheet" type="text/css" href="/stylesheets/iehacks.css" />
+<![endif]-->
+
+  <link rel="icon" type="image/png" href="/images/MuviFavicon.jpg">
+  <%= csrf_meta_tag %>
+  <script>
+    var cast_clicked = 0;
+  </script>
+</head>
+ <body>
+   <div id ='wrapper'>
+  <div id='header'>
+    <div id='global_links' class='right'>
+      <% unless current_user -%>
+        <%= link_to 'Sign-up', new_user_registration_path %>
+        <%= link_to 'Login', new_user_session_path %>
+        <%= link_to_oauth2 "Sign In with Facebook" %>
+      <%else-%>
+
+        <%= link_to 'Edit profile', edit_user_registration_path %>
+        <%#= link_to 'Fetch fb data', fetch_path %>
+        <%= link_to 'Logout', destroy_user_session_path %>
+      <%end-%>
+    </div>
+    <div class='clear'></div>
+    <ul class= 'tabs'>
+         <li <%if request.fullpath =~ /\/movies/%> class = 'active' <% end %> > <%= link_to 'Manage movies', admin_movies_path, :style => "padding:0px 10px" %> </li>
+
+          <li <%if request.fullpath =~ /\/celebrities/%> class = 'active' <% end %> > <%= link_to 'Manage celebrities', admin_celebrities_path, :style => "padding:0px 10px" %> </li>
+
+          <li <%if request.fullpath =~ /\/users/%> class = 'active' <% end %> > <%= link_to 'Manage users', admin_users_path, :style => "padding:0px 10px" %> </li>
+
+          <!--<li> <%= link_to 'Manage comments', '#', :class => ('active' if request.fullpath == '/') %> </li>-->
+
+          <li <%if request.fullpath =~ /\/pages/%> class = 'active' <% end %> > <%= link_to "CMS/Static pages", admin_pages_path, :style => "padding:0px 10px"%> </li>
+
+          <li <%if request.fullpath =~ /\/film_critics/%> class = 'active' <% end %> > <%= link_to "Film Critics", admin_film_critics_path, :style => "padding:0px 10px" %> </li>
+
+
+          <li <%if request.fullpath =~ /\/settings/%> class = 'active' <% end %> > <%= link_to "Settings", admin_settings_path, :style => "padding:0px 10px" %></li>
+
+
+          <li <%if request.fullpath =~ /\/feed/%> class = 'active' <% end %> > <%= link_to "Feed", '/admin/feed', :style => "padding:0px 10px" %></li>
+
+          <li <%if request.fullpath =~ /\/curate_movies/%> class = 'active' <% end %> > <%= link_to "Curate Movies", '/admin/curate_movies', :style => "padding:0px 10px" %></li>
+
+	  <li <%if request.fullpath =~ /\/reports/%> class = 'active' <% end %> > <%= link_to "Reports", '/admin/reports', :style => "padding:0px 10px" %></li>
+
+    </ul>
+    <div class='clear'></div>
+
+  </div>
+
+   <div class="main">
+     <%if notice %> <p class="notice"><%= notice %> </p><%end-%>
+        <p class="alert"><%= alert %></p>
+    <%= yield %>
+   </div>
+  </div>
+
+  </body>
+</html>
+

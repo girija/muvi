@@ -1,0 +1,28 @@
+%div{:style => "width:600px; height:40px"}
+  = form_tag "/videos/like", "data-remote" => "true", :id => "like_form", :style => "float:left; margin-left:415px;margin-right:5px;" do
+    %input{:type => "hidden", :id => "like_video_id", :name => "like_video_id"}
+    %input{:type => "hidden", :name => "celebrity_id", :value => "#{@celebrity.id}"}
+
+    -unless current_user.blank?
+      #like_button_div{:style => "display:none"}
+        .like-button.left.ui-corner-all
+          .like-button.ui-corner-all
+            %input{:type => "submit", :value => "like", :class => "label", :id => "like_button", :onmouseup => "javascript:disable_button('like_form', 'dislike_button', 'like_button')"}
+    -else
+      %a{:href=>'#', :class=>'like-button2 left ui-corner-all', :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+        .like-button2.ui-corner-all
+          .label like
+
+
+  =form_tag "/videos/dislike", "data-remote" => "true", :id => "dislike_form", :style => "float:left" do
+    %input{:type => "hidden", :id => "dislike_video_id", :name => "dislike_video_id"}
+    %input{:type => "hidden", :name => "celebrity_id", :value => "#{@celebrity.id}"}
+    -unless current_user.blank?
+      #dislike_button_div{:style => "display:none"}
+        .dislike-button.left.ui-corner-all
+          .dislike-button.ui-corner-all
+            %input{:type => "submit", :value => "dislike", :class => "label", :id => "dislike_button", :onmouseup => "javascript:disable_button('dislike_fom', 'like_button', 'dislike_button')"}
+    -else
+      %a{:href=>'#', :class=>'dislike-button2 left ui-corner-all', :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+        .dislike-button2.ui-corner-all
+          .label dislike

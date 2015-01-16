@@ -1,0 +1,7 @@
+<% content_for  :header  do %>
+  <meta property="og:title" content="<%= object.name %>"/>
+  <meta property="og:image" content="http://www.muvi.com<%= @movie.banner_image%>"/>
+  <meta property="og:type" content="<%= FB_NAMESPACE %>:join"/>
+  <meta property="og:site_name" content="www.muvi.com"/>
+  <meta property="og:url" content="http://www.muvi.com/movies/<%= object.permalink %>"/>
+<% end %>

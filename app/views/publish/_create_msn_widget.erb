@@ -1,0 +1,68 @@
+<div class='parent chrome23 single1 customcontainer black'>
+ <div class='heading alignright' style='display:block;'>
+    <span class='text'>Muvimeter: Latest Movie Reviews</span>
+  </div>
+  <div class='content'>
+    <div style='font-family:lucida grande, tahoma, verdana, arial, sans-serif;font-size: 12px;background-color:#FFFFFF; padding:12px 4px 4px 0px'>
+
+<% cnt = 1 %>
+<% border = '' %>
+<% @movie_list.each do |movie_list| %>
+  <% @host = movie_list["host"] %>
+    <% if cnt == @movie_list.size %>
+      <% border = '' %>
+    <% else %>
+      <% border = 'border-bottom: 1px dashed #D3D3D3' %>
+      <% cnt = cnt + 1 %>
+    <% end %>
+
+    <DIV style='float:left; <%= border %>'>
+      <div style='float:left;width:38px;height:40px;'><a href='<%=movie_list["host"]%>/msn_embed/movies/<%= movie_list["link"]%>' target='_blank'><img style='border:0px; width:35px; height:35px;' src='<%=movie_list["host"]%><%=movie_list["image"]%>'/></a>&nbsp;</div>
+
+      <div style='float:left;width:100px;margin-right:4px;margin-top:7px;'><a href='<%=movie_list["host"]%>/msn_embed/movies/<%= movie_list["link"] %>' target='_blank' style='text-decoration:none'><%= movie_list["name"] %></a></div>
+
+  <% if movie_list["meter"].to_i >= 60 %>
+        <div style='margin-top:7px; background-color: #D8D8D8; border: 1px solid #BECBD4;border-radius: 6px; height: 15px; padding: 0px 2px 2px 1px; width: 77px;float:left;margin-right:2px'>
+
+          <div style='width:<%=movie_list["meter"].to_i %>%; background:url(\"http://www.muvi.com/images/G-RatingBar.jpg\") repeat-x scroll 0 1px transparent; border-radius:6px; height:17px;'>&nbsp;</div>
+        </div>
+
+  <% elsif movie_list["meter"].to_i < 60  %>
+      <div style='margin-top:7px; background-color: #D8D8D8; border: 1px solid #BECBD4;border-radius: 6px; height: 15px; padding: 0px 2px 2px 1px; width: 77px;float:left;margin-right:3px'>
+        <div style='width:<%=movie_list["meter"].to_i %>%; background:url(\"http://www.muvi.com/images/R-RatingBar.jpg\") repeat-x scroll 0 1px transparent; border-radius:6px; height:17px;'>&nbsp;</div>
+      </div>
+  <% end %>
+
+      <div style='float:left;margin-top:7px;'><%=movie_list["meter"]%>%</div>
+   </DIV>
+    <div style='clear:both; height:5px'></div>
+
+<% end %>
+
+    <div style='clear:both; height:10px'></div>
+    <div id='logo_div' style='width:100%;float:left;margin-top:-5px;'>
+      <span style='color:#ABABAB; font-size:10px; font-weight:bold'>Powered by </span>
+      <div style='clear:both; height:4px'></div>
+      <div style='border-top:1px solid #d3d3d3; float:left; width:80%'>&nbsp;</div>
+      <div style='float:left;margin-top:-12px; margin-left:2px'>
+        <img border='0' src='<%=@host%>/images/logo_small.png'>
+      </div>
+    </div> 
+    <div style='clear:both'></div>
+  </div>
+ </div>
+</div>
+
+<script>
+  /*if (navigator.appName == 'Microsoft Internet Explorer'){
+    var ua = navigator.userAgent;
+    var re  = new RegExp('MSIE ([0-9]{1,}[\.0-9]{0,})');
+    if (re.exec(ua) != null){
+      rv = parseFloat( RegExp.$1 );
+      if (rv  == 7.0){
+        document.getElementById('logo_div').style.marginTop = '-18px';
+      }
+    }
+  }*/
+</script>
+

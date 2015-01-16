@@ -1,0 +1,33 @@
+-unless @movie_user_reviews.blank?
+  .clear{:style => "height:5px"}
+  - @movie_user_reviews.each do |review|
+    -movie = Movie.find_by_id(review.movie_id)
+    -unless movie.blank?
+      .row{:style => "margin:0px 0px 8px 0px"}
+        .images.left{:style => "margin-right:5px;"}
+          =link_to image_tag(movie.banner_image_thumb,:width => 35, :height => 35), movie_path(movie)
+        .names
+          - ['0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'].each do |rate|
+            - if review.rating.to_s == rate
+              %input.star{:class => "{split:2}", :name => "review_#{review.id}[rating]", :value => "#{rate}", :type => "radio", :checked=>true, :disabled=>"disabled" }
+            - else
+              %input.star{:class => "{split:2}", :name => "review_#{review.id}[rating]", :value => "#{rate}", :type => "radio", :disabled=>"disabled" }
+
+          %div{:style => "width:400px;margin-left:50px;padding-top:10px"}
+          %p{:style => "line-height:15px;margin-left:40px;font-size:11px;margin-top:6px;"}
+            = review.description.html_safe if !review.description.blank?
+    
+        /.clear{:style => "height:2px"}
+
+        %div{:id => "review_comments_#{review.id}"}
+          %div{:style => "height:10px"}
+          -review.comments.to_level.includes(:user).each do |comment|
+            = render '/shared/review_comment', { :comment => comment }
+
+        -unless current_user.blank?
+          -if (UserConnection.check_connection(current_user, params[:user_id].to_i) == true)  or (current_user.id == @user_profile.user_id)
+            =render "/comments/review_form_in_profile", {:review => review}
+    .clear{:style => "height:10px"}
+
+
+

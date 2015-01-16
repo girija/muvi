@@ -1,0 +1,41 @@
+<div style="float:left;">
+  <%= image_tag @movie.full_image,:id=>"img_block" ,:class=>"img_block"%>
+</div>
+<div  class="all_info">
+  <div id="name_block" style="font-weight:bold;"><%= @movie.name %></div>
+  <div style="clear:both;height:20px;"></div>
+  <div id="story_block"><%= @movie.story %></div>
+  <div style="clear:both;height:20px;"></div>
+  <div id="why_watch_block"><%= @movie.story%></div>
+  <div style="clear:both;padding-top:20px;"></div>
+  <div id="cast_block" style="padding-top:10px;">
+    <% @movie.movie_casts.where("cast_type = 'actor'").limit(2).each do |cast|
+        if cast.celebrity
+          celeb = cast.celebrity
+          if !celeb.name.blank? %>
+            <div style="float:left">
+              <div style="float:left;">
+                <%= image_tag celeb.image ,:height=>"30px", :width=>"30px"%>
+              </div>
+              <div style="float:left;color:#fff;padding-left:10px;"><%= celeb.name %></div>
+            </div>
+          <%end%>
+      <%end%>
+    <%end%>
+  </div>
+            <div style="clear:both"></div>
+            <div style="padding-top:140px;" >
+              <div style="float:left;">
+                <div style="float:left;">
+                  <%= link_to "<div class='payment_btn'><image src='images/m_icon.png'>5</div>".html_safe,"javascript:void(0);"%>
+                </div>
+                <div style="float:left;">
+                  <%= image_tag "/images/play_trailer.png",:id=>"play_icon" %>
+                </div>
+              </div>
+              <div style="float:right;padding-top:20px;">
+                <input type="button" value="OK" onclick="close_info();" class="btn btn-info" style="width:80px;">
+              </div>
+            </div>
+          </div>
+          <div style="clear:both"></div>

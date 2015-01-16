@@ -1,0 +1,65 @@
+#wanna_see_activity.well.well-small{:style => 'height:800px;padding:0px'}
+  .media{:style => "background-color:#D8D8D8"}
+    %p.lead.p_class.dark_gradient_class.main_wanna_see_block
+      =heading
+    .items.scroll-pane.gradient_class{:style => 'overflow:auto;height:766px;'}
+      -unless all_activity.blank?
+        -all_activity.each do |activity|
+          %script
+            if(document.getElementById('wanna_see_#{activity["user_id"]}_#{activity["movie_id"]}')) {
+            //$('#seen_#{activity["user_id"]}_#{activity["movie_id"]}').remove();
+            }
+
+          -not_show = 0
+          -if activity["action"] == "has recommended" || activity["action"] == "has not recommended"
+            -if activity["target"]["id"].to_i != current_user.id.to_i
+              -not_show = 1
+            -else
+              -not_show = 0
+
+          -if activity["action"] == "saw"
+            -unless activity["viewed_list"].blank?
+              -if activity["viewed_list"].include?(current_user.id.to_i)
+                -not_show = 1
+      
+          -if not_show == 0
+            .activity{:data => {:time => 1}, :id => "wanna_see_#{activity["user_id"]}_#{activity["movie_id"]}", :class => "activity_list gradient_class"}
+              = link_to image_tag("#{activity["object"]["image"]["url"]}" , :class => 'media-object', :style => 'height: 140px; width:90px; '), "#{activity["object"]["url"]}" , :class => 'pull-left'
+              .media-body{:style => "min-height:140px;"}
+                %h5.media-heading
+                  =link_to(activity["object"]["displayName"], activity["object"]["url"], :style => "color: #333333")
+
+                %a{:href => "#{activity["actor"]["url"]}"}
+                  =activity["actor"]["displayName"]
+
+                -if activity["action"] == "want to see"
+                  also 
+                  =activity["action"]
+                -else
+                  =activity["action"]
+  
+                =activity["object"]["displayName"]
+
+                %br
+                -if activity["action"] == "want to see"
+                  %br
+                  .btn-group
+                -elsif activity["action"] == "seen" or activity["action"] == "saw"
+                  Ask for recommendation
+                  .btn-group 
+                    = link_to "<i class='icon-question-sign'></i> &nbsp; Ask".html_safe , "#", :class => "btn btn-success bold_class", :onclick => "javascript:remove_block('wanna_see_#{activity["user_id"]}_#{activity["movie_id"]}', '#{activity["activity_id"]}', #{activity["cur_user_id"]}, #{activity["user_id"]}, '#{activity["movie_id"]}', 'asked');"
+                -elsif activity["action"] == "has recommended" || activity["action"] == "has not recommended"
+                  .btn-group
+                    = link_to "Thanks" , "#", :class => "btn btn-success bold_class", :onclick => "javascript:remove_block_ok('wanna_see_#{activity["user_id"]}_#{activity["movie_id"]}', '#{activity["activity_id"]}');"
+              /%hr
+
+
+=subscribe_to "/home/index"
+:javascript
+  $(function() {
+    var faye = new Faye.Client("#{FAYE_URL}/faye");
+    faye.subscribe("/home/index/#{current_user.id}", function(res) {
+      parse_data(res);
+    });
+  });
+

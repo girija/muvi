@@ -1,0 +1,242 @@
+-item_name = ""
+-rate_class = ""
+-permalink = ""
+-unless options["meter"].blank?
+  -if options["meter"].to_i > 0
+    -if options["meter"].to_i >= 60
+      -rate_class = "positive"
+    -elsif options["meter"].to_i < 60
+      -rate_class = "negative"
+
+-style = "height: 0px; margin-top:-10px;"
+-if options["type"] == "video"
+  -img_height = "172px"
+  -img_width = "212px"
+  -unless options["mouseover"].blank?
+    -unless options["mouseover"][0]["path"].blank?
+      -permalink = options["mouseover"][0]["path"].split("/")
+
+-elsif options["type"] == "poster"
+  -img_height = "238px"
+  -img_width = "212px"
+  -unless options["mouseover"].blank?
+    -unless options["mouseover"][0]["path"].blank?
+      -permalink = options["mouseover"][0]["path"].split("/")
+
+-else
+  -img_height = "238px"
+  -img_width = "212px"
+
+-box_img_height = "238px"
+-box_img_width = "154px"
+
+-unless options["trailer"].blank?
+  -unless options["path"].blank?
+    -permalink = options["path"].split("/")
+    -unless permalink.blank?
+      %a{:href=>'#', :id=>"hidden_reply_login_#{options["trailer"]}", :class=>'gradient-button2 left', :href=>"#{new_user_session_path}?movie_param=#{permalink[2]}", "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' ,:style=>"width:60px;display:none;"}
+
+-if options["type"] == "video" or options["type"] == "poster"
+  -unless permalink.blank?
+    %a{:href=>'#', :id=>"hidden_reply_login_#{options["id"]}", :class=>'gradient-button2 left', :href=>"#{new_user_session_path}?movie_param=#{permalink[2]}", "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' ,:style=>"width:60px;display:none;"}
+
+
+-unless params[:action] == "refresh_comment"
+  -attr_id = "box_#{options["id"]}"
+  -attr_class = "home_box left"
+-else
+  -attr_id = ""
+  -attr_class = ""
+
+%div{:id => "#{attr_id}", :class => "#{attr_class}"}
+  .home_item.left{:id => "home_box_#{options["id"]}", :onclick => 'hide_dropdown("'"#{options["id"]}"'");', :onmouseover => "highlight_text(#{options["id"]}, '#{options["type"]}');", :onmouseout => "remove_highlight_text(#{options["id"]}, '#{options["type"]}');"}
+
+    /Flag block
+    -classname = "flag_container"
+    -f = ""
+
+    -if options["type"] == "news"
+      -classname = "news_flag_container"
+
+    -elsif options["type"] == "video" or options["type"] == "poster"
+      -classname = "video_flag_container"
+
+    -unless options["flag"].blank?
+      %div{:class => classname, :style => "#{f}"}
+        .flag
+          =options["flag"]
+        .flag_2
+
+
+    /Image block
+    -if options["type"] == "news"
+      -w = "width: 180px; background:#C0C3C8 url(/images/body_bg.png) repeat; margin: 6px 6px 6px 7px;"
+
+    -else
+      -w = ""
+
+    .left{:id => "#{options["type"]}_div_#{options["id"]}", :style => w}
+      =render :partial => "/home_display/home_page_image", :locals => {:options => options, :img_width => img_width, :img_height => img_height, :box_img_height => box_img_height, :box_img_width => box_img_width}
+  
+
+      /Play Icon
+      -if options["type"] == "movie"
+        -unless options["trailer"].blank?
+          %a{:class => "play_icon_class", :style => 'display:none'}
+            -if permalink[1] == "movies"
+              =image_tag("/images/play_button.png", :onclick => 'play_movie_video("'"#{permalink[2]}"'", "'"#{options["trailer"]}"'", "videos")', :style => "cursor:pointer")
+
+
+      -if options["type"] == "video"
+        %a{:class => "video_play_icon_class"}
+          -if permalink[1] == "movies"
+            =image_tag("/images/play_button.png", :onclick => 'play_movie_video("'"#{permalink[2]}"'", "'"#{options["id"]}"'", "videos")', :style => "cursor:pointer")
+          -else permalink[1] == "stars"
+            =image_tag("/images/play_button.png", :onclick => 'play_celeb_video_url("'"#{permalink[2]}"'", "'"#{options["id"]}"'", "videos")', :style => "cursor:pointer")
+
+
+      -if options["type"] == "poster"
+        %a{:class => "icon_class"}
+          -unless permalink.blank?
+            -if permalink[1] == "movies"
+              =image_tag("/images/camera.png", :onclick => 'play_movie_video("'"#{permalink[2]}"'", "'"#{options["id"]}"'", "posters")', :style => "cursor:pointer")
+            -else permalink[1] == "stars"
+              =image_tag("/images/camera.png", :onclick => 'play_celeb_video_url("'"#{permalink[2]}"'", "'"#{options["id"]}"'", "posters")', :style => "cursor:pointer")
+
+      
+      /Mouseover
+      =render :partial => "/home_display/home_page_mouseover", :locals => {:options => options}
+   
+    /Meter block
+    -if options["type"] == "movie" or options["type"] == "star"
+      .clear
+      .left{:style => "margin:0px 5px; width:210px;"}
+        .home_page_rating.left{:style => "margin-top:-12px; height:10px"}
+          -if options["type"] == "star"
+            .gray_rating_bar{:class=>"tip_hint tooltipbottom"}
+              %div{:style => "width:#{options["meter"]}%;", :class => "#{rate_class}"}    
+              =generate_tooltip_block("star_index","home_page")
+          -else
+            -if options["is_upcoming"] == true and options["critics_review"] == false
+              .gray_rating_bar{:class=>"tip_hint tooltipbottom"}
+                %div{:style => "width:#{options["meter"]}%;", :class => "#{rate_class}"}
+                =generate_tooltip_block("muvi_buzz","home_page")
+            -elsif options["is_upcoming"] == true and options["critics_review"] == true
+              .home_rating_bar{:class=>"tip_hint tooltipbottom"}
+                %div{:style => "width:#{options["meter"]}%;", :class => "#{rate_class}"}
+                =generate_tooltip_block("muvi_meter","home_page")
+            -else
+              .home_rating_bar{:class=>"tip_hint tooltipbottom"}
+                %div{:style => "width:#{options["meter"]}%;", :class => "#{rate_class}"}
+                =generate_tooltip_block("muvi_meter","home_page")
+        -if options["type"] == "star"
+          .right{:style => "margin-top:-1px; margin-left:-30px; font-size:17px"}
+            -if !options["meter"].blank? and options["meter"] != 0
+              %b
+                -percent = "#{options["meter"] || 0}%"
+                %a{:href => "#{options["path"]}#users", :style => "color:#4F4F4F"}
+                  =percent
+        -else
+          .right{:style => "margin-top:-1px; margin-left:-30px; font-size:17px"}
+            -if !options["meter"].blank? and options["meter"] != 0
+              %b
+                -percent = "#{options["meter"] || 0}%"
+                -if options["is_upcoming"] == true
+                  %a{:href => "#{options["path"]}#tweets", :style => "color:#4F4F4F"}
+                    =percent
+                -else
+                  %a{:href => "#{options["path"]}#critics", :style => "color:#4F4F4F"}
+                    =percent
+
+
+
+    /Like/dislike/fan/notfan/want to watch block  
+    .clear
+    %div{:id => "home_page_popup", :class=>"discussion_child", :style=>"display:none;margin-left:5px;"}
+    -s1 = 'margin-left:5px; margin-top:3px;'
+
+    .left{:style => "margin:5px;width:#{img_width};"}  
+      %div
+        -if options["type"] != "movie"
+          .right{:id => "count_text_#{options["id"]}", :style => s1}
+            -if options['type'] == 'star'
+              -item = Celebrity.find_by_id(options['id'])
+              = link_to "#{options['count_text']}","javascript:void(0)",:onclick =>"show_likes_popup('#{item.id}','#{item.class.to_s}','fan','#{item.fans.count}','350','home_page_popup');", :style=>"color:#4F4F4F;font-weight:normal;"
+            -else
+              -item = options['type'].capitalize.constantize.find_by_id(options['id'])
+              -if options['type'] == 'movie' and (item.release_date.blank? or item.release_date > Date.today)
+                = link_to "#{options['count_text']}","javascript:void(0)",:onclick =>"show_likes_popup('#{item.id}','#{item.class.to_s}','want_to_see','#{item.want_to_sees.count}','550','home_page_popup');", :style=>"color:#4F4F4F;font-weight:normal;"
+              -else
+                = link_to "#{options['count_text']}","javascript:void(0)",:onclick =>"show_likes_popup('#{item.id}','#{item.class.to_s}','like_dislike','#{item.votes.count}','550','home_page_popup');", :style=>"color:#4F4F4F;font-weight:normal;"
+
+        -if options["type"] == "movie"
+          =render :partial => "/home_display/home_page_seen_not_seen", :locals => {:options => options}
+          =render :partial => "/home_display/home_page_want_not_want", :locals => {:options => options}
+
+        =render :partial => "/home_display/home_page_fan_not_fan", :locals => {:options => options}
+
+        -if options["type"] != "movie" and options["type"] != "star"
+          =render :partial => "/home_display/home_page_like_not_like", :locals => {:options => options}
+
+      .clear
+      -unless current_user.blank?
+        .left{:style => "display:none", :id => "rating_area_#{options["id"]}"}
+          %input{:type => "hidden", :id => "rating_flag_#{options["id"]}", :value => "#{options["data"]["seenit"]}"}
+          %textarea{:cols => 19, :rows => 2, :id => "review_#{options["id"]}", :onclick => "adjust_boxes();"}
+          .clear
+          %button{:class => "login_link right", :onclick => 'set_review_comment("'"#{options["id"]}"'", "'"#{current_user.id}"'", "'"#{options["flag_detail"]}"'");'}
+            Submit
+
+    /Bottom comment blocks
+    .clear
+    -unless options["comments"].blank?
+      -if options["type"] == "movie" or options["type"] == "star"
+        -cwid = "width:98.5%"
+      -else
+        -cwid = ""
+
+      .left_comment_wrapper{:style => "#{cwid}"}
+        -options["comments"].each do |com|
+          .moviCasts.left{:style => "margin: 0pt; cursor: pointer; border-top: 1px solid rgb(249, 249, 249); border-bottom: 1px solid #DBDBDB; padding-left:3px; #{cwid}"}
+            .left{:style => "margin-top:4px; margin-bottom:4px; font-size:12px;"}
+              - if com["user"]["path"].to_s =~ /profile/
+                .actress.left{:class => "tip_hint tooltipbottom" ,:style => "height:29px; width:31px"}
+                  - ub = UserBadge.find_by_user_id(com["user"]["id"])
+                  - if !ub.blank?
+                    - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+                    - if points >= 1 and points < 5
+                      - level = "Level: Muvi Scraper"
+                    - elsif points >= 5 and points < 10
+                      - level = "Level: Muvi Junkie"
+                    - elsif points >= 10
+                      - level = "Level: Muvi Maniac"
+                  =link_to(image_tag("#{com["user"]["image"]}", :style => "height:29px; width:31px"), "#{com["user"]["path"]}")
+                  .tooltip_description{:style =>'display:none'}
+                    %b
+                      = com["user"]["name"] 
+                    %br
+                    = level
+              - else
+                .actress.left{:style => "height:29px; width:31px"}
+                  =link_to(image_tag("#{com["user"]["image"]}", :style => "height:29px; width:31px"), "#{com["user"]["path"]}")
+                      
+              .actressNames.left{:style => "width:172px; padding-left:5px;"}
+                -unless com["question"].blank?
+                  =com["question"]
+                  .clear
+                  =com["description"]
+                -unless com["comment"].blank?
+                  =com["comment"]
+          .clear
+    -else
+      %div{:style => "width:223px; border-bottom: 1px solid rgb(202, 202, 202);"}
+    /Engage button
+    .clear{:style => "height:5px"}
+
+    .right{:style => "padding-right:7px; height:20px;"}
+      =render :partial => "/home_display/home_page_engage", :locals => {:options => options}
+
+
+
+
+

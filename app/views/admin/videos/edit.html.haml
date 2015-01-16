@@ -1,0 +1,57 @@
+= form_for [:videos, @video], :url => update_video_admin_videos_path, :html => { :multipart => true } do |f|
+  -unless @video.blank?
+    -if @video.errors.any?
+      #error_explanation
+        %h2
+          = pluralize(@video.errors.count, "error")
+          prohibited this page from being saved:
+        %ul
+          -@video.errors.full_messages.each do |msg|
+            %li= msg
+
+
+  .form{:style => "border:1px solid #666666;margin-bottom:30px;background-color:#E5E5E5;padding:10px 2px; font-size:12px"}
+    %input{:type => "hidden", :name => "video_id", :value => "#{params[:id]}"}
+    .left
+      = f.label :Title, "Title"
+      = f.text_field :name ,:class => 'large'
+
+    .clear
+    = f.label :remote_link, "Video link"
+    = f.text_field :video_remote_url
+
+    &nbsp; &nbsp;
+    OR
+    &nbsp; Video
+    = f.file_field :trailer
+    &nbsp; &nbsp;
+    =f.object.trailer.url.to_s
+    .clear
+
+    = f.label :movie_tag, 'Movie Tag'
+    %input{:type => "text", :name => "movie_tag", :value => "#{@video.tags.find(:all, :conditions => ["taggings.tagger_type='Movie'"]).collect {|t| t.name }.join(", ")}", :class => "movieAutocompleteMulti"}
+
+    .clear
+    = f.label :celebrity_tag, 'Celebrity Tag'
+    %input{:type => "text", :name => "celebrity_tag", :value => "#{@video.tags.find(:all, :conditions => ["taggings.tagger_type='Celebrity'"]).collect {|t| t.name }.join(", ")}", :class => "starAutocompleteMulti"}
+
+    .clear
+    = f.label :other_tag, 'Context Tag'
+    %input{:type => "text", :name => "other_tag", :value => "#{@video.tags.find(:all, :conditions => ["taggings.tagger_type IS NULL or taggings.tagger_type = 'trailer'"]).collect {|t| t.name }.join(", ")}", :class => "video"}
+
+    .clear
+    = f.label :rank, "Rank"
+    = select_tag 'video[rank]', options_for_select([['0','0'],['1', '1'], ['2','2'],['3', '3'],['4', '4'],['5', '5'],['6', '6'],['7', '7'],['8', '8'],['9', '9'],['10', '10']], @video.rank)
+    .clear
+    -if request.env["REQUEST_URI"] =~ /edit/
+      = label_tag "Difference Score"
+      = text_field_tag :diff_score,"", :value => (@video.score.to_i - @video.history_score.to_i)
+      .clear
+      = label_tag "Add Score"
+      = text_field_tag :add_score
+      .clear
+      = label_tag "Set Flag"
+      =select_tag :flag, options_for_select([["Select One", ""], "Latest Trailer","Promoted"],"#{@video.flag}")
+      .clear
+    = f.submit "Save Video"
+

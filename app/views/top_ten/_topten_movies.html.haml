@@ -1,0 +1,18 @@
+- unless @topten.blank?
+  - @topten.each do |movie|
+    -begin
+      -@movie_image =  TopTen.last_item(movie)
+    -rescue
+      -@movie_image = ""
+    -unless @movie_image.blank?
+      .box.left
+        .moviBox.left
+          = image_tag(@movie_image.full_image, :width => "130", :height => "174")
+        .title.left
+          = link_to raw("<h3>#{movie.name}</h3>"), "/top_ten/#{movie.id}/#{movie.name}", :style => 'font-size:15px'
+          .clear
+          %h4.small_orange_font{:style => 'font-weight:normal'}
+            by
+            = link_to UserProfile.find_by_user_id(movie.user_id).display_name , "/profile/#{movie.user_id}/#{UserProfile.find_by_user_id(movie.user_id).display_name}" ,:style => 'font-weight:normal' if UserProfile.find_by_user_id(movie.user_id)
+  .clear
+

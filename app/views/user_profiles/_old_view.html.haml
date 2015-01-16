@@ -1,0 +1,132 @@
+:javascript
+  $(document).ready(function($) {
+    $(".container").css("background-color", '#FFFFFF');
+    $(".container").css("border", '1px solid #d2d6d9');
+  });
+
+/= content_for :heading do
+/  -unless @user_profile.blank?
+/    -user = User.find(@user_profile.user_id)
+/    %div{:style => "width:575px; font-weight:bold;"}
+/      %span
+/        =@user_profile.display_name
+/      /=user.gender
+
+-unless @user_profile.blank?
+
+  -user = User.find(@user_profile.user_id)
+  -unless user.blank?
+    = content_for :breadcrumb do
+      .top_name_bar
+        %h3
+          %span
+            = succeed "'s" do
+              =@user_profile.display_name
+          Filmy Profile
+        .clear
+        -unless current_user
+          .right{:style => "margin-right:30px;margin-top:-15px"}
+            =succeed "" do
+              = "#{link_to 'Join Muvi', new_user_registration_path, :remote => true, :onclick => "registration()", :class => "login_link", :style => "color:#FFF;"}".html_safe
+            %span{:style => "color: #404447;font-weight: normal;"} 
+              and connect with #{@user_profile.display_name}
+        -else
+          .shareThis{:width => '300px', :style => 'padding-top:10px'}
+            %table{:align => "right"}
+              %tr
+                %td{:nowrap => 'nowrap',:valign => 'top'}
+                  %h4
+                    Share
+                    %span{:style => "font-weight:normal"}
+                      this page
+
+                    %a{:href => "http://www.facebook.com/sharer.php?u=http://#{request.env["HTTP_HOST"]}/profile/#{@user_profile.user_id}/#{User.convert_to_seo_url(@user_profile.display_name)}", :onclick => "window.open('http://www.facebook.com/sharer.php?u=http://#{request.env["HTTP_HOST"]}/profile/#{@user_profile.user_id}/#{User.convert_to_seo_url(@user_profile.display_name)}', 'newWindow', 'width=626, height=436'); return false;", :target => "_blank", :title => "Share on Facebook", :id => "fshare"}
+
+                      %img{:src => "/images/Ficon.jpg"}
+                    %a{:href=> "http://twitter.com/home?status=#{@user_profile.display_name} - http://#{request.env["HTTP_HOST"]}/profile/#{@user_profile.user_id}/#{User.convert_to_seo_url(@user_profile.display_name)}", :onclick=> "window.open('http://twitter.com/home?status=#{@user_profile.display_name} - http://#{request.env["HTTP_HOST"]}/profile/#{@user_profile.user_id}/#{User.convert_to_seo_url(@user_profile.display_name)}', 'newWindow', 'width=815, height=436'); return false;",  :target=>"_blank",:title => "Share on Twitter" }
+                      %img{:src => "/images/Ticon.jpg"}
+                %td{:style => 'padding-top:7px'}
+                  %g:plusone{:size => 'medium',:width => 120, :annotation => 'none'}
+
+
+-unless @user_profile.blank?
+  .containerIn.borderDiv
+    =render :partial => "show_user_image"
+    .moviDetail.left
+      = render "/user_profiles/show_badges"
+      .detail
+        %h3 Liked
+        -unless @movie_user_reviews.blank?   
+          =render "/shared/movie_like"
+        -else
+          No movie
+      .detail
+        %h3 Did not like
+        -unless @movie_user_reviews.blank?
+          =render "/shared/movie_not_like"
+        -else
+          No movie
+      
+      .detail
+        %h3 Want to see
+        .clear{:style => "height:4px"}
+        -unless @want_to_see.blank?
+          =render "/shared/want_to_see_in_profile",{:user_movie => @want_to_see}
+        -else
+          No Movies
+        .clear{:style => "height:4px"}
+
+      .detail
+        %h3 Not Want to see
+        .clear{:style => "height:4px"}
+        -unless @not_want_to_see.blank?
+          =render "/shared/want_to_see_in_profile",{:user_movie => @not_want_to_see}
+        -else
+          No Movies
+        .clear{:style => "height:4px"}
+
+      .detail
+        %h3 Fan of 
+        .clear{:style => "height:4px"}
+        -unless @fan.blank?
+          =render "/shared/show_fans_in_profile", {:user_star => @fan}
+        -else
+          Not fan of any star.
+        .clear{:style => "height:4px"}
+      
+      .detail
+        %h3 Not Fan of
+        .clear{:style => "height:4px"}
+        -unless @unfan.blank?
+          =render "/shared/show_fans_in_profile", {:user_star => @unfan}
+        -else
+          Not unfan of any star.
+        .clear{:style => "height:4px"}
+
+      -unless @movie_user_reviews.blank?
+        .detail
+          =render :partial => "/shared/show_reviews_in_profile"
+
+      .detail
+        %h3 Following users
+        .clear{:style => "height:4px"}
+        -unless @follow.blank?
+          -unless @follow.connections.blank?
+            =render :partial => "/shared/show_following_user"
+          -else
+            Not following any user.
+        -else
+          Not following any user.
+        .clear{:style => "height:4px"}
+    .clear
+-else
+  %h1{:style => "font-size: 100%; color: #f00; line-height: 1.5em;"}
+    We're sorry, but something went wrong (500)
+
+:javascript
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+

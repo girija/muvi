@@ -1,0 +1,40 @@
+.right
+  = link_to 'New film Critic', new_admin_film_critic_path
+.clear
+= form_for "search", :url => admin_film_critics_path, :html => {:method => :get} do |f|
+
+  = f.label :name_contains, 'Critics Name'
+  = f.text_field :name_contains
+  = f.submit "Search"
+  .clear
+
+-unless @film_critics.blank?
+  %table.listing
+    %tr
+      %th Name
+      %th organization
+      %th Email
+      %th Actions
+
+    - @film_critics.each do |fc|
+      %tr
+        %td
+          /= image_tag(fc.thumbnail_image.url(:thumb))
+          -unless fc.thumbnail_image_file_name.blank?
+            =image_tag("/system/thumbnail_images/#{fc.id}/thumb/#{fc.thumbnail_image_file_name.gsub(" ", "%20")}")
+          = fc.name
+        %td= fc.organization
+        %td= fc.user.email rescue ''
+        %td
+          = link_to "Edit", edit_admin_film_critic_path(fc.user_id)
+          |
+          = link_to "Delete",admin_film_critic_path(fc.user_id),  :confirm => 'Are you sure?', :method => :delete
+
+-else
+  %p 
+    %b
+      Sorry there are no results for your filter request(s)
+
+-unless @film_critic.blank?
+  = will_paginate @film_critic
+

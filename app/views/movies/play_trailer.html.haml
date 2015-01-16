@@ -1,0 +1,41 @@
+/= javascript_include_tag "https://js.stripe.com/v1/"
+/= javascript_include_tag "bootstrap-tour","bootstrap.tooltip","bootstrap.popover", "bootstrap-tagmanager","bootstrap-fileupload.min"
+/=javascript_include_tag "//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js","http://yui.yahooapis.com/3.12.0/build/yui/yui-min.js", "vendor/bootstrap", "flowplayer","//www.hellobar.com/hellobar.js","#{FAYE_URL}/faye.js","main"
+/= javascript_include_tag "jquery.cookie", "jquery.jscrollpane", "easySlider.packed", "jcarousellite","jquery.easing.pack", "jquery.mousewheel","jquery.Jcrop","jquery.lazyload.min","jquery.tokeninput","flippant","jquery.toastmessage"
+/= stylesheet_link_tag 'bootstrap_new'
+#DirectTrailer.modal.fade.hide{:style => 'width:640px;height:435px;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    #myModalLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+      -unless @movie.blank?
+        =@movie.name
+        trailer
+      -else
+        Trailer
+  .modal-body{:style => 'max-height:290px'}
+    %a{:href => "#" , :id => 'video_player', :style => 'display:block;height:300px;width:610px;'}
+  .modal-footer
+    %button.btn.btn-primary.bold_class{"data-dismiss" => "modal", "aria-hidden" => "true" }
+      Done
+.row-fluid
+  .span12{:style => "background-color:#FFFFFF"}
+    .span3
+      =render :partial => "/home/left_sidebar"
+
+    .span9{:style => "border-left: 4px solid #DFDFDF; margin-left: -2px;"}
+      %div{:class=>"main_content"}
+
+:javascript
+  var movie_name = "#{@movie.name}";
+  videourl = "#{@video_url}";
+  $('#video_player').remove();
+  var $video = $('<a />', {
+    href: videourl,
+    id: 'video_player',
+    style: 'display:block;height:290px;width:610px;'
+  });
+  $('#DirectTrailer .modal-body').append($video);
+  $('#DirectTrailer').modal('show');
+  flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+  $(".main_content").load("/movies/#{@movie.permalink} .main_content");

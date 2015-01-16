@@ -1,0 +1,14 @@
+- review.comments.each do |comment|
+  %div{:id => "comment_#{comment.id}"}
+    %div{:style => "float:left;width:240px;",:class=>"discussion_comment"}
+      %div{:class => "image left",:style=>"height:22px;width:22px;"}
+        =link_to image_tag(comment.user.user_image, :style=>"width:20px;height:20px;border: 1px solid #EEEEEE;"), "/profile/#{comment.user.id}/#{comment.user.display_name}"
+
+      %div{:style => "margin-left:30px"}
+        = comment.comment
+        .small_light_gray
+          = link_to comment.user.display_name, "/profile/#{comment.user.id}/#{comment.user.display_name}", :class => "small_light_gray"
+          ,
+          = distance_of_time_in_words(Time.now, comment.created_at.to_time) + " ago"
+  .clear{:style=>"height:5px;"}
+

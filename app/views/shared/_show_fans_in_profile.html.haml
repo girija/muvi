@@ -1,0 +1,51 @@
+-unless user_star.blank?
+  - count = 0
+  %div{:id => "profile_fan_div"}
+    -user_star.each do |fan|
+      -celebrity = Celebrity.find_by_id(fan.celebrity_id)
+      -unless celebrity.blank?
+        -unless current_user.blank?
+          -if current_user.id == @user_profile.user_id
+            %div{:class => "profile_fan_div left", :id => "div_#{count}",:onmouseover => "javascript:show_button(#{count});", :onmouseout => "javascript:hide_button(#{count});"}
+              =link_to image_tag(celebrity.image, :width => 80, :height => 114),star_path(celebrity)
+              = form_for "fans",:url => "/fans/not_a_fan",  :html => {:id => "fan_form"}, :remote => true  do |f|
+                = f.hidden_field :celebrity_id, :value => fan.celebrity_id
+                = f.hidden_field :type, :value => "profile"
+
+                .actions.left{:id => "not_anymore_#{count}", :style => "display:none;position:absolute;margin-top:-30px"}
+                  .gradient-input-button.ui-corner-all{:style => "width:80px;height:28px"}
+                    .gradient-input-button.ui-corner-all{:style => "height:28px"}
+                      %input{:type => "submit", :value => "Not anymore", :name => "commit", :id => "comment_submit", :class => "label", :style => "background:none;font-size:10px"}
+              .clear
+              =link_to celebrity.name, star_path(celebrity)
+
+
+          -else
+            -count_fan = Fan.find(:first, :select => ["id"],:conditions =>["user_id = ? AND celebrity_id = ?", current_user.id,celebrity.id])
+            -unless count_fan.blank?
+              %div{:class => "profile_fan_div left"}
+                =link_to image_tag(celebrity.image, :width => 80, :height => 114, :style => "border 1px solid red"),star_path(celebrity)
+                .clear
+                =link_to celebrity.name, star_path(celebrity)
+
+            -else
+              %div{:class => "profile_fan_div left" ,:id => "div_#{count}",:onmouseover => "javascript:show_fan_button(#{count});", :onmouseout => "javascript:hide_fan_button(#{count});"}
+                =link_to image_tag(celebrity.image, :width => 80, :height => 114, :style => "border 1px solid red"),star_path(celebrity)
+                = form_for "fans",:url => "/fans",  :html => {:id => "fan_form"}, :remote => true  do |f|
+                  = f.hidden_field :celebrity_id, :value => fan.celebrity_id
+                  = f.hidden_field :type, :value => "profile"
+
+                  .actions.left{:id => "fan_#{count}", :style => "display:none;position:absolute;margin-top:-30px"}
+                    .gradient-input-button.ui-corner-all{:style => "width:80px;height:28px"}
+                      .gradient-input-button.ui-corner-all{:style => "height:28px"}
+                        %input{:type => "submit", :value => "Be a fan", :name => "commit", :id => "comment_submit", :class => "label", :style => "background:none;font-size:10px"}
+                .clear
+                =link_to celebrity.name, star_path(celebrity)
+        -else
+          -count_fan = Fan.find(:first, :select => ["id"],:conditions =>["user_id = ? AND celebrity_id = ?", params[:user_id],celebrity.id])
+          -unless count_fan.blank?
+            %div{:class => "profile_fan_div left"}
+              =link_to image_tag(celebrity.image, :width => 80, :height => 114),star_path(celebrity)
+              .clear
+              =link_to celebrity.name, star_path(celebrity)     
+        -count = count + 1

@@ -1,0 +1,74 @@
+<%= stylesheet_link_tag "jquery.Jcrop.css" %>
+<%= javascript_include_tag "jquery.Jcrop.js" %>
+<script type="text/javascript" charset="utf-8">
+$(function() {
+  var square_size = ""
+  var w = <%= @poster.poster_geometry(:original).width %>
+  var h = <%= @poster.poster_geometry(:original).height %>
+  if(w < h){
+    square_size = w
+  }else if(h < w){
+    square_size = h
+  }else{
+    square_size = w
+  }
+
+  $('#cropbox').Jcrop({
+    onChange: update_crop,
+    onSelect: update_crop,
+    setSelect: [0, 0, 500, 500],
+    aspectRatio: 1
+  });
+});
+
+function update_crop(coords) {
+  var square_size = ""
+  var w = <%= @poster.poster_geometry(:original).width %>
+  var h = <%= @poster.poster_geometry(:original).height %>
+  if(w < h){
+    square_size = w
+  }else if(h < w){
+    square_size = h
+  }else{
+    square_size = w
+  }
+
+  var rx = 100/coords.w;
+  var ry = 100/coords.h;
+  $('#preview').css({
+    width: Math.round(rx * <%= @poster.poster_geometry(:original).width %>) + 'px',
+    height: Math.round(ry * <%= @poster.poster_geometry(:original).height %>) + 'px',
+    marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+    marginTop: '-' + Math.round(ry * coords.y) + 'px'
+  });
+
+  var ratio = <%= @poster.poster_geometry(:original).width %> / <%= @poster.poster_geometry(:medium).width %>;
+
+  //$("#crop_x").val(Math.round(coords.x * ratio));
+  //$("#crop_y").val(Math.round(coords.y * ratio));
+  //$("#crop_w").val(Math.round(coords.w * ratio));
+  //$("#crop_h").val(Math.round(coords.h * ratio));
+
+  $("#crop_x").val(Math.round(coords.x));
+  $("#crop_y").val(Math.round(coords.y));
+  $("#crop_w").val(square_size);
+  $("#crop_h").val(square_size);
+}
+</script>
+
+<%= image_tag("/system/posters/#{@poster.id}/original/#{@poster.poster_file_name}", :id => "cropbox") %>
+
+<h4>Preview:</h4>
+<div style="width:100px; height:100px; overflow:hidden">
+  <%= image_tag("/system/posters/#{@poster.id}/original/#{@poster.poster_file_name}", :id => "preview") %>
+</div>
+
+<%= form_for @poster, :url => "/admin/posters/update_crop" do |f| %>
+  <input type="hidden" name="poster_id" value="<%=@poster.id%>">
+  <% for attribute in [:crop_x, :crop_y, :crop_w, :crop_h] %>
+    <%= f.hidden_field attribute, :id => attribute %>
+  <% end %>
+  <p><%= f.submit "Crop" %></p>
+<% end %>
+
+

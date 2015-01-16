@@ -1,0 +1,333 @@
+:javascript
+  $(document).ready(function($) {
+    $(".tip_hint").tooltip({
+      placement: "bottom",
+      html: true
+    });    
+  });
+  function add_tolist(tag_val){
+    if(tag_val != ""){
+      $(".tagManager").tagsManager('pushTag',tag_val,"{tagsContainer:'div #tags_container'}");
+      $("#2nd_icon").attr("src","/images/tick_icon.png");
+      //$(".tagManager").tagsManager('pushTag',tag_val);
+    }
+  }
+
+  function set_rate_value(ev, rate){
+    $("#hid_rate").val(rate);
+    
+    $(".boring").removeClass("boring_active");
+    $(".ok").removeClass("ok_active");
+    $(".good").removeClass("good_active");
+   
+    if(ev.id == 'boring'){
+      $(ev).addClass("boring_active");
+    }else if(ev.id == 'ok'){
+      $(ev).addClass("ok_active");
+    }else if(ev.id == 'good'){
+      $(ev).addClass("good_active");
+    }
+    $("#1st_icon").attr("src","/images/tick_icon.png");
+  }
+
+  function validate(){
+    if($("#hid_rate").val() == ""){
+      $("#err").html("Please choose how you feel the movie was !");
+      $('#err').css("color", "red");
+      return false;
+    }else{
+      //$('.pull-right').click(); 
+      $('#hide_button').click();
+      $('#rate_form').submit();
+      $("#rateModal").modal('hide');
+      return true;
+    }
+  }
+
+  function open_right_div(){
+    $("#rateModal").css("width", "600px")
+    $("#modal_close").css("margin-right", "48%");
+    $(".modal-content.rating").css("width", "50.6%");
+    $("#modal_close").css("padding-top", "10px");
+    $("#rating_label").css("width", "48.2%");
+    $("#modal_cancel").css("visibility", "visible");
+    $("#modal_ok").css("visibility", "visible");
+    $("#right_div").show();
+    $("#right_header_div").show();
+  }
+
+  function closeDialog () {
+    $("#right_div").hide();
+    $("#right_header_div").hide();
+    $("#rateModal").css("width", "300px");  
+    $("#modal_close").css("margin-right", "0px");
+    $("#modal_close").css("padding-right", "5px");
+    $("#modal_close").css("padding-top", "10px");
+    $(".modal-content.rating").css("width", "100%");
+    $("#rating_label").css("width", "90%");
+    $("#modal_cancel").css("visibility", "hidden");
+    $("#modal_ok").css("visibility", "hidden");
+  };
+
+  function submit_rating(m_id){
+    var rate = $("#hid_rate").val();
+    var review_text = $("#review_text").val();
+    var uid = $("#current_user_id").val();
+
+    var list_arr = [];
+    $('.chk_bok:checked').each(function(i){
+      list_arr[i] = $(this).val();
+    });
+    var new_list = $("#list_name").val();
+    if(new_list != ""){
+      var arr = list_arr.length;
+      list_arr[list_arr.length] = new_list;
+    }
+    $("#rateModal").modal('toggle');
+    closeDialog ();
+
+    var btn_html = "<a href='#rated' class='btn btn-success'><i class='icon-ok'></i> Rated</a>";
+    $("#rate_"+m_id).html(btn_html);
+    $(".rate_div_"+m_id).html(btn_html);
+    $("#rate_div_"+uid+"_"+m_id).html(btn_html);
+
+
+    if(list_arr.length > 0){
+      _gaq.push(['_trackEvent', 'List', 'Created list', 'Created list']);
+    }
+    _gaq.push(['_trackEvent', 'Rate', 'Rated movie', 'Rated movie']);
+
+    $.post("/save_movie_rating?user_id=" + $("#logged_in_user_id").val() + "&movie_id=" + m_id + "&hid_rate="+ rate + "&review_text=" + review_text + "&hidden-tags=" + list_arr, function(res){
+
+    });
+  }
+  
+  function pre_populate_data(user_id, movie_name, movie_id, link, notification_id,fst_tag,sec_tag,trd_tag){
+    $.post("/fetch_review?user_id="+user_id+"&movie_id="+movie_id, function(res){
+      var result = res.split("|");
+      var rating = result[0];
+      var desc = result[1];
+      populate_data(movie_name, movie_id, link, notification_id,fst_tag,sec_tag,trd_tag);
+      prefill_review(rating, desc);
+    });
+  }
+
+  function populate_data(movie_name, movie_id, link, notification_id,fst_tag,sec_tag,trd_tag){
+    var html = "";
+    if(fst_tag == undefined){
+      fst_tag = $("#rec_tag_1").val();
+    }
+    if(sec_tag == undefined){
+      sec_tag = $("#rec_tag_2").val();
+    }
+    if(trd_tag == undefined){
+      trd_tag = $("#rec_tag_3").val();
+    }
+    $("#rating_label").html("Rate "+movie_name);
+    html += "<div class='row-fluid' style='height:160px'>";
+    html += "  <div id='err'></div>";
+    //html += "  <form action='/save_movie_rating' method='post' data-remote='true' id='rate_form'>";
+    // Rating
+    html += "  <div style='width:270px; padding-left:20%'>";
+
+    html += "    <div style='float:left;width:60px;height:50px;'><input type='button' id='boring' title='Boring' class='boring'  onclick='set_rate_value(this, 2); open_right_div();' style='width:33px'> </div>"+
+            "    <div style='float:left;width:60px;height:50px;'><input type='button' id='ok' title='Ok' class='ok' onclick='set_rate_value(this, 4); open_right_div();' style='width:33px'></div> "+
+            "    <div style='float:left;width:60px;height:50px;'><input type='button' id='good' title='Good' class='good' onclick='set_rate_value(this, 5); open_right_div();' style='width:33px'></div>";
+    html += "  </div>";
+
+    html += "    <div class='clear'></div>";
+
+    html += "    <textarea cols=20 rows=4 id='review_text' name='review_text' onkeyup='check_review();' style='width:263px; height:60px' placeholder='Write something...'></textarea>";
+
+    html += "    <div class='clear'></div>";
+    html += "  </div>" ;
+
+    // Buttons
+    html += "  <div style='text-align:right; padding-right:25px;'>";
+    html += "    <input type='hidden' name='movie_id' id='movie_id' value='"+movie_id+"'>"+
+            "    <input type='hidden' name='hid_rate' id='hid_rate'>";
+    html += "    <input type='hidden' name='notification_id' value='"+notification_id+"'>";
+    html += "    <input type='button' class='btn bold_class' data-dismiss='modal' aria-hidden='true' value='Cancel' style='color:#494949; visibility:hidden;' id='modal_cancel' onclick='closeDialog ();'></button>";
+    html += "    <input type='button' value='Save' class='btn btn-primary bold_class' onclick='submit_rating("+movie_id+");' style='visibility:hidden' id='modal_ok'>";
+    html += "  </div>";
+
+    //html += "  </form>";
+    html += "  </div>";
+
+
+    $(".modal-content.rating").html("");
+    $(".modal-content.rating").html(html);
+    $(".tagManager").tagsManager({
+        tagsContainer: 'div #tags_container',
+        typeahead: true,
+        typeaheadAjaxSource: '/tag_list_autocomplete',
+        typeaheadAjaxPolling: true
+    });
+    $('input[name="hidden-tags"]').change(function(){
+      var hid_tag_val = $('input[name="hidden-tags"]').val();
+      if(hid_tag_val != ""){
+        $("#2nd_icon").attr("src","/images/tick_icon.png");
+      }else{
+        $("#2nd_icon").attr("src","/images/2.png");
+      }
+    });
+
+    add_to_list_ratepopup(movie_id);
+  }
+
+
+  function populate_data_old(movie_name, movie_id, link, notification_id,fst_tag,sec_tag,trd_tag){
+    var html = "";
+    if(fst_tag == undefined){
+      fst_tag = $("#rec_tag_1").val();
+    }
+    if(sec_tag == undefined){
+      sec_tag = $("#rec_tag_2").val();
+    }
+    if(trd_tag == undefined){
+      trd_tag = $("#rec_tag_3").val();
+    }
+    $("#rating_label").html("Rate "+movie_name); 
+    html += "<div class='row-fluid'>";
+    html += "  <div id='err'></div>";
+    html += "  <form action='/save_movie_rating' method='post' data-remote='true' id='rate_form'>";
+
+    // Rating
+    html += "  <div class='span12'>";
+
+    html += "    <div class='clear' style='height:20px;'></div>";
+    html += "    <div style='float:left;'><img src='/images/1.png' id='1st_icon'></div> ";
+    html += "    <div style='float:left; width:100px; font-weight:bold; color:#494949;padding-left:10px; '>Your Rating</div>";
+
+    html += "    <div style='float:left;width:60px;height:50px;'><input type='button' id='boring' title='Boring' class='boring'  onclick='set_rate_value(this, 2);' style='width:33px'> </div>"+
+            "    <div style='float:left;width:60px;height:50px;'><input type='button' id='ok' title='Ok' class='ok' onclick='set_rate_value(this, 4);' style='width:33px'></div> "+
+            "    <div style='float:left;width:60px;height:50px;'><input type='button' id='good' title='Good' class='good icon_hint' data-toggle='tooltip' data-original-title = \"#{generate_tooltip_block('good','rating dialog')}\" onclick='set_rate_value(this, 5);' style='width:33px'></div>";
+    //html += "    <div style='float:left; width:60px;'><input id='mr-1' type='radio' value='2' name='rating'>Bad</div>";
+    //html += "    <div style='float:left; width:60px;'><input id='mr-2' type='radio' value='3' name='rating'>Ok</div>";
+    //html += "    <div style='float:left; width:60px;'><input id='mr-3' type='radio' value='4' name='rating' checked='checked'>Good</div>";
+    html += "  </div>";
+  
+    html += "    <div class='clear'></div>";
+    
+
+    // Tag
+    html += "<div id='tag_warn' class='tag_warn'><div style='padding:3px;float:left;'>List must have at least 3 words, such as \"Best Tom Cruise Movies\", \"Latest action movies\".</div><div onclick='check_tag_warn();' class='tag_warn_close'>x</div></div>";
+    html += "  <div class='span12' style='margin-left:0px;'>";
+    html += "    <div style='float:left;'><img src='/images/2.png' id='2nd_icon'></div> ";
+    html += "    <div style='float:left; width:100px; font-weight:bold; color:#494949;padding-left:10px; '>Add to List</div>";
+    html += "    <div style='float:left;margin-top:-5px;'><input type='text' name='tags' placeholder='e.g Horror Movies (Press comma at end of name)' class='tagManager' style='width:320px'></div>";
+    html += "  </div>";
+    //show existing tags
+    html += "  <div style='padding-left:132px;'>";
+    html += "  <span class='tag_list' onclick=\"add_tolist('"+fst_tag+"')\">"+fst_tag+"</span>, ";
+    html += "  <span class='tag_list' onclick=\"add_tolist('"+sec_tag+"')\">"+sec_tag+"</span>, ";
+    html += "  <span class='tag_list' onclick=\"add_tolist('"+trd_tag+"')\">"+trd_tag+"</span>";
+    html += "  </div>";
+    html += "    <div class='clear' style='height:10px'></div>";
+    html += "<div style='padding-left:132px;' id='tags_container' class='tags_block'></div>"
+
+    // Rating text
+    html += "  <div>";
+     
+    html += "    <div class='clear' style='height:10px'></div>";
+    html += "    <div style='float:left;'><img src='/images/3.png' id='3rd_icon'></div> ";
+    html += "    <div style='float:left; width:100px; font-weight:bold; color:#494949;padding-left:10px; '>Add a Review</div>";
+    html += "    <textarea cols=20 rows=4 id='review_text' name='review_text' onkeyup='check_review();' style='width:320px; height:60px' placeholder='Write something...'></textarea>";
+
+    html += "    <div class='clear'></div>";
+    html += "  </div>" ;
+
+    // Buttons
+    html += "  <div class='span12' style='text-align:right; padding-right:25px'>";
+    html += "    <input type='hidden' name='movie_id' id='movie_id' value='"+movie_id+"'>"+
+            "    <input type='hidden' name='hid_rate' id='hid_rate'>";
+    html += "    <input type='hidden' name='notification_id' value='"+notification_id+"'>";
+    html += "    <input type='button' class='btn bold_class' data-dismiss='modal' aria-hidden='true' value='Cancel' style='color:#494949;'></button>";
+    html += "    <input type='button' value='Save' class='btn btn-primary bold_class' onclick='validate();' >";
+    html += "  </div>";
+
+    html += "  </form>";  
+    html += "  </div>";
+
+    $(".modal-body.rating").html("");
+    $(".modal-body.rating").html(html);
+    $(".tagManager").tagsManager({
+        tagsContainer: 'div #tags_container',
+        typeahead: true,
+        typeaheadAjaxSource: '/tag_list_autocomplete',
+        typeaheadAjaxPolling: true
+        //validator: validate_text
+    });
+    $(".icon_hint").tooltip({
+      placement: "bottom",
+      html: true
+    });
+    $('input[name="hidden-tags"]').change(function(){
+      var hid_tag_val = $('input[name="hidden-tags"]').val();
+      if(hid_tag_val != ""){
+        $("#2nd_icon").attr("src","/images/tick_icon.png");
+      }else{
+        $("#2nd_icon").attr("src","/images/2.png");
+      }
+    });
+    //$(".tagManager").tagsManager('tagsContainer','tags_block');
+
+  }
+  
+  function check_review(){
+    var rev = $("#review_text").val();
+    if(rev != ""){
+      $("#3rd_icon").attr("src","/images/tick_icon.png");      
+    }else{
+      $("#3rd_icon").attr("src","/images/3.png");
+    }
+  }
+  function check_tag_warn(){
+    $("#tag_warn").hide();
+  }
+
+  function validate_text(){
+    var tag_text = $(".tagManager").val();
+    tag_text = tag_text.replace(/(^\s*)|(\s*$)/gi,"");
+    tag_text = tag_text.replace(/[ ]{2,replace}/gi," ");
+    tag_text = tag_text.replace(/\n /,"\n");
+    var words = tag_text.split(' ').length;
+    if(words < 3){
+      $("#tag_warn").show();
+      return false;
+    }else{
+      $("#tag_warn").hide();
+      return true;
+    }
+  }
+
+-rated = 0
+-list = UserMovieList.find(:all, :conditions => ["user_id = #{current_user.id}"],:order => "created_at desc")
+-tags = []
+-fst_tag = ""
+-sec_tag = ""
+-trd_tag = ""
+
+-unless list.blank?
+  -list.each do |l|
+    -unless l.tag.blank?
+      -tags << l.tag
+    -unless l.movie_id.nil?
+      -movie_id_arr = ActiveSupport::JSON.decode(l.movie_id)
+      -if movie_id_arr.include?(movie_id)
+        -rated = 1
+-if rated == 0
+  %div{:class => "tip_hint rate_div_#{movie_id}", :id => "rate_div_#{movie_id}","data-toggle" => "tooltip","data-original-title" => generate_tooltip_block('rate','all')}
+    - cls = ""
+    - stl = ""
+    - if defined? button
+      - if button == "small"
+        - cls = "btn-medium"
+        - stl = "border-radius:2px 2px 2px 2px"
+    -if !tags.nil?
+      -fst_tag = tags[0] if tags[0]
+      -sec_tag = tags[1] if tags[1]
+      -trd_tag = tags[2] if tags[2]
+    = link_to "<i class='icon-star'></i> Rate".html_safe, "#rateModal" , :class => "tip_hint btn btn-primary #{cls}",:style => "#{stl}", "data-toggle" => "modal", "role" => "button", "data-id" => "#{movie_id}", :onclick => "populate_data('#{movie_name}', '#{movie_id}', '#{User.convert_to_seo_url(movie_name)}', '','#{fst_tag}','#{sec_tag}','#{trd_tag}'); "
+-else
+  = link_to "<i class='icon-ok'></i> Rated".html_safe, "#rated" , :class => "btn btn-success #{cls}", :style => "#{stl}"

@@ -1,0 +1,211 @@
+= render 'shared/meta_title_and_keywords', { :key => ''}
+
+%div{:style => "width: 1100px;background:#ffffff;padding:15px;"}
+  %h1
+    Send an exclusive Muvicard to your loved ones or collect for yourself
+  .clear{:style => "height:20px"}
+  %div
+    #muvicard.left
+      %div{:style => 'border:1px solid #f3f2f2;padding:5px;text-align:center'}
+        - poster = Poster.find(params[:id]) 
+        = image_tag ("/system/posters/#{poster.id}/medium/#{poster.poster_file_name.gsub(" ", "%20")}")
+      .field{:style => 'text-align:center;font-size:13px'}
+        Questions? Email us at  <a href="mailto:cards@muvi.com">cards@muvi.com</a>
+        
+    #muvitext.left
+      %p{:style => 'padding-top:0'}
+        An ultra high resolution picture with some cool facts about the movie (or celebrity).Own a cinematic experience in your hand!
+      %p
+        Great as a gift to your friends and family, or collect for yourself.
+      %p
+        An order confirmation will be sent to your email address. You will receive the card in mail within 5 days.
+      %p
+        Costs only $0.75 (approx. Rs 30/-), less than a can of soda!
+      %p.small
+        *Currently only available in India.
+      .clear{:style => "height:10px"}
+      - if !current_user
+        <a onclick="check_login();" data-remote="true" href="/user/sign_in"><img src="/images/btn_order_now.jpg"></a>
+  .clear
+  .clear{:style => 'height:10px'}
+  %hr 
+  .clear{:style => 'height:10px;'}
+  #muviform
+    .payment-errors{:style => "color:red;font-size:12px"}
+    - if current_user
+      %form{:action => "", :method => "POST", :id => "paymentform"}
+        %div
+          .form_head
+            Send to
+            %input{:type => 'hidden' , :name => 'poster_id', :id => 'poster_id', :value => params[:id] }
+          .field
+            %label{:for => 'send_to_greeting'}
+              Greeting
+            %input{:type => 'text' , :name => 'send_to_greeting', :id => 'send_to_greeting'}
+          .field
+            %label{:for => 'send_to_name'}
+              Name*
+            %input{:type => 'text' , :name => 'send_to_name', :id => 'send_to_name'}
+          .field
+            %label{:for => 'send_to_address_1'}
+              Address Line 1
+            %input{:type => 'text' , :name => 'send_to_address_1', :id => 'send_to_address_1'}
+          .field
+            %label{:for => 'send_to_address_2'}
+              Address Line 2
+            %input{:type => 'text' , :name => 'send_to_address_2', :id => 'send_to_address_2'}
+          .field
+            %label{:for => 'send_to_city'}
+              City
+            %input{:type => 'text' , :name => 'send_to_city', :id => 'send_to_city'}
+          .field
+            %label{:for => 'send_to_state'}
+              State
+            %input{:type => 'text' , :name => 'send_to_state', :id => 'send_to_state'}
+          .field
+            %label{:for => 'send_to_zip'}
+              Zip Code
+            %input{:type => 'text' , :name => 'send_to_zip', :id => 'send_to_zip'}
+          .field{:style => 'text-align:center;font-size:13px'}
+            Questions? Email us at  <a href="mailto:cards@muvi.com">cards@muvi.com</a>
+        %div
+          .form_head
+            Payment information
+          .field
+            %label{:for => 'pay_to_credit_card'}
+              Credit card
+            %input{:type => 'text' , :name => 'pay_to_credit_card', :id => 'pay_to_credit_card', :class => 'card-number', :value => @upi[:credit_card_no] }
+          .field
+            %label{:for => 'pay_to_security_cvv2'}
+              Security CVV2
+            %input{:type => 'text' , :name => 'pay_to_security_cvv2', :id => 'pay_to_security_cvv2', :class => 'card-cvc',  :value => @upi[:credit_card_cvv]}
+          .field
+            %label{:for => 'pay_to_expiration'}
+              Expiration (MM/YYYY)
+            %input{:type => 'text' , :name => 'pay_to_expiration_mm', :id => 'pay_to_expiration_mm', :style => 'width:100px', :class => 'card-expiry-month',  :value => @upi[:credit_card_mm]}
+            %input{:type => 'text' , :name => 'pay_to_expiration_yyyy', :id => 'pay_to_expiration_yyyy', :style => 'width:200px', :class => 'card-expiry-year',  :value => @upi[:credit_card_yyyy]}
+          .field
+            %label
+            
+            %input{:type => 'checkbox', :id => 'pay_to_copy', :style => 'width:20px;'} Copy information from 'Send To'
+          .field
+            %label{:for => 'pay_to_name'}
+              Name*
+            %input{:type => 'text' , :name => 'pay_to_name', :id => 'pay_to_name', :value => @upi[:name]}
+          .field
+            %label{:for => 'pay_to_address_1'}
+              Address Line 1
+            %input{:type => 'text' , :name => 'pay_to_address_1', :id => 'pay_to_address_1', :value => @upi[:address_1]}
+          .field
+            %label{:for => 'pay_to_address_2'}
+              Address Line 2
+            %input{:type => 'text' , :name => 'pay_to_address_2', :id => 'pay_to_address_2',  :value => @upi[:address_2]}
+          .field
+            %label{:for => 'pay_to_city'}
+              City
+            %input{:type => 'text' , :name => 'pay_to_city', :id => 'pay_to_city',  :value => @upi[:city]}
+          .field
+            %label{:for => 'pay_to_state'}
+              State
+            %input{:type => 'text' , :name => 'pay_to_state', :id => 'pay_to_state',  :value => @upi[:state]}
+          .field
+            %label{:for => 'pay_to_zip'}
+              Zip Code
+            %input{:type => 'text' , :name => 'pay_to_zip', :id => 'pay_to_zip', :value => @upi[:zip]}
+        .clear{:style => 'height:10px;'}
+        %div{:style => 'text-align:right'}
+          %input{:type => 'image', :src => '/images/btn_submit_payment.png', :id => 'btn_submit'}
+      .clear
+    .clear 
+  .clear 
+
+:javascript
+  function stripeResponseHandler(status, response) {
+    if (response.error) {
+        // show the errors on the form
+        $(".payment-errors").text(response.error.message);
+        $("#btn_submit").removeAttr("disabled");
+    } else {
+        var form$ = $("#paymentform");
+        // token contains id, last4, and card type
+        var token = response['id'];
+        // insert the token into the form so it gets submitted to the server
+        form$.append("<input type='hidden' name='stripeToken' value='" + token + "'/>");
+        // and submit
+        form$.get(0).submit();
+    }
+  }
+  $(document).ready(function() {
+    $("#pay_to_copy").change(function(){
+      if(this.checked) {
+         $("#pay_to_name").val($("#send_to_name").val());
+         $("#pay_to_address_1").val($("#send_to_address_1").val());
+         $("#pay_to_address_2").val($("#send_to_address_2").val());
+         $("#pay_to_city").val($("#send_to_city").val());
+         $("#pay_to_state").val($("#send_to_state").val());
+         $("#pay_to_zip").val($("#send_to_zip").val());
+      }
+    });
+    $("#paymentform").submit(function(event) {
+      var error_msg = '';
+      if ($("#send_to_name").val() == ''){
+        error_msg += 'Please enter send to name<br>';
+      }
+      if ($("#send_to_address_1").val() == ''){
+        error_msg += 'Please enter send to address<br/>';
+      }
+      if ($("#send_to_city").val() == ''){
+        error_msg += 'Please enter send to city<br/>';
+      }
+      if ($("#send_to_state").val() == ''){
+        error_msg += 'Please enter send to state<br/>';
+      }
+      if ($("#send_to_zip").val() == ''){
+        error_msg += 'Please enter send to zip<br/>';
+      } else if(isNaN($("#send_to_zip").val())){
+        error_msg += 'Please enter valid send to zip<br/>';
+      }
+
+      if ($("#pay_to_credit_card").val() == ''){
+        error_msg += 'Please enter credit card number<br/>';
+      }
+      if ($("#pay_to_security_cvv2").val() == ''){
+        error_msg += 'Please enter CVV2 number<br/>';
+      }
+
+      if ($("#pay_to_name").val() == ''){
+        error_msg += 'Please enter payment information name<br>';
+      }
+      if ($("#pay_to_address_1").val() == ''){
+        error_msg += 'Please enter payment information address<br/>';
+      }
+      if ($("#pay_to_city").val() == ''){
+        error_msg += 'Please enter payment information city<br/>';
+      }
+      if ($("#pay_to_state").val() == ''){
+        error_msg += 'Please enter payment information state<br/>';
+      }
+      if ($("#pay_to_zip").val() == ''){
+        error_msg += 'Please enter payment information zip<br/>';
+      }
+      else if(isNaN($("#pay_to_zip").val())){
+        error_msg += 'Please enter valid payment information zip<br/>';
+      }
+      if (error_msg.length > 0) {
+        $(".payment-errors").html(error_msg);
+        $("#btn_submit").removeAttr("disabled");
+        return false;
+      }
+      // disable the submit button to prevent repeated clicks
+      $('#btn_submit').attr("disabled", "disabled");
+      Stripe.createToken({
+        number: $('.card-number').val(),
+        cvc: $('.card-cvc').val(),
+        exp_month: $('.card-expiry-month').val(),
+        exp_year: $('.card-expiry-year').val()
+      }, stripeResponseHandler);
+
+      // prevent the form from submitting with the default action
+      return false;
+    });
+  }); 

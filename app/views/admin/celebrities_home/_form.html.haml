@@ -1,0 +1,21 @@
+.form
+  =form_for "celebrities_home", :url=>"/admin/celebrities_home/create_settings" do |f|
+    .admin_home_page_div
+      %h3
+        In Theatres
+      =render "celeb_theater"
+
+    .admin_home_page_div
+      %h3
+        Next Week
+      =render "celeb_nextweek"
+
+    .admin_home_page_div
+      %h3
+        Trending
+      =render "celeb_trending"
+
+
+    .clear
+    = f.submit "Save Celebrity Home Page", :style => "margin-left:45%"
+

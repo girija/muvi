@@ -1,0 +1,21 @@
+%div
+  .left
+    =image_tag("muvi_text.png")
+
+  %div{:style => "text-align:right; margin-right:12px;font-size:14px;"}
+    -if request.fullpath =~ /\/released/
+      %b
+        Released
+    -else
+      =link_to("Released", "/released")
+  
+    %b
+      &nbsp; | &nbsp;
+
+    -if request.fullpath =~ /\/upcoming/
+      %b
+        Upcoming
+    -else
+      =link_to("Upcoming", "/upcoming")
+
+  .clear{:style => "height:10px"}

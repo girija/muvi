@@ -1,0 +1,24 @@
+<div itemscope itemtype="http://schema.org/Movie" style="display:block">
+  <h1 itemprop="name"><%= @movie.name%></h1>
+  <%= image_tag @movie.banner_image ,:itemprop=>"image" %>
+    <span itemprop="description"><%= @movie.story%></span>
+    Director:
+     <div itemprop="director" itemscope itemtype="http://schema.org/Person">
+    <span itemprop="name"><%= @director.first.celebrity.name if @director.first%></span>
+    </div>
+    Writers:
+     <div itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <span itemprop="name"><%= @writer.first.celebrity.name if @writer.first%></span>
+    </div>
+    Stars:
+    <% @actors.each do |actor| %>
+      <div itemprop="actor" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name"><%= actor.celebrity.name if actor.celebrity %></span>,
+      </div>
+    <% end %>
+    <div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+      <span itemprop="ratingValue"><%= (@movie.reviews.sum("rating")/@movie.reviews.count).round(1) if @movie.reviews.count > 0%></span>/<span itemprop="bestRating">5</span> stars from
+      <span itemprop="ratingCount"><%= @movie.reviews.count %></span> users.
+      Reviews: <span itemprop="reviewCount"><%= @movie.reviews.count %></span>.
+    </div>
+    </div>

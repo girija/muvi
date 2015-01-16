@@ -1,0 +1,33 @@
+-if current_user
+  -@movie_lists = ListOfMovie.find_by_user_id(current_user.id)
+
+-if params[:filter_text] == "seen_icon"
+  -unless @movie_lists.blank?
+    - unless @movie_lists.seen_lists.blank?
+      - seen_it =  ActiveSupport::JSON.decode(@movie_lists.seen_lists).reverse
+      - seen_it.each do |seen|
+        -if !seen.nil?
+          %li.media
+            = link_to image_tag("#{POSTER_URL}#{seen['object']['image']['url'].sub! 'thumb', 'medium'}", :alt => '', :style => 'height:64px;'), "#{seen['object']['url']}" , :class => 'pull-left', :style => 'padding-right:4px;'
+            .media-body
+              %h5{:style => 'margin-top:0'}
+                = link_to seen['object']['displayName'], "#{seen['object']['url']}"
+              =render "/shared/movie_rating", movie_name: seen['object']['displayName'], movie_image: seen['object']['image']['url'], movie_id:seen['object']['id']
+
+
+
+-if params[:filter_text] == "wanna_see_icon"
+  -unless @movie_lists.blank?
+    -unless @movie_lists.wanna_see_lists.blank? && @movie_lists.wanna_see_lists.nil?
+      - wanna_see_it =  ActiveSupport::JSON.decode(@movie_lists.wanna_see_lists)
+      -if wanna_see_it
+        - wanna_see_it = wanna_see_it.reverse
+        - wanna_see_it.each do |wanna_see|
+          - if !wanna_see.nil?
+            %li.media{:style => 'border-bottom:1px solid #eee'}
+              = link_to image_tag("#{POSTER_URL}#{wanna_see['object']['image']['url'].sub! 'thumb', 'medium'}", :alt => '' , :style => 'height:64px;') , "#{wanna_see['object']['url']}" , :class => 'pull-left', :style => 'padding-right:4px;'
+              .media-body
+                %h5{:style => 'margin-top:0'}
+                  = link_to wanna_see['object']['displayName'], "#{wanna_see['object']['url']}"
+                = link_to "<i class='icon-eye-open'></i> Seen".html_safe, "#" , :class => 'btn btn-seen-list' , 'data-id' => wanna_see['object']['id']
+

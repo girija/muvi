@@ -1,0 +1,52 @@
+#invitation_div
+  %div{:style => "width:575px; font-weight:bold;color:#445B6D"}
+    %h2
+      Invite to join
+  %a{:href => "", :name => "invite"}
+  -count = 0
+  
+  .homeContainerIn.connectionborderDiv_1{:style => "font-size:11px"}
+    /%span
+    /  Your invitation link is http://www.muvi.com/invite/#{current_user.id}
+    /.clear{:style => "height:10px"}
+    
+    /%span{:class => "left"}
+    /  =form_tag '/connections/email_invite',:remote => true, :onsubmit => "return validate_email();", :id => "email_invite_form" do
+    /    %span
+    /      Invite by email
+    /    =text_field_tag "email_invite"
+    /    =submit_tag "Invite"
+    /#message
+
+    /.clear{:style => "height:10px"}
+
+    = form_for "connections",:url => "/connections/send_invitation", :html => {:id => "invite_form"},  :remote => true do |f|
+      %div{:id => "scroll_div",:style => "min-height:100px; overflow:auto;"}
+        -@unregistered_user.each do |unreg|
+          .tinybox.left
+            -user = UserProfile.find(:first,:conditions => ["user_id = ?",unreg])
+            -user_fb_id = User.find(unreg)
+            %input{:type => "checkbox", :style => "float:left;margin-top:10px;",:id => "invite_#{count}", :name => "connections_invite[]", :onclick => "count_checkbox(this);", :value => unreg}
+
+            .tinyfriendsBox.left
+              -unless user.profile_image_file_name.blank?
+                =image_tag(user_profile_image(user))
+              -else
+                -unless user_fb_id.facebook_id.blank?
+                  =image_tag("http://graph.facebook.com/#{user_fb_id.facebook_id}/picture")
+                -else
+                  =image_tag('no-profile.png')
+            .tinyfriendstitle
+              =truncate(user.display_name, :length => 14)
+          -count = count + 1
+          -if count > 8
+            %script
+              $("#scroll_div").css("height","200px");
+      .clear{:style => "height:10px"}
+      .actions.right{:style => "margin-right:5px"}
+        .gradient-input-button.ui-corner-all
+          .gradient-input-button.ui-corner-all
+            %input{:type => "submit", :value => "Invite", :name => "commit", :id => "invite_submit", :class => "label"}
+      .clear{:style => "height:10px"}
+
+

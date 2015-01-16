@@ -1,0 +1,47 @@
+-if options["type"] != "movie" or options["type"] != "star"
+  -unless options["data"]["like"].blank?
+    %div{:style => "border: 0px inset #E0E1E3", :class => "like_btn_bg"}
+
+      %a{:href=>'#', :class => "left", :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+        .like_btn.left{:style => "width:55px; height:20px;margin-top:1px;margin-left:1px"}
+          &nbsp;
+
+      %a{:href=>'#', :class => "left", :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+        .dislike_btn.left{:style => "width:28px; height:20px;margin-top:1px;"}
+          &nbsp;
+
+-unless options["data"]["seenit"].blank?
+  %div{:style => "width:131px; height:22px; background:url(/images/seen_btn_bg.png) no-repeat;"}
+
+    %a{:href=>'#', :class => "left", :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+      .seen_btn.left{:style => "width:60px; height:20px;margin-top:1px;margin-left:1px"}
+        &nbsp;
+
+    %a{:href=>'#', :class => "left", :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+      .not_seen_btn.left{:style => "width:68px; height:20px;margin-top:1px;"}
+        &nbsp;
+
+
+-unless options["data"]["wanttosee"].blank?
+  %div{:style => "display:none; width:156px; height:22px; background:url(/images/w_t_s_btn_bg.png) no-repeat;"}
+
+    %a{:href=>'#', :class => "left", :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+      .want_btn.left{:style => "width:98px; height:20px;margin-top:1px;margin-left:1px"}
+        &nbsp;
+
+    %a{:href=>'#', :class => "left", :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+      .not_want_btn.left{:style => "width:55px; height:20px;margin-top:1px;"}
+        &nbsp;
+
+
+-unless options["data"]["fan"].blank?
+  %div{:style => "width:80px; height:22px; background:url(/images/fan_btn_bg.png) no-repeat;"}
+
+    %a{:href=>'#', :class => "left", :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+      .fan_btn.left{:style => "width:48px; height:20px;margin-top:1px;margin-left:1px"}
+        &nbsp;
+
+    %a{:href=>'#', :class => "left", :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+      .un_fan_btn.left{:style => "width:29px; height:20px;margin-top:1px;"}
+        &nbsp;
+

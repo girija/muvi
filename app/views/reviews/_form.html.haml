@@ -1,0 +1,114 @@
+:javascript
+  function display_block(block_id){
+      if (block_id == 'like_it'){
+        $('#seen_it_btn').attr('src', '/images/seen_active.png');
+        $('#not_seen_it_btn').attr('src', '/images/wanna_see_normal.png');
+        $('#not_seen_it_btn').css("opacity","0.3");
+      }
+      if (block_id == 'want_it'){
+        $('#seen_it_btn').attr('src', '/images/seen_normal.png');
+        $('#not_seen_it_btn').attr('src', '/images/wanna_see_active.png');
+      }
+      $("#not_seen_it_btn").parent().css('width','107px');
+  }
+  function form_review_submit(movie_id,like){
+    var user_id = $("#user_id").val();
+    if(like != 0){
+      $('#review_rating').val(like);
+    }
+    $('#rating_text').show('slow');
+    $(".first_sec").css("height","430px");
+    $("#information_block").css("height","430px");
+    if(user_id == "" || typeof user_id == 'undefined'){
+      var url = $("#hidden_reply_login").attr('href');
+      $("#hidden_reply_login").attr('href',url+"&login_for=like&refer_id="+movie_id+"&refer_type=Movie");
+      $("#hidden_reply_login").click();
+    } else {
+      var comment = $("#review_area_1").val();
+      if(comment == ""){
+        $("#new_review").submit();
+      }
+      return false;
+    }
+  }
+#login{:style=>"background: none;"}
+  - btn_not_seen = "wanna_see_normal.png"
+  - div_width = "210"
+  - img_width = "107"
+  - if !movie.release_date.blank? and movie.release_date <= Date.today
+    - if current_user && current_user.reviwed_movie?(movie)
+      - review_section = "display:block"
+      - like_it_section = ''
+    - else
+      - review_section = ''
+      - if !@is_wanna_see
+        - btn_not_seen = "wanna_see_normal.png"
+        - div_width = "210"
+      - else
+        - if @is_wanna_see
+          - btn_not_seen = "wanna_see_active.png"
+          - div_width = "242"
+          - img_width = "118" 
+        - else
+          - btn_not_seen = "wanna_see_normal.png"
+          - div_width = "242"
+          - img_width = "64"
+    - want_to_see_section = "display:none"
+  - else
+    - review_section = "display:none"
+    - if !@is_wanna_see
+      - want_to_see_section = ''
+    - else
+      - if movie.release_date.blank? or movie.release_date > Date.today
+        - want_to_see_section = ''
+      - else
+        - want_to_see_section = 'display:none'
+  - if !movie.release_date.blank? and movie.release_date <= Date.today
+    #seen_it{:style => "#{review_section}"}
+      %div{:style => "height:26px;width:#{div_width}px"}
+        - if current_user
+          - if current_user && current_user.reviwed_movie?(movie)
+            %div{:style=>"width:85px;float:left;",:class=>"tip_hint tooltipbottom"}
+              = image_tag("seen_active.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px", :onclick => "javascript:show_rating_popup('rating_popup','#{@movie.id}','#{current_user.id}')", :id => 'seen_it_btn')
+              =generate_tooltip_block("seen_it","movie_page")
+            %div{:style=>"width:107px;float:left;",:class=>"tip_hint tooltipbottom"}
+              = image_tag("wanna_see_normal.png", :style => "float:left;cursor:pointer;padding-right:1px;padding-top:1px;opacity:0.3;", :id => 'not_seen_it_btn')
+              =generate_tooltip_block("notseen_it","movie_page")
+          - else
+            %div{:style=>"width:85px;float:left;",:class=>"tip_hint tooltipbottom"}
+              = image_tag("seen_normal.png", :style => "float:left;cursor:pointer;pointer;padding-left:1px;padding-top:1px", :onclick => "javascript:show_rating_popup('rating_popup','#{@movie.id}','#{current_user.id}')", :id => 'seen_it_btn')
+              =generate_tooltip_block("seen_it","movie_page")
+            %div{:style=>"width:#{img_width}px;float:left;",:class=>"tip_hint tooltipbottom"}
+              = image_tag("#{btn_not_seen}", :style => "float:left;cursor:pointer;padding-right:1px;padding-top:1px", :onclick => "javascript:save_wanna_see('#{@movie.id}','#{current_user.id}')", :id => 'not_seen_it_btn')
+              =generate_tooltip_block("notseen_it","movie_page")
+        - else
+          %div{:style=>"width:85px;float:left;",:class=>"tip_hint tooltipbottom"}
+            = image_tag("seen_normal.png", :style => "float:left;cursor:pointer;pointer;padding-left:1px;padding-top:1px", :onclick => "javascript:show_rating_popup('rating_popup','#{@movie.id}','')", :id => 'seen_it_btn')
+            =generate_tooltip_block("seen_it","movie_page")
+          %div{:style=>"width:107px;float:left;",:class=>"tip_hint tooltipbottom"}
+            = image_tag("#{btn_not_seen}", :style => "float:left;cursor:pointer;padding-right:1px;padding-top:1px", :onclick => "javascript:save_wanna_see('#{@movie.id}','')", :id => 'not_seen_it_btn')
+            =generate_tooltip_block("notseen_it","movie_page")
+  
+  -else
+    #want_it{:style => "clear:left;#{want_to_see_section}"}
+      - if current_user
+        - if @is_wanna_see
+          %div{:style=>"width:85px;float:left;"}
+            = image_tag("seen_normal.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px;opacity:0.3;", :id => 'seen_it_btn')
+          %div{:style=>"width:107px;float:left;",:class=>"tip_hint tooltipbottom"}
+            = image_tag("wanna_see_active.png", :style => "float:left;cursor:pointer;padding-right:1px;padding-top:1px;", :id => 'not_seen_it_btn')
+            =generate_tooltip_block("notseen_it","movie_page")
+        -else
+          %div{:style=>"width:85px;float:left;"}
+            = image_tag("seen_normal.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px;opacity:0.3;", :id => 'seen_it_btn')
+          %div{:style=>"width:#{img_width}px;float:left;",:class=>"tip_hint tooltipbottom"}
+            = image_tag("#{btn_not_seen}", :style => "float:left;cursor:pointer;padding-right:1px;padding-top:1px", :onclick => "javascript:save_wanna_see('#{@movie.id}','#{current_user.id}')", :id => 'not_seen_it_btn')
+            =generate_tooltip_block("notseen_it","movie_page")
+      -else
+        %div{:style=>"width:85px;float:left;"}
+          = image_tag("seen_normal.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px;opacity:0.3;", :id => 'seen_it_btn')
+        %div{:style=>"width:107px;float:left;",:class=>"tip_hint tooltipbottom"}
+          = image_tag("#{btn_not_seen}", :style => "float:left;cursor:pointer;padding-right:1px;padding-top:1px", :onclick => "javascript:save_wanna_see('#{@movie.id}','')", :id => 'not_seen_it_btn')
+          =generate_tooltip_block("notseen_it","movie_page")
+
+    /= render :partial => "/want_to_see/form", :locals => {:movie => movie}

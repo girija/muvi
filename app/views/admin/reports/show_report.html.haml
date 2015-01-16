@@ -1,0 +1,93 @@
+%style
+  th{
+  text-align:left;
+  }
+  
+%table
+  %tr
+    %th
+      Statistics
+    %th
+      Total
+    %th
+      This Month
+    %th
+      =1.month.ago.strftime('%B	%Y') 
+    %th
+      =2.month.ago.strftime('%B %Y') 
+
+
+  %tr
+    %td
+      User registrations
+    %td
+      =@unique_reg.total
+    %td
+      =@unique_reg_this_month.total
+    %td
+      =@unique_reg_last_month.total
+    %td
+      =@unique_reg_last_2month.total
+
+  %tr
+    %td
+      Unique logins
+    %td
+      =@unique_logins_total.total
+    %td
+      =@unique_login_this_month.total
+    %td
+      =@unique_login_last_month.total
+    %td
+      =@unique_login_last_2month.total
+
+  %tr
+    %td
+      Videos (YouTube)
+    %td
+      =@youtube.total
+    %td
+      =@youtube_this_month.total
+    %td
+      =@youtube_last_month.total
+    %td
+      =@youtube_last_2month.total
+
+
+
+  %tr
+    %td
+      Videos (CPs)
+    %td
+      =@cps.total
+    %td
+      =@cps_this_month.total
+    %td
+      =@cps_last_month.total
+    %td
+      =@cps_last_2month.total
+
+  %tr
+    %td
+      Views (YouTube)
+    %td
+      =@youtube_view
+    %td
+      =@youtube_view_this_month
+    %td
+      =@youtube_view_last_month
+    %td
+      =@youtube_view_last_2month
+
+  %tr
+    %td
+      Views (CPs)
+    %td
+      =@cp_youtube_view
+    %td
+      =@cp_youtube_view_this_month
+    %td
+      =@cp_youtube_view_last_month
+    %td
+      =@cp_youtube_view_last_2month
+

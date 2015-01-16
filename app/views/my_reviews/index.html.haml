@@ -1,0 +1,37 @@
+= content_for :heading do
+  Latest Movies to
+  %span Review
+
+/= content_for :breadcrumb do
+/  %span
+/    = link_to "Home &#187;".html_safe, root_path
+/    My reviews
+.clear
+
+
+.homeContainerIn.borderDiv
+  = form_for @search, :url => my_reviews_path, :html => {:method => :get} do |f|
+    .left.moviSearch
+      = f.label :name_contains, 'Movie Title'
+      = f.text_field :name_contains
+      = f.submit "Search"
+      .clear
+  .clear
+  %br
+  -unless @movies.blank?
+    -@movies.each_with_index do |movie, i|
+      .left.reviewImage
+        = image_tag movie.banner_image, :size => "125x200"
+      .right.addReview
+        = render :partial => '/shared/critics_review', :locals => { :movie => movie}
+      .clear
+
+  -else
+    %p Sorry there are no results for your filter request(s)
+
+%textarea#review_description{:cols => "40", :name => "review[description]", :rows => "20"}
+%label
+  You have
+  %span#reviewCharsLeft
+  chars left.
+

@@ -1,0 +1,13 @@
+%ul
+  -unless @contacts.nil?
+    %form{:action => "invite_contact", :name => "contact", "data-remote" => true, :onsubmit => "$('#inviteModal').modal('hide');"}
+      -@contacts.each do |c|
+        %li{:style => "list-style-type: none"}
+          %input{:type => 'checkbox', :name => "contacts[]", :value => "#{c[1]}"}
+          #{c[1]}
+      %li{:style => "list-style-type: none"}
+        %input{:type => "submit", :value => "Send Invitation", :class => "brn btn-primary btn-large"}
+    
+  -else
+    -@con = "No contacts found." 
+

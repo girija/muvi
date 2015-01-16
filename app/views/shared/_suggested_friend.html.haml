@@ -1,0 +1,14 @@
+.GrayHeaderBox
+  .sidebar_header
+    %h3 Suggested Friends
+  - @suggested_friend.each do |user|
+    - usr = User.find(user)
+    .row
+      .image.left
+        = image_tag(usr.user_image)
+      %h4
+        = link_to(usr.display_name,"/profile/#{usr.id}/#{usr.display_name}", :style => 'font-weight:normal')
+        %br
+        = form_for "connections",:url => "/connections/follow", :html => {:id => "follow_form"},  :remote => true do |f|
+          = f.hidden_field :user_id, :value => usr.id
+          %input{:type => "submit", :value => "Follow", :name => "commit", :id => "comment_submit", :class => "label"}

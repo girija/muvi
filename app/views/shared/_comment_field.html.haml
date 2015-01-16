@@ -1,0 +1,14 @@
+%li
+  .user_image
+    = image_tag(comment.user.image)
+  .user_detail
+    %p.name
+      = comment.user.display_name
+      %span
+        |
+        = comment.created_at.strftime('%d %B %Y')
+    %p
+      = comment.comment
+  .clear
+  %br
+

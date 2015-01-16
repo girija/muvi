@@ -1,0 +1,23 @@
+-unless current_user.blank?
+  -if current_user.id == @user_profile.user_id
+    %h3
+      Reviews By Me
+  -else
+    -unless @user_profile.display_name.blank?
+      %h3
+        Reviews By
+        =@user_profile.display_name
+    -else
+      %h3
+        Reviews
+-else
+  -unless @user_profile.display_name.blank?
+    %h3
+      Reviews By
+      =@user_profile.display_name
+  -else
+    %h3
+      Reviews
+.clear{:style => "height:4px"}
+=render :partial => "/shared/movie_reviews_in_profile"
+

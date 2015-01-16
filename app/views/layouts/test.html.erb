@@ -1,0 +1,28 @@
+<html> 
+	<head>
+		<title>Test Pjax::: <%= Time.now() %></title>
+
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<%= javascript_include_tag "application" %>
+		<!--script src="http://pjax.heroku.com/jquery.js"></script>
+		<script src="http://pjax.heroku.com/jquery.cookie.js"></script>
+		<script src="http://pjax.heroku.com/pages.js"></script>
+
+		  <script src="http://pjax.heroku.com/jquery.pjax.js"></script-->
+
+	</head>
+
+	<body>
+		<div id="pjax-container">
+			<%= yield %>
+		</div>
+	</body>
+
+	<script>
+		$(document).ready(function($) {
+			//$('a').pjax('[data-pjax-container]')  
+			$(document).pjax('a', '#pjax-container')
+			alert("aa");
+		});
+	</script>
+</html>

@@ -1,0 +1,70 @@
+-if params[:layout] == "facebook"
+  -unless current_user.blank?
+    %div{:style => "background-color:#404447; height:20px;text-align:right; padding-right:20px;padding-top:5px;"}
+      = link_to 'Logout', '/user/signout', :style => "color:#FFFFFF"
+
+
+/= render 'shared/meta_title_and_keywords', { :key => 'home', :object => @connections}
+= render 'shared/meta_title_and_keywords', { :key => 'connections'}
+
+= content_for :heading do
+  Latest Activities
+- if @show_tab == true and @show_login == false 
+  .containerIn.topTenBorderDiv{:style => "width:800px"}
+    #reviews
+      %ul
+        %li
+          = link_to('All Activities<span>&nbsp;</span>'.html_safe, '/connections/activities/all')
+        %li
+          = link_to('Movies<span>&nbsp;</span>'.html_safe, '/connections/activities/movies')
+        %li
+          = link_to('Celebs<span>&nbsp;</span>'.html_safe, '/connections/activities/celebrities')
+        %li
+          = link_to('Top 10s<span>&nbsp;</span>'.html_safe, '/connections/activities/topten')
+        %li
+          = link_to('Connections<span>&nbsp;</span>'.html_safe, '/connections/activities/connections')
+- else
+  - if !@activities.blank? and @show_login == false
+    %div{ :style => "margin-top:12px;width:100%", :class => "moviRatingBox left"}
+    - count = 0
+    - @activities.each do |activity|
+      .wrdLatest{:id => "#{activity.id}"}
+        = activity_block(activity, true)
+        - count = count + 1
+        %div{:id => "activity_comments_#{activity.id}"}
+          %div{:style => "height:10px"}
+          -activity.comments.to_level.includes(:user).each do |comment|
+            = render '/shared/activity_comment', { :comment => comment}
+        -unless current_user.blank?
+          -if (UserConnection.check_connection(current_user, current_user.id.to_i) == true)  or (current_user.id == @user_profile.user_id)
+            = render '/comments/activity_form', {:activity => activity}
+
+- if @show_login == true
+  %div{:style => 'width:511px', :id => "signup_facebook"}
+    #login
+      - if params['register']=='yes'
+        = render 'register'
+      - else
+        = render 'login'
+
+:javascript
+  $('.star').rating({readOnly:false,required:true});
+  function swapMe(){
+    $("#login").load('/connections/activities?layout=none&register=yes');
+  }
+
+  function lastActivity(){
+   $.post("/connections/activities/#{params[:type]}?register=yes&lastID="+$(".wrdLatest:last").attr("id"),
+   function(data){
+    if (data != "") {
+      $(".wrdLatest:last").after(data);
+    }
+   });
+  }
+
+  $(window).scroll(function(){
+   if  ($(window).scrollTop() + 1 == $(document).height() - $(window).height()){
+    lastActivity();
+   }
+  })
+

@@ -1,0 +1,44 @@
+%div{:id=>"loader",:style=>"height:300px;padding-left:40%;padding-top:10%;"}
+  %img{:src=>"/images/loading.gif"}
+
+:javascript
+  $(document).ready(function($) {
+    var activity = "#{params[:activity]}" ;
+    var user_id = "#{params[:user_id]}" ;
+    $.getScript("http://www.muvi.com/users/sign_in?authentication_key=#{@user.authentication_token}", function( data, textStatus, jqxhr ) {
+      if(jqxhr.status == "200"){
+        if(activity == "have_seen"){
+          var movie_id = "#{params[:movie_id]}" ;
+          $.getScript("/seenit_add?user_id=#{@user.id}&movie_id=" + movie_id,function(){
+            window.location.href = "/movies/#{@movie.permalink if @movie}";
+          });
+        }else if(activity == "wanna_see"){
+          var movie_id = "#{params[:movie_id]}" ;
+          $.getScript("/wannasee_add?user_id=#{@user.id}&movie_id=" + movie_id,function(){
+            window.location.href = "/movies/#{@movie.permalink if @movie}";
+          });
+        }else if(activity == "follow_list"){
+          var list_id = "#{params[:list_id]}" ;  
+          $.post("/follow?list_id=" + list_id + "&user_id=#{@user.id}", function(data) {
+            window.location.href = "/movie_list/#{@list.id if @list}/#{@list.tag if @list}";
+          });
+        }else if(activity == "follow_celeb"){
+          var celeb_id = "#{params[:celeb_id]}" ;
+          $.post("/follow_star?list_id=" + celeb_id + "&user_id=#{@user.id}" , function(data) {
+            window.location.href = "/stars/#{@celeb.permalink if @celeb}";
+          });
+        }else if(activity == "add_activity"){
+          var movie_id = "#{params[:movie_id]}" ;
+          var notification_id = "#{params[:notification_id]}";
+          var current_user_id = "#{params[:current_user_id]}";
+          var target_user_id = "#{params[:target_user_id]}";
+          var activity_type = "#{params[:activity_type]}";
+          $.post('/add_activity', {notification_id : notification_id, current_user_id : current_user_id, target_user_id : target_user_id, movie_id : movie_id, activity_type: activity_type}, function(data) {
+            //window.location.href = "http://www.muvi.com/";
+            //window.location.href = "/profile/#{params[:current_user_id]}/#{@user.user_profile.display_name}";
+            window.location.href = "http://www.muvi.com";
+          });
+        }
+      }
+    });
+  });

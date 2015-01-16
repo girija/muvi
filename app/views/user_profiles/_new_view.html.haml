@@ -1,0 +1,229 @@
+:javascript
+  function change_picture_1(){
+    var cont = "#{escape_javascript(render :partial => 'user_profiles/upload_image')}";
+    $("#picture_popup").html(cont);
+    $("#edit_picture").css('margin-left', '-400px');
+    $("#edit_picture").modal("show");
+  }
+-first_name = @user_profile.display_name.split(" ")
+= render :partial => "/shared/followings"
+/= render :partial => "/shared/notify_new_version"
+#loginModal.modal.fade.hide{:style => 'width:365px;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    %h4#rateModalLabel
+      Login
+  .modal-body
+  .modal-footer
+
+#edit_picture.modal.fade.hide{:style=>"width:400px;height:250px;"}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    %h4#rateModalLabel
+      Change profile picture
+  .modal-body{:style=>"max-height:500px;"}
+    #picture_popup
+
+#myTrailer.modal.fade.hide{:style => 'width:640px;height:435px;'}
+  .modal-header
+    .pull-right{"data-dismiss" => "modal" , "aria-hidden" => "true"}
+      =image_tag("/images/popup_close.png")
+    #myModalLabel{:style=>"color:#494949;font-size:20px;font-weight:bold;"}
+      Trailer
+  .modal-body{:style => 'max-height:290px'}
+    %a{:href => "#" , :id => 'video_player', :style => 'display:block;height:300px;width:610px;'}
+  .modal-footer
+    %button.btn.btn-primary.bold_class{"data-dismiss" => "modal", "aria-hidden" => "true" }
+      Done
+
+%input{:type => 'hidden', :name=> 'flip_back' , :id => 'flip_back'}
+
+.container-fluid
+  .row-fluid
+    .span12.well-small
+      .row-fluid
+        .media
+          %a.pull-left{:href => "/profile/#{@user_profile.user_id}/#{@user_profile.display_name}"}
+            .left{:onmouseover => "$('#edit_profile_link').show();", :onmouseout => "$('#edit_profile_link').hide();",:style => "cursor:pointer;padding:2px;"}
+              = image_tag("/system/profile_images/#{@user_profile.id}/small/#{@user_profile.profile_image_file_name.gsub(' ', '%20')}",:style => "height:140px;width:140px;", :class => 'media-object img-circle') unless @user_profile.profile_image_file_name.blank?
+              - user = User.find(@user_profile.user_id)
+              - if @user_profile.profile_image_file_name.blank?
+                - unless user.facebook_id.blank?
+                  = image_tag("http://graph.facebook.com/#{user.facebook_id}/picture?type=normal",:style => "height:140px;width:140px;", :class => 'media-object img-circle')
+                - else
+                  = image_tag("/images/no-profile.png",:style => "height:140px;width:140px;", :class => 'media-object img-circle')
+              %img{:src => "/images/loading.gif", :style => "position:absolute; top:70px; left:700px; display:none;", :id => "upload_loader"}
+              -unless current_user.blank?
+                %input{:type => 'hidden', :name=> 'logged_in_user_id' , :id => 'logged_in_user_id', :value => current_user.id}
+                -if current_user.id == @user_profile.user_id
+                  %a{:href => "#", :class => "edit_profilepicture", :id => "edit_profile_link", :onclick => "change_picture();"}
+                    Update Pic
+          .media-body{:style=>"padding-left:10px;"}
+            %div{:class => 'page_heading'}
+              = @user_profile.display_name
+            %div{:style=>"height:25px;padding-top:10px;"}
+              -loc_val = @user_profile.location == "nil" ? "" : @user_profile.location
+              =text_field_tag "location","#{loc_val}",:onkeypress => "saveuser_data('location',event,'#{@user_profile.id}')",:style=>"border:1px solid #D2D6D9;width:250px;display:none;",:class=>"commentBox",:placeholder => "Add your location",:onblur => "hide_textbox('location');"
+              -if @user_profile.location == "nil" or @user_profile.location == ""
+                -unless current_user and current_user.id != @user_profile.user_id
+                  =link_to "User Location","javascript:void(0);",:onclick => "show_textbox('location');",:id => "location_link",:style=>"color:#a4a4a4;font-weight:bold;"
+                  %div{:style=>"color:#b5b5b5;font-size:14px;",:id => "location_text",:onclick => "show_textbox('location');"}
+                -else
+                  =link_to "User Location","javascript:void(0);",:style=>"color:#a4a4a4;font-weight:bold;"
+              -else
+                -unless current_user and current_user.id != @user_profile.user_id
+                  %div{:style=>"color:#a4a4a4;font-weight:bold;",:onclick => "show_textbox('location');",:id => "location_text"}
+                    =@user_profile.location
+                -else
+                  %div{:style=>"color:#a4a4a4;font-weight:bold;"}
+                    =@user_profile.location
+            =image_tag("loading.gif", :style => "position:absolute;margin-left: 20%; margin-top: -4%; display:none", :id => "load_user_all_seen")
+             
+            .clear
+            %div{:style => "font-size:15px;padding-top:10px;"}
+              %span{:style=>"color:#494949;font-weight:bold;"}
+                ="Following #{link_to "#{user.following_by_type_count("UserMovieList")} lists", "#followsModal" , "data-toggle" => "modal"}".html_safe
+
+  .row-fluid
+    .span12.well-small
+      %div{:style=>"width:400px;float:left;"}
+        -fav_stars = Follow.where("followable_type = 'Celebrity' and follower_id = '#{@user_profile.user_id}'").limit("3")
+        -if !fav_stars.blank?
+          %div
+            %div{:class=>"heading",:style=>"float:left;"}
+              FAVORITE STARS
+            %div{:style=>"float:left;border-bottom:1px solid #ececec;width:210px;margin-left:20px;height:10px;"}
+          .clear
+          %div{:style=>"height:100px;padding-top:10px;"}
+            -fav_stars = Follow.where("followable_type = 'Celebrity' and follower_id = '#{@user_profile.user_id}'").order("id desc").limit("3")
+            -fav_stars.each do |star|
+              -celeb = Celebrity.find_by_id(star.followable_id)
+              %div{:style=>"width:120px;float:left;"}
+                = link_to "<div style = 'height:102px;width:102px;border:1px solid #ececec;background:url(#{celeb.image});background-repeat:no-repeat;background-position:-15px -30px;' class = 'media-object'></div>".html_safe, star_path(celeb)
+                =link_to celeb.name,star_path(celeb),:style=>"color:#494949;font-weight:bold;"
+      -rev = @user_profile.reviews.where("description != ''").first
+      -if rev
+        %div{:style=>"width:400px;float:right;"}
+          %div
+            %div{:class=>"heading",:style=>"float:left;"}
+              RECENT REVIEWS
+            %div{:style=>"float:left;border-bottom:1px solid #ececec;width:255px;margin-left:20px;height:10px;"}
+          .clear
+          %div{:style=>"height:100px;padding-top:10px;"}
+            -movie = rev.movie
+            %div{:style=>"width:80px;float:left;"}
+              = link_to image_tag(movie.banner_image_medium, :style => "height:102px;width:70px;border:1px solid #ececec;", :class => 'media-object'),movie_path(movie)
+            %div{:style=>"width:300px;float:left"}
+              %div
+                %div{:style=>"float:left;width:280px;"}
+                  =link_to movie.name,movie_path(movie),:style=>"color:#494949;font-size:15px;font-weight:bold;"
+                %div{:style=>"float:right;"}
+                  =rating_mood(rev.rating)
+              .clear
+              %div{:style=>"color:#707070;padding-top:5px;",:id=>"half_review"}
+                =rev.description.truncate(175)
+                -if rev.description.length > 175
+                  =link_to "more","javascript:void(0);",:onclick=>"display_full_review()"
+              %div{:style=>"color:#707070;padding-top:5px;display:none;",:id=>"full_review"}
+                =rev.description
+                =link_to "hide","javascript:void(0);",:onclick=>"display_full_review()"
+
+  %input{:type => "hidden", :id => "selected_list_id"}
+  .row-fluid
+    .span12.well-small
+      %div
+        %div{:class=>"heading",:style=>"float:left;"}
+          = "#{first_name[0].upcase}'S LISTS"
+        %div{:style=>"float:left;border-bottom:1px solid #ececec;width:697px;margin-left:20px;height:10px;"}
+      .clear 
+
+      %div{:style => "min-height:300px; width:100%;"}
+        #all_lists
+        #all_seen_lists
+        #all_wanna_see_lists
+
+:javascript
+  $(document).ready(function($) {
+    fetch_list();
+  });
+    
+:javascript
+  var back, back_content;
+  var cur_url = document.URL;
+
+  $(document).keyup(function(e) {
+    if (e.keyCode == 27) {
+      var recent_content = $(".flippant-back").html();
+      $($("#flip_back").val()).html(recent_content);
+      back.close();
+    }   // esc
+  });
+
+  function close_movie_list1(list_id){
+    if(list_id != ''){
+      var recent_content = $(".flippant-back").html();
+      $('#movie_list_back_'+list_id).html(recent_content);
+    }
+    back.close();
+  }
+
+  function display_full_review(){
+    $("#half_review").toggle();
+    $("#full_review").toggle();
+  }
+  function play_trailer(videourl,movie_name){
+    $("#myModalLabel").html(movie_name+" Trailer");
+    if (videourl == "") {
+      return false;
+    }
+    //$('#video_player').remove();
+    var $video = $('<a />', {
+      href: videourl,
+      id: 'video_player',
+      style: 'display:block;height:290px;width:610px;'
+    });
+    $('#myTrailer .modal-body').append($video);
+    $('#myTrailer').modal("show");
+    flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+
+  }
+ 
+  function add_movie_to_list_old(list_id){
+    var movie_id = $("#movie_id_"+list_id).val();
+    var url = "/save_movietolist";
+    $.post(url,{list_id:list_id,movie_id:movie_id},function(res){
+      $(".movie_list_"+list_id).append(res);
+    });
+    $("#movie_name_"+list_id).val("");
+    $("#movie_id_"+list_id).val("");
+    $("#movie_story_"+list_id).html("");
+    $("#movie_pic_"+list_id).attr("src","/images/unknown.png");
+  }
+  $(function() {
+    $(".movie_block").live({ mouseenter: function(){
+      $(this).children(".close_btn_movie_list").show();
+    }, mouseleave: function(){
+      $(this).children(".close_btn_movie_list").hide();
+    }});
+
+    window.location.hash = "#{params['list_id']}";
+    $('.row-list-header[data-id=#{params['list_id']}]').next().slideToggle("slow",function() {
+        if ($(this).is(':hidden'))
+        {
+          $("#marker" + "#{params['list_id']}" ).attr("class", "icon-chevron-down");
+          _gaq.push(['_trackEvent', 'User Profile', 'Closed', '']);
+
+        }
+        else
+        {
+          $("#marker" + "#{params['list_id']}" ).attr("class", "icon-chevron-up");
+          _gaq.push(['_trackEvent', 'User Profile', 'Opened', '']);
+        }
+    });
+
+
+    flowplayer("video_player", {src:"#{VIDEO_URL}/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+  });
+                

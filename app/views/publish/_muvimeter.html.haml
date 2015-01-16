@@ -1,0 +1,14 @@
+%div{ :style => "margin-top:12px;", :class => "moviRatingBox left"}
+  .rating
+    %span.gray_bold
+      = link_to "MUVIMETER", '#critics', :onclick => "go_to_tab(0);", :style => "color:#4F4F4F"
+    .clear
+    .ratingBar.left
+      = ratingbar(@movie.muvimeter)
+    -if @movie.muvimeter != 0 and !@movie.muvimeter.blank? and !@movie.muvimeter.nil?
+      .ratingvalue.left
+        -muvimeter = "#{@movie.muvimeter || 0}%"
+        = link_to muvimeter, '#critics', :onclick => "go_to_tab(0);",:style => "font-size:20px; color:#4F4F4F"
+      .right
+        = thumb_class(@movie.muvimeter)
+

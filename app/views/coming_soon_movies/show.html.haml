@@ -1,0 +1,23 @@
+= render 'shared/meta_title_and_keywords', { :object => @movie }
+= content_for :heading do
+  %div{:style => "width:575px; float:left; font-weight: bold;"}
+    %span Movie Review:
+    = @movie.name
+
+.shareThis
+  %h4
+    Share on
+    %a{:href => "http://www.facebook.com/sharer.php?u=#{movie_url(@movie)}", :onclick => "window.open('http://www.facebook.com/sharer.php?u=#{movie_url(@movie)}', 'newWindow', 'width=626, height=436'); return false;", :target => "_blank", :title => "Share on Facebook"}
+      %img{:src => "/images/Ficon.jpg"}
+    %a{:href=> "http://twitter.com/home?status=#{@movie.name} - #{movie_url(@movie)}", :onclick=> "window.open('http://twitter.com/home?status=#{@movie.name} - #{movie_url(@movie)}', 'newWindow', 'width=815, height=436'); return false;",  :target=>"_blank",:title => "Share on Twitter" }
+      %img{:src => "/images/Ticon.jpg"}
+
+= content_for :breadcrumb do
+  %span
+    = link_to "Home &#187;".html_safe, root_path
+    = link_to "Coming Soon &#187;".html_safe, coming_soon_movies_path
+    = @movie.name
+
+.clear
+= render '/shared/movie',  {:from => 'coming_soon'}
+

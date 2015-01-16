@@ -1,0 +1,19 @@
+-if @movie_user_reviews.blank?
+  %h4 User reviews are  not present.
+-else
+  - @movie_user_reviews.in_groups_of(2) do |group|
+
+    - group.each do |tweet|
+      - unless tweet.blank?
+        .row
+          .image.left
+            = display_image(tweet)
+          .names
+            - unless tweet[2].blank?
+              = truncate(tweet[2].html_safe, :length => 100)
+            %br
+            = link_to display_name(tweet), "/profile/#{tweet[1]}/#{display_name(tweet)}"
+            = Time.parse(tweet[6]).strftime('%d %B %Y').to_s rescue ''
+  .clear
+
+

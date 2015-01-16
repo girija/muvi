@@ -1,0 +1,180 @@
+:javascript
+
+  $(document).ready(function(){	
+    var data_arr = eval(#{activity});
+    for(var i = 0; i < data_arr.length; i++){
+      var data = data_arr[i];
+      var host = "http://muvi.com";
+      var html = '';
+		
+      var not_show = 0;
+      var uid = $("#current_user_id").val();
+
+      var connections = $("#loggedin_user_connection").val();
+      var my_wanna_movie = $("#loggedin_user_wannasee_movie").val();
+      var my_seen_movie = $("#loggedin_user_seenit_movie").val();
+
+      var all_movie = $("#logged_user_movie").val();
+  
+      var my_all_movie = my_wanna_movie + my_seen_movie;
+      if(all_movie.search(data["movie_id"]) != -1)
+      {
+        var id = "";
+			
+        if(data["block_type"] == "rated"){
+          id = "rated"
+        }else if(data["block_type"] == "seenit"){
+          id = "seen"
+        }else{
+          id = "wanna_see"
+        }
+			
+        if(!document.getElementById(id+'_'+data["user_id"]+'_'+data["movie_id"])) {
+          if(data["block_type"] == "rated"){
+				
+          }
+          else{
+            if(data["block_type"] != "seenit")
+            {
+              if(data["action"] == "has recommended" || data["action"] == "has not recommended" || data["action"] == "asked")
+              {                 
+                if (parseInt(data["target"]["id"]) != parseInt(uid))
+                {
+                  not_show = 1;
+                }else{
+                  not_show = 0;
+                }
+              }
+              else if(data["action"] == "want to see" || data["verb"] == "asked")
+              {
+                not_show = 1;
+              }else
+              {
+                not_show = 0;
+              }
+						
+              if(data["action"] == "saw")
+              {
+                if(data["viewed_list"] != "")
+                {
+                  try
+                  {
+                    if(data["viewed_list"].toString().search(parseInt(uid)) != -1)
+                    {
+                      not_show = 1
+                    }
+                  }
+                  catch(E)
+                   {
+                   }
+                 }else{
+                   not_show = 0;
+                 }
+              }
+            }
+            else
+            {
+              if(data["action"] == "asked")
+              {                 
+                if (parseInt(data["target"]["id"]) != parseInt(uid))
+                {
+                  not_show = 1;
+                }else{
+                  not_show = 0;
+                }
+              }else if(data["action"] == "want to see" || data["action"] == "saw")
+              {
+                not_show = 1;
+              }
+              else
+              {
+                not_show = 0;
+              }
+            }
+          } 
+
+          if(not_show == 0)
+          {
+            if(data["block_type"] == "rated")
+            {
+              html += '<div data-time="1" class="activity activity_list gradient_class" style="padding:5px; font-size:12px; background-color: #F5F5F5" id="'+id+'_'+data["user_id"]+'_'+data["movie_id"]+'">';
+						
+              html +=    '<a class="pull-left" href="'+ data["object"].url+'"><img style="height: 140px;width:90px;" src="'+ data["object"]["image"].url+'" class="media-object"></a>';
+						
+              html +=     '<div class="media-body" style="min-height:140px;">';
+						
+              html +=       '<h5 class="media-heading"> <a href="#" style="color:#333333;">'+data["movie_name"]+'</a></h5>';
+				
+              html +=       data["user_name"]+' &nbsp; '+ data["action"] + ' '+data["movie_name"];
+              html +=       '<br>';
+              html +=        'Do you want to rate the next movie &nbsp;'+data["next_movie_name"];
+						
+              html +=		  '<div class="clear"></div>';
+              html +=       '<a role="button" onclick=\'populate_data("'+data["next_movie_name"]+'", "'+data["next_movie_id"]+'", "'+data["next_permalink"]+'"); remove_rate_block("wrated_'+data["user_id"]+'_'+data["movie_id"]+'");\' data-toggle="modal" class="btn" href="#rateModal" ><i class="icon-star-empty"></i> Rate</a>';
+						
+              html +=     '</div>';
+              html +=   '</div>';
+
+              $(html).hide().prependTo("#seen_activity .items .jspPane").css({opacity:0}).slideDown("100").animate({opacity:1},"100");
+						
+              $('.scroll-pane').jScrollPane();
+						
+            }
+            else{
+              html += '<div data-time="1" class="activity activity_list gradient_class" style="padding:5px; font-size:12px; background-color: #F5F5F5" id="'+id+'_'+data["user_id"]+'_'+data["movie_id"]+'">';
+              html +=    '<a class="pull-left" href="'+ data["object"].url+'"><img style="height: 140px;width:90px;" src="'+ data["object"]["image"].url+'" class="media-object"></a>';
+              html +=     '<div class="media-body" style="min-height:140px;">';
+              html +=       '<h5 class="media-heading"> <a href="'+ data["object"].url+'" style="color:#333333;">'+data["object"]["displayName"]+'</a></h5>';
+				
+              html +=       '<a href="'+ data["actor"].url+'">'+data["actor"].displayName+'</a> '+ data["action"] + ' '+data["object"]["displayName"];
+              html +=       '<br>';
+						
+              //if(data["block_type"] == "seenit" && (data["verb"] == "want to see" || data["verb"] == "asked" || data["action"] == "want to see" || data["action"] == "wants to see")){
+						
+              if(data["block_type"] == "seenit")
+              {
+                if(data["verb"] == "asked"){
+                  html +=       'Do you want to recommend?';
+                  html +=       '<div class="btn-group">';
+                  html +=       '  <a class="btn btn-warning bold_class" href="#" onclick=\'javascript:remove_block("seen_'+data["user_id"]+'_'+data["movie_id"]+'", "'+data["activity_id"]+'", "'+data["cur_user_id"]+'", "'+data["user_id"]+'", "'+data["movie_id"]+'", "has recommended");\'><i class="icon-thumbs-up"></i> &nbsp; Yes</a>';
+
+                  html +=       '  <a class="btn btn-warning bold_class" href="#" onclick=\'javascript:remove_block("seen_'+data["user_id"]+'_'+data["movie_id"]+'", "'+data["activity_id"]+'", "'+data["cur_user_id"]+'", "'+data["user_id"]+'", "'+data["movie_id"]+'", "has not recommended");\'><i class="icon-thumbs-down"></i> &nbsp; No </a>';
+                  html +=       '</div>';
+                }
+              }
+              else{
+                if(data["action"] == "saw" || data["action"] == "seen")
+                {
+                  html +=       'Ask for recommendation'
+                  html +=       '<div class="btn-group">';
+                  html +=       '  <a class="btn btn-success bold_class" href="#" onclick=\'javascript:remove_block("wanna_see_'+data["user_id"]+'_'+data["movie_id"]+'", "'+data["activity_id"]+'", '+data["cur_user_id"]+', '+data["user_id"]+', '+data["movie_id"]+', "asked");\'><i class="icon-question-sign"></i> &nbsp; Ask</a>';
+                  html +=       '</div>';
+                }
+                else if(data["action"] == "has recommended" || data["action"] == "has not recommended")
+                {
+                  html +=       '<br>';
+				
+                  html +=       '<div class="btn-group">';
+                  html +=       '  <a class="btn btn-success bold_class" href="#" onclick=\'javascript:remove_block_ok("wanna_see_'+data["user_id"]+'_'+data["movie_id"]+'", '+data["activity_id"]+');\'>Thanks</a>';
+                  html +=       '</div>';
+                }
+
+              }
+              html +=     '</div>';
+              html +=   '</div>';
+
+              if(data["block_type"] == "seenit")
+              {
+                $(html).hide().prependTo("#seen_activity .items .jspPane").css({opacity:0}).slideDown("100").animate({opacity:1},"100");
+              }else{
+                $(html).hide().prependTo("#wanna_see_activity .items .jspPane").css({opacity:0}).slideDown("100").animate({opacity:1},"100");
+              }
+              $('.scroll-pane').jScrollPane();
+            }
+          }
+        }  // Inner IF ENDS	
+      }  // Inner IF ENDS
+    }
+  });	
+	
+	

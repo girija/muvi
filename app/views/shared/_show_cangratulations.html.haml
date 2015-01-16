@@ -1,0 +1,25 @@
+%div{:style => 'height:100px'}
+  &nbsp;
+%div{:style=> 'padding-top:20px'}
+  %h1{:style => 'color:#eb6517'}
+    Congratulations!
+
+  .right_sctivity
+    You have won the following badges. This will be displayed on your profile page. Mouseover the badge to learn how to get the next level.
+  %br{:class => 'clear'} 
+  - celeb_ids = params[:super_fan].gsub("[","").gsub("]","").split(",").to_a
+  - celeb_ids.each do |celeb_id|
+    - star = Celebrity.find_by_id(celeb_id)
+    - unless star.blank?
+      .muvi_badge{:style => 'float:left;width:120px; height:120px;padding:2px; margin-right:5px;position:relative;'}
+        = image_tag('/images/Celeb_Bronze.png', :style => "position: absolute; z-index: 1;")
+        .left{:class => "badge", :style => "position: absolute; z-index:0;background: url('#{star.image}')"}
+
+  - celeb_ids = params[:mega_fan].gsub("[","").gsub("]","").split(",").to_a
+  - celeb_ids.each do |celeb_id|
+    - star = Celebrity.find_by_id(celeb_id)
+    - unless star.blank?
+      .muvi_badge{:style => 'float:left;width:120px; height:120px;padding:2px; margin-right:5px;position:relative;'}
+        = image_tag('/images/Celeb_Silver.png', :style => "position: absolute; z-index: 1;")
+        .left{:class => "badge", :style => "position: absolute; z-index:0;background: url('#{star.image}')"}
+

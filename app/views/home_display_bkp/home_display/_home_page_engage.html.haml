@@ -1,0 +1,31 @@
+-unless current_user.blank?
+  -user_id = current_user.id
+-else
+  -user_id = ""
+
+-if options["type"]
+  -if options["type"] == "video"
+    -type = "video"
+  -if options["type"] == "poster"
+    -type = "poster"
+  -if options["type"] == "news"
+    -type = "news"
+  -if options["type"] == "celebtweet"
+    -type = "celebtweet"
+  -if options["type"] == "star"
+    -type = "star"
+  -if options["type"] == "movie"
+    -type = "movie"
+
+  -if options["type"] == "video" or options["type"] == "poster" or options["type"] == "news" or options["type"] == "celebtweet"
+    %a{:style => "color:#717170; cursor:pointer; width:100%;", :class => "engage small-input-button ui-corner-all engage_btn", :id => "video_poster_comment_btn_#{options["id"]}", :onclick => 'show_video_comment("'"#{options["id"]}"'", "'"#{user_id}"'", "video_poster_comment_btn_'"#{options["id"]}"'","video_poster_comment_div_'"#{options["id"]}"'", "'"#{options["flag"]}"'", "'"#{type}"'")', :onmouseover => "change_link_color(#{options["id"]});", :onmouseout => "remove_link_color(#{options["id"]});"}
+      Add a comment
+
+    .clear{:style => "height: 4px"}
+
+  -else
+    %a{:style => "color:#717170; cursor:pointer;width:100px; ",:class => "engage small-input-button ui-corner-all engage_btn", :id => "video_poster_comment_btn_#{options["id"]}", :onclick => 'show_video_comment("'"#{options["id"]}"'", "'"#{user_id}"'", "video_poster_comment_btn_'"#{options["id"]}"'","video_poster_comment_div_'"#{options["id"]}"'", "'"#{options["flag"]}"'", "'"#{type}"'")', :onmouseover => "change_link_color(#{options["id"]});", :onmouseout => "remove_link_color(#{options["id"]});"}
+      Add a comment
+
+    .clear{:style => "height: 4px"}
+

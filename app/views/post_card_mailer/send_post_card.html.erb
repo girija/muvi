@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <h1>New post card request from muvi.com user</h1>
+<table width="100%" border="0">
+  <% poster = Poster.find(@object.poster_id) %>
+  <tr>
+    <td>Post Card</td>
+    <td><%= image_tag ("http://muvi.com/system/posters/#{poster.id}/medium/#{poster.poster_file_name.gsub(" ", "%20")}") %></td>
+  </tr>
+  <tr>
+    <td>Post Card URL</td>
+    <td><%= "http://muvi.com/system/posters/#{poster.id}/original/#{poster.poster_file_name.gsub(" ", "%20")}" %></td>
+  </tr>
+
+  <tr>
+    <td>Greeting</td>
+    <td><%= @object.greeting%></td>
+  </tr>
+  <tr>
+    <td>Name</td>
+    <td><%=  @object.name  %></td>
+  </tr>
+  <tr>
+    <td>Address Line 1</td>
+    <td><%= @object.address_1 %></td>
+  </tr>
+  <tr>
+    <td>Address Line 2</td>
+    <td><%= @object.address_2 %></td>
+  </tr>
+  <tr>
+    <td>City</td>
+    <td><%= @object.city %></td>
+  </tr>
+  <tr>
+    <td>State</td>
+    <td><%= @object.state %></td>
+  </tr>
+  <tr>
+    <td>Zip Code</td>
+    <td><%= @object.zip %></td>
+  </tr> 
+</table>
+  </body>
+</html>

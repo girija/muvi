@@ -1,0 +1,17 @@
+<% if resource.errors.empty?  %>
+  //$('#registration').dialog('destroy');
+  //$('#registration').html('<%#= escape_javascript(render '/devise/sessions/new') %>')
+  //$('#message').html("Password was successfully changed. Please login with your new password");
+  //$('#registration').dialog({ modal: true,  width: 600, height: 350, title: 'Muvi Login' });
+
+  
+  //registration();
+  //$.get('/user/sign_in', function(data){
+  //  $("#registration").html(data);
+  //});
+  window.location.href = "/";
+ <%else%>
+  <% messages = resource.errors.full_messages.map { |msg| content_tag(:p, msg) }.join %>
+  $('#errors').html("<%= messages.html_safe %>");
+ <%end%>
+

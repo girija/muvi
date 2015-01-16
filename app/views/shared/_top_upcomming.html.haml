@@ -1,0 +1,47 @@
+-if type == "top"
+  - movie_list = @top_rated_movies
+-elsif type == "liked_movies"
+  - movie_list = []
+  -@liked_reviews[0..4].each do |review|
+    -movie_list << review.movie
+-elsif type == "disliked_movies"
+  - movie_list = []
+  -@disliked_reviews[0..4].each do |review|
+    -movie_list << review.movie  
+-elsif type == "wantsee_movies"
+  - movie_list = []
+  -@w_see_movies[0..4].each do |want_watch|
+    -movie_list << want_watch.movie
+-elsif type == "notwant_movies"
+  - movie_list = []
+  -@n_see_movies[0..4].each do |not_watch|
+    -movie_list << not_watch.movie
+-elsif type == "related_movies"
+  - movie_list = @related_movies
+-else
+  - movie_list = @upcoming_movies
+.clear{:style => 'height:10px'}
+%div
+  -chk_arr = []
+
+  - movie_list[0..4].each_with_index do |movie,i|
+    -unless movie.blank?
+      -if !chk_arr.include?(movie.id)
+        -chk_arr << movie.id
+        %div{:class=>"left", :style=>"height:180px;cursor:pointer;padding-right:10px;width:96px;", :onclick => "window.location.href='#{movie_path(movie.permalink)}'"}
+          -begin
+            .left{:style => "border:1px solid #d2d6d9;"}
+              .moviImage{:style=>"height:124px;width:84px;padding:2px;"}
+                =link_to image_tag(movie.banner_image,:style=>"height:124px;width:84px;"),movie_path(movie.permalink)
+            .clear
+          -rescue
+          .clear
+          = link_to movie.name,movie_path(movie.permalink),:style=>"font-weight:normal;font-size:13px;color:#000;"
+          %br
+          %span{:class => "small_light_gray"}
+            -if type == "related_movies"
+              -rel_movies =  ActiveSupport::JSON.decode(@movie.related_movies)
+              - if rel_movies[i]["type"] != "Other"
+                = rel_movies[i]["type"]
+            -else
+              = movie.release_date.strftime("%Y") unless  movie.release_date.nil?

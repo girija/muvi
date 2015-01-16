@@ -1,0 +1,67 @@
+-like_votes = review.like_votes
+-dislike_votes = review.dislike_votes
+-if type != 'dislike'
+  -if like_votes.count > 0
+    %div{:style => "float:left;width:250px;max-height:300px;"}
+      %h2{:style=>"height:30px;color:#F87413; text-align:left;", :id=>"header_like_#{review.id}"}
+        ="#{like_votes.count} Liked"
+      - like_votes.each do |vote|
+        -if vote.class.to_s == "Vote"
+          - vote_user = User.find_by_id(vote.voter_id)
+        -elsif vote.class.to_s == "Review"
+          - vote_user = vote.user
+        -if vote_user
+          %div
+            %div{:class => "image left tip_hint tooltipbottom",:style=>"height:42px;width:42px;"}
+              - ub = UserBadge.find_by_user_id(vote_user.id)
+              - if !ub.blank?
+                - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+                - if points >= 1 and points < 5
+                  - level = "Level: Muvi Scraper"
+                - elsif points >= 5 and points < 10
+                  - level = "Level: Muvi Junkie"
+                - elsif points >= 10
+                  - level = "Level: Muvi Maniac"
+              =link_to image_tag(vote_user.user_image, :style=>"width:40px;height:40px;border: 1px solid #EEEEEE;"), "/profile/#{vote_user.id}/#{vote_user.display_name}"
+              .tooltip_description{:style =>'display:none'}
+                %b
+                  = vote_user.display_name
+                %br
+                = level
+
+            %div{:style => "float:left;margin-left:5px"}
+              = link_to vote_user.display_name, "/profile/#{vote_user.id}/#{vote_user.display_name}"
+            .clear
+            %br
+-if type == "all" || type == 'dislike'
+  -if dislike_votes.count > 0
+    %span{:style=>"float:left;max-height:300px;"}
+      %h2{:style=>"height:30px;color:#F87413; text-align:left;", :id=>"header_like_#{review.id}"}
+        ="#{dislike_votes.count} Didn't Like"
+      - dislike_votes.each do |vote|
+        -if vote.class.to_s == "Vote"
+          - vote_user = User.find_by_id(vote.voter_id)
+        -elsif vote.class.to_s == "Review"
+          - vote_user = vote.user
+        -if vote_user
+          %div
+            %div{:class => "image left tip_hint tooltipbottom",:style=>"height:42px;width:42px;"}
+              - ub = UserBadge.find_by_user_id(vote_user.id)
+              - if !ub.blank?
+                - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+                - if points >= 1 and points < 5
+                  - level = "Level: Muvi Scraper"
+                - elsif points >= 5 and points < 10
+                  - level = "Level: Muvi Junkie"
+                - elsif points >= 10
+                  - level = "Level: Muvi Maniac"
+              =link_to image_tag(vote_user.user_image, :style=>"width:40px;height:40px;border: 1px solid #EEEEEE;"), "/profile/#{vote_user.id}/#{vote_user.display_name}"
+              .tooltip_description{:style =>'display:none'}
+                %b
+                  = vote_user.display_name
+                %br
+                = level
+            %div{:style => "float:left;margin-left:5px"}
+              = link_to vote_user.display_name, "/profile/#{vote_user.id}/#{vote_user.display_name}"
+            .clear
+            %br

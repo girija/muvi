@@ -1,0 +1,35 @@
+- if (params[:controller] == 'connections' or params[:controller] == 'user_profiles') and params[:action] != 'show'
+  .GrayHeaderBox
+    .sidebar_header
+      %h3 Your Network
+    .row_heading
+      Following : 
+      = link_to(@your_network.size, "#your_network" ,:id => 'load_your_network')
+    .row{:id => 'result_your_network'}
+      - @your_network.sort_by{rand}[0..3].each do |user|
+        .image.left
+          - usr = User.find(user)
+          = link_to(image_tag(usr.user_image, :alt => usr.display_name), "/profile/#{user}/#{usr.display_name}", :title => usr.display_name)
+  -if @followers.size > 0
+    .row_heading
+      Followers :
+      = link_to(@followers.size, "#followers" ,:id => 'load_followers')
+    .row{:id => 'result_followers'}
+      - @followers.sort_by{rand}[0..3].each do |user|
+        .image.left
+          - usr = User.find(user)
+          = link_to(image_tag(usr.user_image, :alt => usr.display_name), "/profile/#{user}/#{usr.display_name}", :title => usr.display_name)
+
+- elsif params[:action] == 'show' and params[:id] == 'your_network'
+  - @your_network.each do |user|
+    .image.left
+      - usr = User.find(user)
+      = link_to(image_tag(usr.user_image, :alt => usr.display_name), "/profile/#{user}/#{usr.display_name}", :title => usr.display_name)
+  .clear
+- elsif params[:action] == 'show' and params[:id] == 'followers'
+  - @followers.each do |user|
+    .image.left
+      - usr = User.find(user)
+      = link_to(image_tag(usr.user_image, :alt => usr.display_name), "/profile/#{user}/#{usr.display_name}", :title => usr.display_name)
+  .clear
+

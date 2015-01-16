@@ -1,0 +1,87 @@
+%h2
+  %span Latest
+  Trailers
+.clear  
+
+%input{:type => "hidden", :id => "counter", :value => "0"}
+
+.left{:style => "margin-top:-25px;margin-right:12px;margin-left:352px"}
+  -if @latest_trailers.size > 3
+    .left_arrow.left{:id => "left", :onclick => "trailer_show('left');", :style => "visibility:hidden"} &nbsp; 
+    .right_arrow.right{:id => "right", :onclick => "trailer_show('right');"} &nbsp;
+
+
+.clear
+
+
+-unless @latest_trailers.blank?
+  %div{:style => "margin-left:5px"}
+    -count = 0
+    -@latest_trailers.each do |lt|
+      .left{:id => "trailer_#{count}", :style => "width:112px; height:175px;padding:2px;border:1px solid #dddddd; margin-right:10px"}
+        =link_to image_tag(lt.banner_image, :width => "112px", :height => "175px"), "/movies/#{lt.permalink}#video"
+        %div{:style => "height:110px;cursor:pointer; padding-left:35px;margin-top: -110px;"}
+          =link_to image_tag("/images/large_play_icon.png"), "/movies/#{lt.permalink}#video"
+
+        .clear
+        =link_to lt.name, movie_path(lt)
+  
+        %script
+          if("#{count.to_i}" >= 3){
+          $("#trailer_#{count}").hide();
+          }
+        -count = count + 1
+
+  :javascript
+    function trailer_show(p){
+      if(p == "left"){
+        if(parseInt($("#counter").val()) > 0){
+          $("#counter").val(parseInt($("#counter").val()) - 3);
+        }
+        else{
+          $("#counter").val(0);
+        }
+
+        var start = $("#counter").val();
+        var end = parseInt($("#counter").val()) + 3;
+
+        for(var i = 0; i < "#{@latest_trailers.size}"; i++){
+          $("#trailer_"+i).hide();
+        }
+        for(var i = start; i < end; i++){
+          $("#trailer_"+i).show();
+        }
+        if($("#counter").val() == 0){
+          $("#right").css("visibility", "visible");
+          $("#left").css("visibility", "hidden");
+        }
+        else{
+          $("#right").css("visibility", "visible");
+          $("#left").css("visibility", "visible");
+        }
+
+     }
+      else{
+        $("#counter").val(parseInt($("#counter").val()) + 3);
+  
+        var start = $("#counter").val();
+        var end = parseInt($("#counter").val()) + 3;
+
+        for(var i = 0; i < "#{@latest_trailers.size}"; i++){
+          $("#trailer_"+i).hide();
+        }      
+        for(var i = start; i < end; i++){
+          $("#trailer_"+i).show();
+        }  
+
+        if(parseInt($("#counter").val()) + 3 >= "#{@latest_trailers.size}"){
+          $("#right").css("visibility", "hidden");
+          $("#left").css("visibility", "visible");
+        }
+        else{
+          $("#right").css("visibility", "visible");
+          $("#left").css("visibility", "visible");
+        }
+      }
+    }
+

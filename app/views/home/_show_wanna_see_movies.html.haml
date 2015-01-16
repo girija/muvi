@@ -1,0 +1,18 @@
+/.items.scrollx-pane{:style => 'height:766px;overflow:auto;width:280px'}
+.items.scroll-pane{:style => "width:300px"}
+  %ul.media-list{:style => 'width:300px;margin-left:5px;'}
+  
+    -unless movie_lists.blank?
+      -unless movie_lists.wanna_see_lists.blank? && movie_lists.wanna_see_lists.nil?
+        - wanna_see_it =  ActiveSupport::JSON.decode(movie_lists.wanna_see_lists)
+        -if wanna_see_it
+          - wanna_see_it = wanna_see_it.reverse
+          - wanna_see_it.each do |wanna_see|
+            - if !wanna_see.nil?
+              %li.media{:style => 'border-bottom:1px solid #eee'}
+                = link_to image_tag("#{POSTER_URL}#{wanna_see['object']['image']['url'].sub! 'thumb', 'medium'}", :alt => '' , :style => 'height:64px;') , "#{wanna_see['object']['url']}" , :class => 'pull-left', :style => 'padding-right:4px;'
+                .media-body
+                  %h5{:style => 'margin-top:0'}
+                    = link_to wanna_see['object']['displayName'], "#{wanna_see['object']['url']}"
+                  = link_to "<i class='icon-eye-open'></i> Seen".html_safe, "#" , :class => 'btn btn-seen-list btn-primary' , 'data-id' => wanna_see['object']['id']
+

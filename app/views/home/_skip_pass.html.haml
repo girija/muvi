@@ -1,0 +1,6 @@
+:javascript
+  $("#movie_id").val("#{@current_movie.id}");
+  $("#movie_released").val("#{@current_movie.release_date}");
+  $("#movie_link").val("/movies/#{@current_movie.permalink}");
+  $("#movie_link").attr({href : "/movies/#{@current_movie.permalink}"});
+  passIT(false); 

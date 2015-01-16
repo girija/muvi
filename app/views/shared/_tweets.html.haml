@@ -1,0 +1,24 @@
+-if !params[:by].blank?
+  .right
+    #pagination
+      -if params[:by] == "user"
+        = will_paginate(@celebrity_tweets, :entry_name => 'review',:params => {:controller => "tweets" , :action => "index", :id => @celebrity.id, :by => "user" })
+      - else
+        = will_paginate(@celebrity_tweets, :entry_name => 'review',:params => {:controller => "tweets" , :action => "index", :id => @celebrity.id, :by => @celebrity.permalink })
+
+  .clear
+  = render '/shared/celebrity_tweets'
+
+-elsif !params[:user].blank?
+  .right
+    #pagination
+      = will_paginate(@movie_user_reviews,:entry_name => 'review', :params => {:controller => "tweets" , :action => "index", :id => @movie.id,:user => "review" })
+  .clear
+  = render '/shared/movie_reviews'
+-else
+  .right
+    #pagination
+      = will_paginate(@movie_tweets,:entry_name => 'review', :params => {:controller => "tweets" , :action => "index", :id => @movie.id })
+  .clear
+    = render '/shared/movie_tweets'
+

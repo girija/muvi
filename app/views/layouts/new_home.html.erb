@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="msvalidate.01" content="12F48210ACFB9126A8D69AA7D8089200" />
+        <% if !@celebrity.blank? %>
+          <title><%="#{@celebrity.name} | watch movies of #{@celebrity.name}" %></title>
+          <meta name="keywords" content="<%= "#{@celebrity.name}, watch #{@celebrity.name} movies, #{@celebrity.name} filmography, #{@celebrity.name} movies, #{@celebrity.name} top movies, #{@celebrity.name} upcoming movies, follow #{@celebrity.name}" %>">
+          <meta name="description" content="<%= "Watch top and upcoming movies of #{@celebrity.name}. Follow #{@celebrity.name} and get notified when a new movie releases." %>">
+        <% elsif !@movie.blank? %>
+          <title><%= "#{@movie.name} | watch #{@movie.name}" %></title>
+          <meta name="keywords" content="<%= "#{@movie.name}, watch #{@movie.name}, see #{@movie.name}, #{@movie.name} review, #{@movie.name} trailer, #{@movie.name} info, #{@movie.name} information" %>">
+          <meta name="description" content="<%= "Watch #{@movie.name}, See your friend's reviews of the movie and find out if you should watch it." %>">
+
+        <% elsif !@user_profile.blank? and params[:controller] != 'home' and params[:action] != 'index' %>
+          <% if request.fullpath.include?("movie_list") %>
+            <% ulist = UserMovieList.find_by_id(params[:id])
+                desc = ""
+                movie_ids = ActiveSupport::JSON.decode(ulist.movie_id)
+                movie_ids = movie_ids.uniq
+                movie_ids.each do |movie_id|
+                  movie = Movie.find_by_id(movie_id)
+                  unless movie.blank?
+                    desc += "#{movie.name}, "
+                  end
+                end
+                description = desc.chop
+            %>
+            <% unless ulist.blank? %>
+              <title><%= "#{ulist.tag}" %> </title>
+              <meta name="keywords" content="<%= "#{ulist.tag},#{description}" %>">
+              <meta name="description" content="<%= "#{ulist.tag} - Muvi list made by #{@user_profile.display_name}. Contains #{description}" %>">
+
+            <% else %>
+              <title><%= "#{@user_profile.display_name} | #{@user_profile.display_name}'s profile" %></title>
+              <meta name="keywords" content="<%= "#{@user_profile.display_name}, #{@user_profile.display_name} muvi, #{@user_profile.display_name} lists" %>">
+              <meta name="description" content="<%= "See what #{@user_profile.display_name} has seen and wants to see, and custom lists #{@user_profile.display_name} has created." %>">
+
+            <% end %>
+          <% else %>
+            <title><%= "#{@user_profile.display_name} | #{@user_profile.display_name}'s profile" %></title>
+            <meta name="keywords" content="<%= "#{@user_profile.display_name}, #{@user_profile.display_name} muvi, #{@user_profile.display_name} lists" %>">
+            <meta name="description" content="<%= "See what #{@user_profile.display_name} has seen and wants to see, and custom lists #{@user_profile.display_name} has created." %>">
+  
+          <% end %>
+        <% else %>
+          <!--title>Discover Your Favorite Movies Socially | MUVI</title>
+          <meta name="keywords" content="Discover Movies, Find Movies To Watch, Favourite Movies To Watch, Awesome Movies To Watch, Recommend Movies">
+          <meta name="description" content="Discover Your Favourite movies socially at muvi.com and share it with your buddies online to recommend these awesome movies to watch."-->
+
+          <title><%= title %> </title>
+          <meta name="keywords" content="<%= meta_keyword %>">
+          <meta name="description" content="<%= meta_description %>">
+        <% end %>
+
+
+        <meta name="viewport" content="width=device-width">
+        <%= yield :header%>
+        <link href="/icon.png" type="image/png" rel="icon">
+        <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+        <%= stylesheet_link_tag 'bootstrap_new' %>
+        <%= csrf_meta_tag %>
+        <style>
+            body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }
+
+            @font-face {
+             /*font-family: "ProximaNova-Light.otf";
+             src: url("public/stylesheets/font/ProximaNova-Light.otf");
+             src: url("http:www.muvi.com/stylesheets/font/ProximaNova-Light.otf");
+
+             font-family: 'Source Sans Pro';
+             src: url('http://www.muvi.com/stylesheets/font/SourceSansPro-Regular.ttf')*/
+            }
+        </style>
+        <%= javascript_include_tag "https://js.stripe.com/v1/" %>
+        <%= tag :meta, :name => "stripe-key", :content => STRIPE_PUBLIC_KEY %>
+        <script type="text/javascript">
+          //Stripe.setPublishableKey('pk_yzLio3RPGWw0B7C0hcaAYFyY9dKd1');
+          //Stripe.setPublishableKey('pk_test_LyXrlHHB6tTKZEBtcz3knDuh');
+
+	  //for test mode
+          //Stripe.setPublishableKey('pk_LHCRnZNURUjz4UE2BxHGAJxj6x4tV');
+
+	  //for live mode
+	  Stripe.setPublishableKey('pk_yzLio3RPGWw0B7C0hcaAYFyY9dKd1');
+        </script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+	<script language="JavaScript" src="http://www.geoplugin.net/javascript.gp" type="text/javascript"></script>
+
+        <%= stylesheet_link_tag 'bootstrap-responsive.min.css', 'main' ,'css/font-awesome.css',  'buffer', 'jquery.jscrollpane.min', 'new_common', 'tags','bootstrap-fileupload.min','jquery.Jcrop','flat-ui','token-input','flippant',"jquery.toastmessage" %>
+        <script src="https://www.google.com/jsapi"></script>
+        <%= javascript_include_tag "vendor/modernizr-2.6.2-respond-1.1.0.min.js" %>
+
+        <!--script>window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.8.3.min.js"><\/script>')</script-->
+        <%= javascript_include_tag 'jquery_ujs' %>
+	<%= javascript_include_tag "#{FAYE_URL}/faye.js", "flowplayer" %>	
+        <%= javascript_include_tag "vendor/bootstrap" %>
+        <%= javascript_include_tag "jquery.cookie", "jquery.jscrollpane", "easySlider.packed", "jcarousellite","jquery.easing.pack", "jquery.mousewheel","jquery.Jcrop","jquery.lazyload.min","jquery.tokeninput","flippant","jquery.toastmessage" %>
+	<% 
+	   unless current_user.blank? 
+	   subscription = UserSubscriptions.find(:first, :conditions => ["user_id = #{current_user.id} AND end_date > '#{Date.today}' AND agent='muvi'"])
+           unless subscription.blank?
+             subs = 1
+           else
+             subs = 0
+           end
+
+
+           if current_user.is_admin == true 
+ 	%>
+	  <script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js' type='text/javascript'></script>
+	  <script src='/javascripts/ajax_page.js' type='text/javascript'></script>
+	  <link href='/stylesheets/edit_page.css' media='screen' rel='stylesheet' type='text/css'>
+	  <script>
+	    var cast_clicked = 0;
+	    $(document).ready(function($) {
+	      var int = self.setInterval("celeb_dropdown()", 1000);
+	    });
+	  </script>
+	<% end 
+	   end 
+	%>
+
+        <!--[if IE]>
+          <link rel="stylesheet" type="text/css" href="/stylesheets/all-ie-only.css" />
+        <![endif]-->	
+
+        <script>
+          var faye = false;
+          faye = new Faye.Client("<%=FAYE_URL%>/faye",{timeout: 120});
+        </script>
+
+        <script src="http://yui.yahooapis.com/3.12.0/build/yui/yui-min.js"></script>
+        <script>
+                // Create a new YUI instance and populate it with the required modules.
+             //alert(document.URL.indexOf("trailer"));
+             if("<%= current_user %>" != "" && document.URL.indexOf("trailer") != 27 && 
+                (document.URL.indexOf("what-is-muvi") == -1 || document.URL.indexOf("careers") == -1 || 
+                 document.URL.indexOf("press") == -1 || document.URL.indexOf("partners") == -1 || 
+                 document.URL.indexOf("faq") == -1 || document.URL.indexOf("blog") == -1 || 
+                 document.URL.indexOf("contact_us") == -1)   
+               ){
+             
+                YUI().use('pjax', function (Y) {
+                    var pjax = new Y.Pjax({
+                                          linkSelector: 'a',
+                                          container: '.span9',
+                                          contentSelector: '.main_content'
+                                     });
+                    pjax.on('navigate', function (e) {
+		      //$("#myTrailer").remove();
+                      $('.span9').html("<img src='/images/loading.gif'>");
+		      try{
+                              back.close();
+                      }catch(E){}
+
+                    });
+
+                    pjax.after('load', function (e) {
+			$(".token-input-dropdown").hide();
+                        var cur_url = document.URL;
+
+			if($(".main_content").length == 0){
+                          location.reload(true);
+                        }
+                        var profile_RegExp =  'http://www.muvi.com/[A-Za-z0-9\?&=-]+';
+                        if(cur_url.match(profile_RegExp)== cur_url){
+                          fetch_list();
+                        }else{
+                          if(cur_url.indexOf("/stars") != -1){
+                                get_all_movie($("#current_celeb_id").val());
+                          }else if(cur_url.indexOf("/profile") != -1){
+                                fetch_list();
+                          }else if(cur_url.indexOf("/movie_list") != -1){
+                            var movie_id = "<%= params[:movie_id] %>";
+                            var list_id = "<%= params[:id] %>";
+                            if(movie_id != ""){
+                              $("#movie_block_"+movie_id+"_"+list_id).first().children().css("background-color","#dddddd");
+                              $("#movie_div_"+movie_id+"_"+list_id).first().css("background-color","#dddddd");
+                            }
+                          }else{
+                            if(cur_url.indexOf("/movies") != -1){
+                              fetch_movie_lists();
+                            } else if(cur_url.indexOf("/movie_list") != -1){
+				suggest();
+			    } else if(cur_url.indexOf("/list") != -1){
+				suggest();
+				show_fb_share_div();
+			    }else{
+                              disableButtons();
+                              passIT(false, true);
+                              $(this).parents(".row-fluid:first").fadeOut(3000,function(){
+                                $(this).next().show().fadeIn(3000);
+                              });
+                              $("#discover_box").show();
+			      <% unless current_user.blank? %>
+                                    year = "", language="";
+	               		    load_mannual_list("<%=params[:available_watch]%>", '<%=current_user.language.to_s.html_safe %>');	
+			      <% end %>
+                            }
+                          }
+                        }
+			play_discover_trailer("<%=VIDEO_URL%>")
+
+ 			$(".btn_view_trailer_inside").live("click", function(){
+      				play_trailer_pjax(this, "<%=VIDEO_URL%>");
+			});
+
+	
+			var browser = (navigator.userAgent);
+			if(indexOf("AppleWebKit/534.34 (KHTML, like Gecko) PhantomJS/1.9.7 Safari") == -1){
+                        	flowplayer("video_player", {src:"<%=VIDEO_URL%>/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+
+				flowplayer("video_player_discv", {src:"<%=VIDEO_URL%>/flash/flowplayer.commercial-3.2.7.swf", wmode: "opaque"},{key: '#$8fe04ea70c52430ec72', logo: {url: '/images/flowplayerLogo.png', fullscreenOnly: false, bottom: 30, right: 2, opacity: 0.5}, clip: {autoPlay: true, autoBuffering: true}});
+			}
+
+
+                    });
+
+                });
+             }
+        </script>
+
+    </head>
+    <body>
+        <script type="text/javascript" src="//www.hellobar.com/hellobar.js"></script>
+        <script type="text/javascript">
+          new HelloBar(71649,107536);
+        </script>
+
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- This code is taken from http://twitter.github.com/bootstrap/examples/hero.html -->
+	<%if request.env["HTTP_REFERER"] =~ /www.facebook.com/ %>
+	  <%= render :partial => "/shared/fb_login_from_invite" %>
+	<% end %>
+	<h1 style="color:#FFFFFF; display:none;">Discover Movies</h1>
+
+        <div class="navbar navbar navbar-fixed-top">
+          <div class="navbar-inner">
+            <div style="padding-left:50px;">
+                <%#= link_to image_tag('new_logo.png'), root_path, :class => 'brand' %>
+                <% unless current_user.blank? %>
+		        <a href="/" class="brand"> <img src="/images/new_logo.png"></a>
+		<% else %>
+			<span style="cursor:pointer" onclick="window.location.href='/';" class="brand"><img src="/images/new_logo.png"></span>
+		<% end %>
+
+              <div style="width:1px;border-left:1px solid #bdbdbd;height:40px;margin-left:100px;margin-top:5px;position:absolute;"></div>
+              <div style="width:150px;float:left;">
+                <div style="float:left">
+                  <!--<form class="navbar-search pull-left" action="<%= search_path%>" id="search_form">-->
+		  <% unless current_user.blank? %>
+                    <input type="text" class="search-query" name="q" id="search_field" autocomplete="off" style="display:block;border-radius: 0px; width: 125px; margin-left: 25px; height: 20px; margin-top: 5px;" placeholder="Search Movies Here..." onkeyup="change_link(event);">
+		  <% else %>
+		    <input type="text" class="search-query" name="q" id="search_field" autocomplete="off" style="display:block;border-radius: 0px; width: 125px; margin-left: 25px; height: 20px; margin-top: 5px;" placeholder="Search Movies Here...">
+
+		  <% end %>
+<script>
+  function change_link(e){
+	if(e.keyCode == 13){
+            $("#search_link")[0].click();
+            $(".token-input-dropdown").hide();
+            e.stopPropagation();
+         }else{
+            var search_string = $("#search_field").val();
+            $("#search_link").attr("href", "/search?q="+search_string);
+         }
+  }
+</script>
+
+		    <div class="token-input-dropdown" style="display:none;top:305x; margin-left:25px; z-index: 4100;"></div>
+                  <!--</form>-->
+                </div>
+                <div style="float: right; position: absolute; margin-top: 15px; margin-left: 190px;">
+		
+		<% unless current_user.blank? %>
+		  <%= link_to '<i class="icon-search" style="cursor:pointer;"></i>'.html_safe, "#", :id => "search_link"  %>
+		<% else %>
+	            <%= link_to '<i class="icon-search" style="cursor:pointer;"></i>'.html_safe, "javascript:void(0);", :onclick => "search_res();"  %>
+		<% end %>
+
+                </div>
+              </div>
+              <% if !current_user.nil? %>
+                <div style="float:right;">
+                  <div style="float:left;margin-top:15px;color:#7a7a7a;font-size:13px;">
+                    <!--<a href="/profile/<%=current_user.id %>/<%=User.convert_to_seo_url(current_user.display_name)%>">-->
+                    <a href="/<%= current_user.user_profile.permalink%>">
+			<%= current_user.display_name %>
+  		    </a>
+                  </div>
+                  <div style="float:left;margin-left:10px;margin-top:12px;">
+                    <% begin %>
+                      <% unless current_user.user_profile.profile_image_file_name.blank? %>
+                        <a href="/<%= current_user.user_profile.permalink%>">
+				<%= image_tag("/system/profile_images/#{current_user.user_profile.id}/small/#{current_user.user_profile.profile_image_file_name.gsub(' ', '%20')}",:style => "border-radius:100px;height:30px;width:30px;", :class => 'media-object') unless current_user.user_profile.profile_image_file_name.blank? %>
+			</a>
+                      <%else%>
+                        <a href="/<%= current_user.user_profile.permalink%>">
+				<%= image_tag("http://graph.facebook.com/#{current_user.facebook_id}/picture?type=normal",:style => "height:30px;width:30px;border-radius:100px;top:10px;", :class => 'media-object')%>
+			</a>
+                      <% end %>
+                    <% rescue %>
+
+                    <% end %>
+                  </div>
+                  <ul class="nav pull-right" style="padding-left:10px;">
+                    <li class ='dropdown'>
+                      <a href="#" id="users_link" role="button" class="dropdown-toggle" data-toggle="dropdown" style="padding:18px 45px 5px 2px;"><i id="user_menu" class="icon-chevron-down"></i></a>
+                      <ul class="dropdown-menu" role="menu" aria-labelledby="user_link">
+                        <li id="li_1"><a tabindex="-1" href="/profile_edit" id="link_1">Settings</a></li>
+                        <!--li class="divider"></li-->
+			<li id="li_2">
+                          <%#= link_to 'Logout', destroy_user_session_path, "tabindex" => "-1", "id" => "link_3" %>
+                          <!--span id="link_2" style="cursor:pointer" onclick="window.location.href='/users/sign_out'">Logout</span-->
+			  <span id="link_2" style="cursor:pointer" onclick="signout();">Logout</span>
+                        </li>
+
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              <% end %>
+		<input type="hidden" id="loggedin_user_connection">
+         	<input type="hidden" id="loggedin_user_wannasee_movie">
+		<input type="hidden" id="loggedin_user_seenit_movie">
+		<input type="hidden" id="current_user_id">
+              </div><!--/.nav-collapse -->
+            </div>
+          </div>
+        </div>
+        <% if params[:action] != "user_agreement" %>		
+          <div style="padding-left:20px;width:24px;float:left;">
+            <div style="clear:both; height:5px"></div>
+  
+            <% if params[:action] != "show_invite" and params[:action] != "page" and params[:action] != "contact_us"  %>
+              <div>
+                <i class="icon-bell feed_hint" title="all activities" style="cursor:pointer; font-size:21px;" id="all_movie_icon" onclick="filter_feed('all_movie');" data-toggle="tooltip" data-original-title = "generate_tooltip_block('feed icon','left_side')"></i>
+              </div>
+              <div style="clear:both; height:7px"></div>
+
+              <div>
+                <i class="icon-ok feed_hint" title="seen activities" style="cursor:pointer; font-size:24px; display:none;" id="seen_icon" onclick="filter_feed('seen');" data-toggle="tooltip" data-original-title = "generate_tooltip_block('seen icon','left_side')"></i>
+              </div>
+              <div style="clear:both; height:9px"></div>
+  
+              <div>
+                <i class="icon-plus feed_hint" title="wanna see activities" style="cursor:pointer; font-size:24px; display:none;" id="wanna_see_icon" onclick="filter_feed('wanna_see');" data-toggle="tooltip" data-original-title = "generate_tooltip_block('wanna see icon','left_side')"></i>
+              </div>
+              <div style="clear:both; height:9px"></div>
+
+              <div>
+                <i class="icon-reorder feed_hint" title="movies from lists you follow " style="cursor:pointer; font-size:24px; display:none;" id="list_movie_icon" onclick="filter_feed('list_movie');" data-toggle="tooltip" data-original-title = "generate_tooltip_block('list_movie_icon','left_side')"></i>
+              </div>
+
+            <% end %>
+          </div>
+        <% end %>		
+		<script>
+			$(document).ready(function($) {
+                                disableButtons();
+                                passIT(false, true);
+                                $(this).parents(".row-fluid:first").fadeOut(3000,function(){
+                                  $(this).next().show().fadeIn(3000);
+                                });
+                                $("#discover_box").show();
+                                $(".feed_hint").tooltip({
+                                    placement: "right",
+                                    html: true,
+                                    'delay':{show:1000, hide: 500}
+                                });
+                                $(".tip_hint").tooltip({
+                                  placement: "bottom",
+                                  html: true,
+                                  'delay':{show:1000, hide: 500}
+                                });
+
+				$("#all_movie_icon").css("color", "#0081CC");
+				$("#seen_icon").css("color", "#cccccc");
+				$("#wanna_see_icon").css("color", "#cccccc");
+				$("#list_movie_icon").css("color", "#cccccc");
+				
+				$('.activity_pannel').show();						
+                                //$("#seen_wanna_see_container").show();
+				$('.seen_pannel').hide();
+				$('.wanna_see_pannel').hide();
+			        $(".movie_from_list_pannel").hide();	
+				adjust_feed_height();
+		
+				
+			});
+			
+			self.setInterval("adjust_feed_height()", 1000);
+                        function play_paid_movie(amt,movie_path,id){
+                          var url = "/pay_for_movie";
+                          $.post(url,{coins:amt,movie_id:id},function(res){
+                            if(res == "ok"){
+                              window.location.href = "/play_fullmovie/"+id;
+                            }else{
+                              window.location.href = "/profile_edit"
+                            }
+                          });
+                        }
+
+			function adjust_feed_height(){
+                                var main_height = parseInt($(".main_content").height());
+                                if(main_height < 500){
+                                  var feed_height = "500px";
+                                }else{
+                                  var feed_height = $(".main_content").height();
+                                }     
+				$(".jspContainer").css("height", feed_height);
+				$("#seen_activity").css("height", feed_height);
+				$(".items").css("height", feed_height);
+				$(".jspContainer").css("height", feed_height);
+			}
+			
+			function populate_movie_in_feed(data){
+				$('#loading_feed').hide();
+				
+				$('.activity_pannel').show();
+				$('.seen_pannel').hide();
+				$('.wanna_see_pannel').hide();
+				
+				$('.activity_pannel').html("");
+				$('.activity_pannel').html(data);
+				$('.scroll-pane').jScrollPane();
+				
+				//adjust_feed_height();
+			}
+			
+			function filter_feed(id){
+				$("#all_movie_icon").css("color", "#cccccc");
+				$("#seen_icon").css("color", "#cccccc");
+				$("#wanna_see_icon").css("color", "#cccccc");
+                                $("#list_movie_icon").css("color", "#cccccc");
+				
+				$("#"+id+"_icon").css("color", "#0081CC");
+				
+				$('.activity_pannel').hide();						
+				$('.seen_pannel').hide();
+				$('.wanna_see_pannel').hide();
+                                $(".movie_from_list_pannel").hide();
+			
+				if(id == "all_movie"){
+					$('.activity_pannel').show();
+                                        $("#seen_wanna_see_container").hide();	
+					$("#movies_from_lists_container").hide();
+				}else if (id == "list_movie"){
+					$('.activity_pannel').hide();
+					$("#seen_wanna_see_container").hide();
+					$("#movies_from_lists_container").show();
+					$(".movie_from_list_pannel").show();
+				}else{				
+					$('.'+id+'_pannel').show();
+                                        $("#seen_wanna_see_container").show();
+					$("#movies_from_lists_container").hide();
+				}
+				//$('.scroll-pane').jScrollPane();						
+				//adjust_feed_height();
+                                $(".scroll-pane").css("width", "100%");
+                                $(".jspContainer").css("width", "100%");
+                                $(".jspPane").css("width", "100%");
+			}
+		</script>
+		
+		<img src='/images/loading.gif' style='display:none;position: absolute; z-index: 4000; padding-top: 10%; padding-left: 7%;' id="loading_feed"/>
+		
+        <div class="container" style="width:96%;margin-left:54px;">
+          <%= render :partial => "/shared/check_user_login" %>
+          <%= render :partial => "/shared/new_home_header" %>
+          <%= yield %>
+
+
+	  <!--  subscription modal -->
+	  <%= render :partial => "/users/show_subscription_popup" %>
+	  <!--   -->
+
+          <!-- update credit card info modal -->
+          <%  if params[:controller] == "registrations" and params[:action] == "edit" %>
+          <div style="width: 500px;height:auto;" id="update_creditcard_info" class="modal fade hide in" aria-hidden="false">
+            <div class="modal-header">
+              <div data-dismiss="modal" class="pull-right" aria-hidden="true">
+                <img src="/images/popup_close.png">
+              </div>
+                <div style="color:#494949;font-size:20px;font-weight:bold;" id="cr_label">Update credit card info</div>
+            </div>
+            <div class="modal-body">
+	      <%= render :partial => "/users/update_cr_info" %>
+	    </div>
+          </div>
+          <% end %>
+
+	  <!-------------------->
+
+	  <!------ratemodal-->
+          <div style="width: 300px;height:auto; min-height:150px; background:none; left:60%;" id="rateModal" class="modal fade hide in" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+            <div class="modal-header" style="background:none; padding:0px;">
+              <div data-dismiss="modal" class="pull-right" aria-hidden="true" id="modal_close" style="margin-right:0px; padding-top:10px; padding-right:5px;">
+                <img src="/images/popup_close.png" id="close_popup">
+              </div>
+
+              <div id="right_header_div" style="display:none; float:right; height:35px; border-left: 1px solid #BBBBBB; padding-top:10px; padding-left:15px; margin-right:-304px; width:262px; font-size:17px; font-weight:bold;padding-top:15px; margin-bottom:-15px; color:#FFF;">
+                Add this movie to a List
+              </div>
+
+              <div style="background-color:#EFEFEF;color:#494949;font-size:20px;font-weight:bold; padding:15px; width:90%;" id="rating_label">Rate Movie</div>
+            </div>
+            <div class="modal-body" style="min-height:100px; padding-bottom:0px; width:100%; padding-bottom:20px; padding-right:0px; padding-bottom:0px; overflow:hidden; padding:0px;">
+              <div class="modal-content rating" style="float:left; width:100%; height:200px; background-color:#FFFFFF; padding-left:15px; padding-top:15px;"></div>
+
+              <div id="right_div" style="display:none;background-color: none; float: left; width: 46.5%; border-left: 1px solid #BBBBBB; height:214px; border-bottom:1px solid #BBBBBB; color:#FFFFFF; ">
+                <div id="show_user_list_ratepopup"></div>
+              </div>
+            </div>
+          </div>
+
+          <!--ratemodal ends -->
+
+
+          <div style="width: 500px;height:auto;" id="rateModal_old" class="modal fade hide in" aria-hidden="false">
+            <div class="modal-header">
+              <div data-dismiss="modal" class="pull-right" aria-hidden="true">
+                <img src="/images/popup_close.png">
+              </div>
+                <div style="color:#494949;font-size:20px;font-weight:bold;" id="rating_label">Rate Movie</div>
+            </div>
+            <div class="modal-body rating"></div>
+          </div>
+          
+
+          <!----------- FB contact Modal -->
+          <div class='modal fade hide' id='fbModal' style='width:550px;' data-backdrop="static" data-keyboard="false">
+              <div class='modal-header'>
+                <div aria-hidden="true" class="pull-right" data-dismiss="modal">
+                   <img src="/images/popup_close.png">
+                </div>
+                <h4 id='fbModalLabel'>
+                   Invite your friends to Join MUVI
+		   <input type="hidden" id="fb_access_token_for_join">
+		   <input type="hidden" id="fb_user_id">
+                </h4>
+              </div>
+              <div class='modal-body' id='fb_modal_body'></div>
+              <div class='modal-footer'><div id="fb_error" style="color:red; font-weight:bold"></div></div>
+           </div>
+          <!-- ------------------------ -->
+
+          <%= render :partial => "/home/onboarding" %>
+          <!----------- Email Join Modal -->
+	  <div id="fb_join_div" style="display:none"> 
+	  </div>
+
+          <div class='modal fade hide' id='joinModal' style='width:365px;'>
+              <div class='modal-header'>
+                <div aria-hidden="true" class="pull-right" data-dismiss="modal">
+                   <img src="/images/popup_close.png">
+                </div>
+                <h4 id='rateModalLabel'>
+                   Join
+                </h4>
+              </div>
+              <div class='modal-body'></div>
+              <div class='modal-footer'></div>
+           </div>
+          <!-- ------------------------ -->
+          <% if !current_user.nil? %>
+            <div class="explore_bar">
+              <div style="padding-left:35%;">
+                <div class="btn-toolbar">
+                  <div class="btn-group">
+                    <a class="btn btn-large" id="explore_btn" style="padding:12px 80px 13px">Explore</a>
+                    <% wanna_see_movies = AllActivity.get_current_user_wanna_list(current_user.id)%>
+                    <!--<a href="/show_trailer" class="btn btn-primary btn-large" style="padding:12px 80px 13px" onclick="show_video_content();" id="play_btn">Play</a>-->
+                    <input type="button" value="Play" class="btn btn-primary btn-large" style="padding:12px 80px 13px" onclick="show_video_content(<%= subs %>);" id="play_btn">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="movie_msg" class="play_msg">
+              You Don't have any matching movies to watch. <br/> Do some activities(rate movies, follow lists, follow celebrities etc..) so that Muvi can find movies that match your interest.<br/><br/>
+              <a href="#available_watch" id="avail_watch_link" onclick="$('.tagManager').tagsManager('empty');filter_avail_movies('pjax', '<%= current_user.language.to_s %>');show_top_movies();$('#movie_msg').hide();"> List of movies currently available to watch</a>
+
+              <div style="float:right;padding-top:20px;">
+                <input type="button" value="OK" class="btn btn-primary" onclick="javascript:$('#movie_msg').hide();">
+              </div>
+
+            </div>
+          <% end %>
+          <div class="clear"></div>       
+	  <div style="width: 104%;height:100%;left:18.5%;top:0;" id="videoModal" class="modal fade hide in" aria-hidden="false">
+            <div class="modal-body" style="max-height:100%;padding:2px;overflow:visible;">
+              <div id="video_content"></div>
+            </div>
+          </div> 
+          <footer>
+            <%= render :partial => 'shared/footer'%>
+          </footer>
+        </div> <!-- /container -->
+
+		<input type="hidden" id="last_action">
+		<input type="hidden" id="last_object_id">
+		
+        <%#= javascript_include_tag "plugins" %>
+
+        <%#= javascript_include_tag 'jquery-ui-1.9.2.custom.min.js','jquery.pageless.js','jquery.placeholder.js', 'webtoolkit.base64.js' %>
+        <%#= javascript_include_tag 'jquery.easing.pack.js', 'jquery.mousewheel.pack.js','jquery.masonry.min.js','jquery.tooltip.js' %>
+        <%#= javascript_include_tag 'jquery.purr.js', 'jquery.shadow.js' , 'jquery.ifixpng.js','jquery.fancybox.js','swfobject.js', 'jquery.cookie.js' %>
+        <%#= javascript_include_tag 'base_packaged_home.js', 'jquery.mousewheel' %>
+        <%#= javascript_include_tag 'jquery.remotipart','jquery.iframe-transport' %>
+        <%#= javascript_include_tag 'autoresize.js', 'bootstrap-typeahead','bootstrap-tour', 'bootstrap-tab' %>
+        <%#= javascript_include_tag 'jquery-fonteffect-1.0.0.js' %>
+        <%#= javascript_include_tag "vendor/bootstrap" %>
+        <%= javascript_include_tag "base64_encode", "webtoolkit.base64", "buffer" %>  
+        <%= javascript_include_tag "bootstrap-tour","bootstrap.tooltip","bootstrap.popover", "bootstrap-tagmanager","bootstrap-fileupload.min"%>
+	<%= javascript_include_tag "main" %>
+	<%= stylesheet_link_tag    "flat-ui","video_style","small_style" %>
+	<%#= javascript_include_tag "video.dev","vjs.youtube" %>
+        <script>
+            var _gaq=[['_setAccount','UA-23408239-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+
+<script src="http://connect.facebook.net/en_US/all.js"></script>
+
+<script>
+
+  function set_link(cat, permalink, id, name){
+                        if(cat == "Stars"){
+                           window.location = "/stars/"+permalink;
+                        }else if(cat == "Movies"){
+                           window.location = "/movies/"+permalink;
+                        }else{
+                           window.location = "/profile/"+id+"/"+name;
+                        }
+                }
+                function search_res(){
+                  var search_val = $("#search_field").val();
+                  window.location = "/search?q="+search_val;
+                }
+
+		$("#search_link").click(function(){
+			$(".token-input-dropdown").hide();
+		});
+                $("#search_field").keyup(function(){
+                        var q = $("#search_field").val();
+			
+			/*if(e.keyCode == 13){
+		          $("#search_link")[0].click();
+  			  $(".token-input-dropdown").hide();
+		          e.stopPropagation();
+		        }else{
+		          var search_string = $("#search_field").val();
+		          $("#search_link").attr("href", "/search?q="+search_string);
+		        }*/
+
+                        if(q.length >= 3){
+                                $.post( "/autocomplete?q="+q, function( data ) {
+                                        //$( ".result" ).html( data );
+					if(/<[a-z][\s\S]*>/i.test(data) == true){
+                                          if(data){
+                                            data = $(data).text();
+                                            data = JSON.parse(data);
+                                          }
+                                       }
+
+                                        var category = "";
+					var loc = "";
+                                        var html = "<ul>";
+                                        for(var i = 0; i < data.length; i++){
+                                                var permalink = data[i].permalink;
+                                                var cat = data[i].cat;
+                                                var id = data[i].id;
+                                                var name = data[i].name;
+
+
+                                                if(cat == "Movies"){
+                                                   loc = "/movies/"+permalink;
+                                                }else if(cat == "Stars"){
+                                                   loc = "/stars/"+permalink;
+                                                }else if(cat == "Lists"){
+                                                   loc = "/list/"+permalink;
+                                                }else{
+                                                   loc = "/"+permalink;
+                                                }
+
+                                                if(category != data[i].cat){
+                                                  category = data[i].cat;
+
+                                                  //html += "<li><div class='autocomplete-header'>"+data[i].cat+"</div><div style='padding:3px; cursor:pointer;' onclick=\"set_link('"+cat+"', '"+permalink+"', '"+id+"', '"+name+"')\">"+data[i].name+"</div></li>";
+						html += "<li><div class='autocomplete-header'>"+data[i].cat+"</div></li><li id='li_"+i+"' class='search_item'><a id='link_"+i+"' style='color:#333333;padding:3px; cursor:pointer;' href="+loc+">"+data[i].name+"</a></li>";
+
+                                                }else{
+                                                  //html += "<li> <div style='padding:3px; cursor:pointer;' onclick=\"set_link('"+cat+"', '"+permalink+"', '"+id+"', '"+name+"')\">"+data[i].name+" </div></li>";
+						  html += "<li id='li_"+i+"' class='search_item'> <a id='link_"+i+"' style='color:#333333;padding:3px; cursor:pointer;' href="+loc+">"+data[i].name+"</a></li>";
+                                                }
+                                        }
+                                        html += "</ul>";
+                                        $(".token-input-dropdown").html(html);
+                                        $(".token-input-dropdown").show();
+                                });
+                        }
+                        var chosen = "";
+	                $(document).keyup(function(e){ // 38-up, 40-down
+			  if (e.keyCode == 40) { 
+			    $("#search_field").blur();
+			    if(chosen === "") {
+			      chosen = 0;
+			    } else if((chosen) < $('.search_item').length-1) {
+			      chosen++; 
+			    }
+			    $('li').css("background-color","#fff").css("cursor","default");
+			    $("#li_"+chosen).css("background-color","#0196EC").css("cursor","pointer");
+                            var link_text = $("#link_"+chosen).text();
+			    $("#search_field").val(link_text);
+			    return false;
+			  }
+			  if (e.keyCode == 38) { 
+			    $("#search_field").blur();
+			    if(chosen === "") {
+			      chosen = 0;
+			    } else if(chosen > 0) {
+			      chosen--;            
+			    }
+			    $('li').css("background-color","#fff").css("cursor","default");
+			    $("#li_"+chosen).css("background-color","#0196EC").css("cursor","pointer");
+                            var link_text = $("#link_"+chosen).text();
+			    $("#search_field").val(link_text);
+			    return false;
+			  }
+                          if (e.keyCode == 13) {
+                            if (chosen === ""){
+                              search_res();
+                            }else{
+                              $("#link_"+chosen).get(0).click();
+                            }
+			  }
+			});
+                });
+
+  var curcat ;
+  $(document).ready(function() {
+    //$("#video_content").load("/show_trailer");
+    var avail_watch = "<%= params[:available_watch]%>";
+    if(avail_watch == "true"){
+     //$('.tagManager').tagsManager('empty');
+     //show_top_movies();
+    }
+    $("#search_field_1").tokenInput("/autocomplete" ,{
+      hintText: "",
+      searchingText: "",
+      noResultsText:"",
+      animateDropdown: false,
+      tokenLimit: 1,
+      onResult: function (results) {
+	if(/<[a-z][\s\S]*>/i.test(results) == true){
+             //results = $(results).text();
+             if(results){
+                results = JSON.parse(results);
+             }
+       }
+        curcat = "";
+        return results;
+      },
+      resultsFormatter: function(item){
+        if(curcat != item.cat){
+          curcat = item.cat;
+          return "<li><div class='autocomplete-header'>"+item.cat+"</div><div style='padding:3px;'>"+item.name+"</div></li>";
+        }else{
+          return "<li> <div style='padding:3px;'>"+item.name+" </div></li>";
+        }
+      }
+    });
+  });
+
+  $("body").click(function(){
+      $(".token-input-dropdown").hide()
+  });
+
+
+	function sleep(milliseconds) {
+	  var start = new Date().getTime();
+	  for (var i = 0; i < 1e7; i++) {
+		if ((new Date().getTime() - start) > milliseconds){
+		  break;
+		}
+	  }
+	}
+
+
+		
+	function parse_data(res){
+		var data_arr = eval(res);
+		if(data_arr == null) {return false;}		
+		
+		for(var i = 0; i < data_arr.length; i++){			
+			var data = data_arr[i];
+			var host = "http://muvi.com";
+			var html = '';
+			
+			var not_show = 0;
+			var rate_it = 0;
+			
+			
+			var uid = $("#current_user_id").val();
+
+			var connections = $("#loggedin_user_connection").val();
+			var my_wanna_movie = $("#loggedin_user_wannasee_movie").val();
+			var my_seen_movie = $("#loggedin_user_seenit_movie").val();
+
+			if (typeof(data["object"]) == "undefined")	 {continue;}
+			
+			var id = "";					
+			id = data["block_type"].replace(/ /g,"_");
+			
+			
+			var release_date = "";
+ 			if(data["release_date"] != ""){
+				release_date = new Date(data["release_date"]);
+			}
+			var today = new Date();
+			var ds = "";
+			
+			//if(!document.getElementById(id+'_'+data["user_id"]+'_'+data["object"]["id"])) {	
+			
+				html += '<div data-time="1" class="activity activity_list gradient_class '+data["where_to_display"]+'"  onmouseover="show_close(this);" onmouseout="hide_close(this);"  style="padding:5px; font-size:12px; background-color: #FFFFFF;" id="'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'">';
+				html += '  <div class="pull-right" id="close_'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'" title="delete from list" style="width:15px;cursor:pointer;visibility:hidden" onclick=\'remove_block_ok("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", '+data["notification_id"]+');\'>X</div>';
+				
+				if(data["block_type"] == "follow_filmography"){
+					html +=    '<a class="pull-left image_class" href="'+ data["object"]["url"]+'"><img class="image_class" src="'+ data["object"]["image"].url+'" class="media-object"></a>';
+				}
+				else if(data["block_type"] == "follow_list" || data["block_type"] == "follow_another_list" || data["block_type"] == "update_list"){
+					html +=    '<a class="pull-left image_class" href="'+data["object"]["url"]+'"><img class="image_class" src="'+ data["list_image"]+'" class="media-object"></a>';
+				}
+				else if(data["block_type"] == "ask_for_recommendation" || data["block_type"] == "rate_it" || data["block_type"] == "celebs_next_movie" || data["block_type"] == "asked" || data["block_type"] == "answered_the_ask" || data["block_type"] == "answered_the_thank" || data["block_type"] == "recommendation" || data["block_type"] == "kudos" || data["block_type"] == "list_rated_movie" || data["block_type"] == "list rated movie" || data["block_type"] == "added_movie_to_list"){
+					html +=    '<a class="pull-left image_class" href="'+ data["object"].url+'"><img class="image_class" src="'+ data["object"]["image"].url+'" class="media-object"></a>';
+				}
+				
+				else if(data["block_type"] == "rated"){
+					html +=    '<a class="pull-left image_class" href="'+ data["next_movie_url"]+'"><img class="image_class" src="'+ data["next_movie_image"]+'" class="media-object"></a>';
+				}
+
+				else if(data["block_type"] == "new_movie_added"){
+					html +=    '<a class="pull-left image_class" href="'+ data["object"]["url"]+'"><img class="image_class" src="'+ data["object"]["image"].url+'" class="media-object"></a>';
+				}
+  				else if(data["block_type"] == "invited_to_follow_list" || data["block_type"] == "added_list"){
+					if(data["target"].url == ""){
+						html +=    '<a class="pull-left image_class" href="'+ data["actor"].url+'"><img class="image_class" src="'+ data["actor"]["image"].url+'" class="media-object"></a>';
+					}else{
+	                                        html +=    '<a class="pull-left image_class" href="'+ data["target"].url+'"><img class="image_class" src="'+ data["target"]["image"].url+'" class="media-object"></a>';
+					}
+                }
+				
+				
+				
+				/********************* ADMIN FEEDS ***********************/
+				else if(data["block_type"] == "follow_admin_filmography"){
+					html +=    '<a class="pull-left image_class" href="'+ data["object"]["url"]+'"><img class="image_class" src="'+ data["object"]["image"].url+'" class="media-object"></a>';
+				}
+				
+				else if(data["block_type"] == "follow_list_a"){
+					html +=    '<a class="pull-left image_class" href="'+ data["list_url"]+'"><img class="image_class" src="'+ data["list_image"]+'" class="media-object"></a>';
+				}
+				
+				else if(data["block_type"] == "released_movie"){
+					html +=    '<a class="pull-left image_class" href="'+ data["object"]["url"]+'"><img class="image_class" src="'+ data["object"]["image"].url+'" class="media-object"></a>';
+				}
+				/*********************************************************/
+				
+				
+			  	else if(data["block_type"] == "follow_new_list"){
+					html +=    '<a class="pull-left image_class" href="'+ data["list_url"]+'"><img class="image_class" src="'+ data["list_image"]+'" class="media-object"></a>';
+				}
+		
+				else{
+					html +=    '<a class="pull-left image_class" href="'+ data["actor"].url+'"><img class="image_class" src="'+ data["actor"]["image"].url+'" class="media-object"></a>';
+				}
+				
+				html +=     '<div class="media-body" style="min-height:90px;">';		
+
+                                html +=       '<DIV style="min-height:70px">';
+				
+				if(data["block_type"] == "invited_to_follow_list" || data["block_type"] == "follow"){
+					html +=       '<h5 class="media-heading"> <a href="'+ data["object"]["url"]+'" style="color:#333333;">'+data["object"]["displayName"]+'</a></h5>';
+				}
+				else if(data["block_type"] == "rated"){
+					html +=       '<h5 class="media-heading"> <a href="'+ data["next_movie_url"]+'" style="color:#333333;">'+data["next_movie_name"]+'</a></h5>';
+				}
+                                else if(data["block_type"] == "kudos"){
+                                        html +=       '<h5 class="media-heading"> <a href="'+ data["object"]["destination_url"]+'" style="color:#333333;"> Kudos for '+ data["object"]["displayName"]+'</a></h5>';
+                                }
+                                else if(data["block_type"] == "list_rated_movie" || data["block_type"] == "list rated movie" || data["block_type"] == "added_movie_to_list"){
+                                        html +=       '<h5 class="media-heading">  <a href="'+ data["target"]["url"]+'" style="color:#333333;"> Movie added to list '+ data["target"]["displayName"]+'</a></h5>';
+                                }
+				
+				else if(data["block_type"] == "new_movie_added"){
+					html +=       '<h5 class="media-heading">  <a href="'+ data["object"]["url"]+'" style="color:#333333;"> '+ data["object"]["displayName"]+'</a></h5>';
+				}
+				else{
+					html +=       '<h5 class="media-heading"> <a href="'+ data["object"]["url"]+'" style="color:#333333;">'+data["object"]["displayName"]+'</a></h5>';
+				}
+				
+				var actor_name = "";
+				var next_movie = "";
+				
+				if(data["block_type"] == "rated" || data["block_type"] == "rate_it" || data["block_type"] == "added_list" || (data["block_type"] == "ask_for_recommendation" && data["actor"]["id"] == uid)){
+					actor_name = "You";
+
+				}else if(data["block_type"] == "follow_another_list"){
+					actor_name = "";
+				}else{
+					actor_name = data["actor"].displayName;
+				}
+				
+				if(data["block_type"] == "answered_the_thank"){
+					html +=       '<a href="'+ data["actor"]["url"]+'">'+actor_name+ '</a> '+ data["notification_action"];
+				}
+				
+				else if(data["block_type"] == "released_movie" || data["block_type"] == "follow_another_list"){
+					html +=       data["notification_action"];
+				}
+                                else if(data["block_type"] == "kudos"){
+                                        html +=       '<a href="'+ data["actor"]["url"]+'">'+actor_name+ '</a> gave you kudos for rating  <a href="'+ data["object"]["url"]+'">' +data["object"]["displayName"]+'</a>';
+                                }
+				else if(data["block_type"] == "list_rated_movie" || data["block_type"] == "list rated movie"){
+                                        html +=       '<a href="'+ data["object"]["url"]+'">'+data["object"]["displayName"]+ '</a> was added to list <a href="'+ data["target"]["url"]+'">' +data["target"]["displayName"]+'</a>';
+                                }
+
+				else if(data["block_type"] == "added_movie_to_list"){
+                                        html +=       '<a href="'+ data["actor"]["url"]+'">'+data["actor"]["displayName"]+ '</a> added <a href="'+ data["object"]["url"]+'">'+data["object"]["displayName"]+ '</a> to the list <a href="'+ data["target"]["url"]+'">' +data["target"]["displayName"]+'</a>';
+                                }
+
+				else if(data["block_type"] == "follow_new_list"){
+					//html += "";
+				}
+
+				else if(data["block_type"] == "new_movie_added"){
+					html +=       '<a href="'+ data["target"]["url"]+'">'+data["target"]["displayName"]+ '</a> has a new movie - <a href="'+ data["object"]["url"]+'">' +data["object"]["displayName"]+'</a>';
+				}
+
+				else{
+					html +=       '<a href="'+ data["actor"]["url"]+'">'+actor_name+ '</a> '+ data["notification_action"] +' <a href="'+ data["object"]["url"]+'">' +data["object"]["displayName"]+'</a>';
+				}
+				
+				html +=       '<br>';
+				
+			        if(data["block_type"] != "list_rated_movie" && data["block_type"] != "list rated movie" && data["block_type"] != "added_movie_to_list"){	
+					html +=        data["action_text"];
+				}
+				
+				html +=           '</DIV>';
+				html +=		  '<div class="clear"></div>';
+				html +=       '<div style="float:right">';
+				
+				if(data["block_type"] == "follow_list" || data["block_type"] == "follow_another_list"){
+					html +=       '<a class="bold_class" href="#" onclick=\' follow_list("'+data["object"]["id"]+'", "'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Follow"); \'><i class="icon-arrow-right"></i> Follow</a>';
+				}
+
+				else if( data["block_type"] == "follow_new_list"){
+					var ourl = data["object"]["url"].split("/");
+					list_id = ourl[2];
+                                        html +=       '<a class="bold_class" href="#" onclick=\' follow_list("'+list_id+'", "'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Follow"); \'><i class="icon-arrow-right"></i> Follow</a>';
+                                }
+				else if(data["block_type"] == "update_list"){
+				    html += '<a class="bold_class" href="#" onclick=\'update_list_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Update List", "'+data["object"]["url"]+'");\'><i class="icon-reorder"></i> Update List</a>';
+				}
+
+				else if(data["block_type"] == "ask_for_recommendation"){
+										
+					if(data["actor"]["id"] == uid){
+						html +=		  '<div style="float:right" id="rate_div_'+data["actor"]["id"]+'_'+data["object"]["id"]+'">';
+						html +=       		'<a role="button" onclick=\'populate_data("'+data["object"]["displayName"]+'", "'+data["movie_id"]+'", "'+data["object"]["url"]+'", "'+data["notification_id"]+'"); remove_block_ok("'+id+'_'+data["actor"]["id"]+'_'+data["movie_id"]+'", '+data["notification_id"]+');\' data-toggle="modal" class="bold_class" href="#rateModal" ><i class="icon-star"></i> Rate</a>';
+						html +=			'</div>';
+					}
+					else{
+						html +=       '  <a class="bold_class" href="#" onclick=\'javascript:remove_block("'+id+'_'+data["actor"]["id"]+'_'+data["movie_id"]+'", "'+data["notification_id"]+'", '+uid+', '+data["actor"]["id"]+', '+data["movie_id"]+', "asked");\'><i class="icon-comment"></i> Ask</a>';
+					}
+				}
+
+                                else if(data["block_type"] == "recommendation"){
+                                     html +=       '  <a class="bold_class" href="#" onclick=\'javascript:remove_block("'+id+'_'+data["actor"]["id"]+'_'+data["movie_id"]+'", "'+data["notification_id"]+'", '+uid+', '+data["actor"]["id"]+', '+data["movie_id"]+', "asked");\'><i class="icon-comment"></i> Ask</a>';
+                                }
+
+				else if(data["block_type"] == "asked"){
+					html +=       '  <a class="bold_class" href="#" onclick=\'javascript:remove_block("'+id+'_'+data["actor"]["id"]+'_'+data["movie_id"]+'", "'+data["notification_id"]+'", "'+uid+'", "'+data["actor"]["id"]+'", "'+data["movie_id"]+'", "has recommended");\'><i class="icon-thumbs-up"></i> Yes</a> &nbsp; &nbsp; &nbsp; &nbsp;';
+					html +=       '  <a class="bold_class" href="#" onclick=\'javascript:remove_block("'+id+'_'+data["actor"]["id"]+'_'+data["movie_id"]+'", "'+data["notification_id"]+'", "'+uid+'", "'+data["actor"]["id"]+'", "'+data["movie_id"]+'", "has not recommended");\'><i class="icon-thumbs-down"></i>  No </a>';
+				}
+				else if(data["block_type"] == "answered_the_ask"){
+					html +=       '  <a class="bold_class" href="#" onclick=\'javascript:remove_block("'+id+'_'+data["actor"]["id"]+'_'+data["movie_id"]+'", "'+data["notification_id"]+'", '+uid+', '+data["actor"]["id"]+', '+data["movie_id"]+', "thanked");\'><i class="icon-comment"></i>  Thanks</a>';
+				}
+				else if(data["block_type"] == "answered_the_thank"){
+					html +=       '  <a class="bold_class" href="#" onclick=\'javascript:remove_block_ok("'+id+'_'+data["actor"]["id"]+'_'+data["movie_id"]+'", '+data["notification_id"]+');\'><i class="icon-ok"></i> Ok</a>';
+				}
+				else if(data["block_type"] == "invited_to_follow_list"){
+					html +=       '<a class="bold_class" href="#" onclick=\' follow_list("'+data["object"]["id"]+'", "'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Follow"); \'><i class="icon-arrow-right"></i>&nbsp; Follow</a>';
+				}
+				
+				else if(data["block_type"] == "rated"){
+					html +=       '<a role="button" onclick=\'populate_data("'+data["next_movie_name"]+'", "'+data["next_movie_id"]+'", "'+data["next_movie_url"]+'", "'+data["notification_id"]+'"); remove_block_ok("'+id+'_'+data["actor"]["id"]+'_'+data["movie_id"]+'", '+data["notification_id"]+'); \' data-toggle="modal" class="bold_class" href="#rateModal" ><i class="icon-star"></i> Rate</a>';
+				}
+		                
+                                else if(data["block_type"] == "kudos"){
+                                        html +=       '  <a class="bold_class" href="#" onclick=\'remove_block_ok("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", '+data["notification_id"]+');\'><i class="icon-comment"></i>  Thanks</a>';
+                                }
+		
+				else if(data["block_type"] == "rate_it"){
+					//|| data["block_type"] == "list_rated_movie" || data["block_type"] == "list rated movie"){
+					
+					html +=		  '<div  style="float:right" id="rate_div_'+data["actor"]["id"]+'_'+data["object"]["id"]+'">';
+					html +=       		'<a role="button" onclick=\'populate_data("'+data["object"]["displayName"]+'", "'+data["movie_id"]+'", "'+data["object"]["url"]+'", "'+data["notification_id"]+'"); remove_block_ok("'+id+'_'+data["actor"]["id"]+'_'+data["movie_id"]+'", '+data["notification_id"]+');\' data-toggle="modal" class="bold_class" href="#rateModal" ><i class="icon-star"></i> Rate</a>';
+					html +=			'</div>';
+				}
+				
+				else if(data["block_type"] == "list_rated_movie" || data["block_type"] == "list rated movie" || data["block_type"] == "added_movie_to_list" || data["block_type"] == "new_movie_added"){
+                                        html +=       '  <a class="bold_class" href="#" onclick=\'javascript:wanna_see_and_seen_movie('+uid+', '+data["object"]["id"]+', "wanna see","'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Wanna see on feed")\'><i class="icon-plus"></i>Wanna See</a> &nbsp; &nbsp;';
+
+                                        html +=       '  <a class="bold_class" href="#" onclick=\'javascript:wanna_see_and_seen_movie('+uid+', '+data["object"]["id"]+', "seen it" ,"'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Seen on feed")\'><i class="icon-ok"></i>Seen </a>';					
+				}
+				else if(data["block_type"] == "added_list"){
+					html +=       '<a href="#" class="bold_class" onclick=\' send_invite("'+data["object"]["id"]+'", "'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Invite"); \'><i class="icon-plus"></i> Invite</a>';
+				}
+				
+				else if(data["block_type"] == "follow_filmography"){
+					html +=       '<a class="bold_class" href="#" onclick=\' follow_filmography("'+data["object"]["id"]+'", "'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Follow"); \'><i class="icon-arrow-right"></i> Follow</a>';
+				}
+				
+				else if(data["block_type"] == "celebs_next_movie"){
+					
+					html +=       '  <a class="bold_class" href="#" onclick=\'javascript:wanna_see_and_seen_movie('+uid+', '+data["object"]["id"]+', "wanna see","'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Wanna see on feed")\'><i class="icon-plus"></i>Wanna See</a> &nbsp; &nbsp;';
+
+					if(release_date == "" || (release_date > today)){
+						html +=       '  <a class="bold_class" style="color:#B2B2B2"><i class="icon-ok"></i>Seen </a>';
+					}
+					else{
+						html +=       '  <a class="bold_class" href="#" onclick=\'javascript:wanna_see_and_seen_movie('+uid+', '+data["object"]["id"]+', "seen it" ,"'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Seen on feed")\'><i class="icon-ok"></i>Seen </a>';
+					}
+					
+					
+					
+				}
+				
+				
+				/*********************** ADMIN FEEDS *******************************/
+				else if(data["block_type"] == "follow_admin_filmography"){
+					html +=       '<a class="bold_class" href="#" onclick=\' follow_filmography("'+data["object"]["id"]+'", "'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Follow"); \'><i class="icon-arrow-right"></i> Follow</a>';
+				}
+				
+				
+				else if(data["block_type"] == "follow_list_a"){
+					html +=       '<a class="bold_class" href="#" onclick=\' follow_list("'+data["object"]["id"]+'", "'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Follow"); \'><i class="icon-arrow-right"></i> Follow</a>';
+				}
+				
+				else if(data["block_type"] == "released_movie"){
+					html +=       '  <a class="bold_class" href="#" onclick=\'javascript:wanna_see_and_seen_movie('+uid+', '+data["object"]["id"]+', "wanna see","'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Wanna see on feed")\'><i class="icon-plus"></i>Wanna See</a> &nbsp; &nbsp;';
+					if(release_date == "" || (release_date > today)){
+						html +=       '  <a class="bold_class" style="color:#B2B2B2"><i class="icon-ok"></i>Seen </a>';
+					}
+					else{
+						html +=       '  <a class="bold_class" href="#" onclick=\'javascript:wanna_see_and_seen_movie('+uid+', '+data["object"]["id"]+', "seen it" ,"'+data["notification_id"]+'"); remove_feed_block("'+id+'_'+data["actor"]["id"]+'_'+data["object"]["id"]+'", "Seen on feed")\'><i class="icon-ok"></i>Seen </a>';
+					}	
+					
+				}
+				
+				/********************************************************************/
+				
+				
+				html +=			'</div>';
+				html +=     '</div>';
+				html +=   '</div>';
+
+
+				$('.scroll-pane').jScrollPane();
+                                $(html).hide().prependTo("#seen_activity .items .jspPane").css({opacity:0}).slideDown("100").animate({opacity:1},"100");
+				
+			//}  // First if ends				
+		}  // For loop ends
+	}
+	
+	
+	$(function() {
+          $("img").lazyload({
+            event : "sporty",
+            threshold : 200
+          });
+        });
+	   $(window).bind('load', function()
+	   {
+			var timeout = setTimeout(function() { $("img").trigger("sporty") }, 10000);
+  			$('.scroll-pane').jScrollPane();
+			//$("img").lazyload();
+
+			if("<%= params[:action] %>" != "show_invite"){
+				if("<%= current_user %>" != ""){
+					load_seen_wanna_see();
+ 					load_movies_from_lists();
+				}
+			}
+			
+			if(document.URL.indexOf("show_invite") == -1){
+				var u = "<%= current_user %>";
+				//if(u){
+				<% unless current_user.blank? %>
+					if(<%= current_user.sign_in_count %> <= 2 ){
+						if ($.cookie("user_<%= current_user.id %>") == null) {
+							$.cookie("user_<%= current_user.id %>", 'yes', { expires: 365, path : "/"});
+							var tour = new Tour();
+							tour.addStep({
+							  element: "#all_movie_icon",
+							  placement: "right",
+							  title: null,
+							  content: "Your movie activities are shown here",
+							  reflex: true
+							});
+
+
+							tour.addStep({
+								element: "#seen_icon",
+								placement: "right",
+								title: null,
+								content: "Movies you have seen are shown here"
+							 });
+
+							 tour.addStep({
+								element: "#wanna_see_icon",
+								placement: "right",
+								title: null,
+								content: "Movies you want to see are shown here"
+							 });
+
+							 tour.addStep({
+							   element: ".btn-discover",
+							   placement: "top",
+							   title: null,
+							   content: "Click here to find movies that match your entertainment taste"
+							 });
+
+							 tour.addStep({
+                                                           element: ".see_top_movies",
+                                                           placement: "bottom",
+                                                           title: null,
+                                                           content: "Click here to browse top rated by movies by actor, genre and more.."
+                                                         });
+
+							 /*tour.addStep({
+							   element: "#user_menu",
+							   placement: "left",
+							   title: null,
+							   content: "Click here to see/update your profile"
+							 });*/
+
+							 tour.addStep({
+                                                           element: "#manual_link_top",
+                                                           placement: "left",
+                                                           title: null,
+                                                           content: "Find movies manually yourself OR automatically matched to your taste"
+                                                         });
+
+							 tour.addStep({
+                                                           element: "#play_btn",
+                                                           placement: "top",
+                                                           title: null,
+                                                           content: "Play a movie that matches your taste instantly! No more browsing"
+                                                         });
+
+							 tour.restart();
+							 $(this).parents(".alert").alert("close");
+						}	 
+					}
+					<% end %>
+				//}	
+			}
+
+	   });
+
+        $(window).resize(function() {
+          //resize just happened, pixels changed
+	  try{
+
+                 $('.scroll-pane').jScrollPane();
+          }catch(E){}	
+        });
+
+	$(document).ready(function($) {
+		//$('.scroll-pane').jScrollPane();
+	        self.setInterval(function(){scrollpane()}, 1000);
+        });
+
+        function scrollpane(){
+	  try{
+
+	         $('.scroll-pane').jScrollPane();
+	  }catch(E){}
+        }
+        function show_movie_msg(){
+          $("#movie_msg").show();
+        }
+        function show_video_content(subs){
+          //$("#img_block").css("height",get_infoimg_height(98));
+          //$("#img_block").css("width",get_infoimg_width(40));
+	  if(subs == ""){
+		$("#paid_subscription_modal_home").modal("show");
+		$("#payment_div_home").show();
+		$("#credit_card_fields_home").hide();
+	  }else{
+	          window.location = "/show_trailer";
+	  }
+        }
+
+	function fetch_fb_contacts(){
+                FB.init({
+                                appId           : <%= FACEBOOK_APPID %>, // App ID
+                                status          : true, // check login status
+                                cookie          : true, // enable cookies to allow the server to access the session
+                                oauth           : true,
+                                xfbml           : true
+                });
+
+		$("#fb_modal_body").html('<img src="/images/loading.gif">');
+		$("#fb_error").html("");
+
+                FB.getLoginStatus(function (response) {
+
+                        if (response.authResponse) {    // if the user is authorized...
+                                var accessToken = response.authResponse.accessToken
+				var fbid = response.authResponse.userID
+
+				var tokenUrl = "https://graph.facebook.com/me/friends?access_token=" + accessToken;
+				$("#fb_access_token_for_join").val(accessToken);
+				$("#fb_user_id").val(fbid);
+
+				FB.api(tokenUrl, function(resp) {
+					var fr = "";
+					fr += '<div style="height:250px; overflow:auto">';
+					for(var i = 0; i < resp.data.length; i++){
+ 	  				  fr += '  <div style="float:left; width:250px; padding: 4px 0;">';
+					  fr += '    <input type="checkbox" name=check[]" class="fb_chkbox" value="'+resp.data[i].id+'" style="float:left; margin-right:4px">';
+					  fr +=	'    <div style="float:left;">' + resp.data[i].name + '</div>';
+					  fr += '  </div>';
+					}
+					fr += '</div>';
+             				fr += '<div id="loading_suggestion" style="display: none;"><img src="/images/loading.gif"></div>';
+					fr += '<input type="button" class="btn btn-primary bold_class" value="Send Invitation" onclick="send_invitation()" style="margin-top:10px" id="fb_invite">';
+					$("#fb_modal_body").html(fr);
+				});
+                        }
+			else{
+				FB.login( handleLogin, {scope: 'publish_stream'}  );
+			}
+                });
+
+	}
+
+	function handleLogin(){
+  	  $('#fbModal').modal('hide');
+	  //$(".icon-facebook").click();
+	}
+
+
+	function send_invitation(){
+	  $("#fb_error").html("");
+	  var access_token = $("#fb_access_token_for_join").val();
+          var sender = $("#fb_user_id").val();
+	  var url_arr = document.URL.split("/");
+	  var permalink = url_arr[url_arr.length - 1]
+
+	  var user_ids = new Array()
+	  $('.fb_chkbox:checked').each(function(i){
+	    user_ids.push($(this).val());
+
+		  /*FB.ui(
+		  {
+		     method: 'stream.publish',
+		     name: 'Muvi',
+		     link: document.URL,
+		     //picture: 'http://www.muvi.com/images/new_logo.png',	
+		     caption: 'Invitation to join Muvi.',
+		     description: document.title, 
+		     message: 'Invitation to join Muvi!',
+		     target_id: $(this).val()
+	   	  })*/
+	  });
+	  $("#fbModal").modal("hide");
+	  $.post("/send_invitation?access_token="+access_token +"&permalink="+permalink+"&sender="+sender+"&user_ids=" + user_ids, function(data) {
+	
+  	  });
+	}
+
+	function send_invitation_old(){
+	  $("#fb_error").html("");
+	  var uid = "";
+          var user_ids = new Array();
+          var message = "";
+	  var access_token = $("#fb_access_token_for_join").val();
+	  var url = encodeURIComponent(document.URL);
+	  //var url = "http%3A%2F%2Fwww.muvi.com%2Fmovies%2Fkuch-tum-kaho-kuch-hum-kahein";
+
+	  $('.fb_chkbox:checked').each(function(i){
+	    if(uid == ""){
+              uid = "@["+ $(this).val() + "]";
+            }else{
+              uid += "," + "@["+ $(this).val() + "]";
+            }
+
+	    user_ids.push($(this).val());
+	  });
+          var m = "welcome to Muvi.";
+          message = uid + ", " + m;
+	  if(uid == ""){
+		$("#fb_error").html("You have not selected any friends");
+		return false;
+	  }
+          var app = "<%= FB_NAMESPACE %>";
+	  $("#fb_invite").hide();
+	  $("#loading_suggestion").show();
+
+	  $("#fbModal").modal("hide");
+          $.post('https://graph.facebook.com/me/'+app+':invite?method=POST&join='+url+'&access_token='+access_token+'&scrape=true&user_ids=' + user_ids, function(data) {
+		$("#fbModal").modal("hide");
+	  });
+
+	}
+
+</script>
+    <%
+      chat = Chat.find(:first)
+      session[:first_visit] == ""
+      if session[:first_visit].blank?
+        if cookies[:first_time_visit] != "yes"
+          session[:first_visit] = 1
+        end
+      end
+    %>
+
+<script>
+    if(<%=session[:first_visit].to_i %> == 1){
+      if("<%=chat.is_enabled%>" == "true"){
+	(function() {
+          var se = document.createElement('script'); se.type = 'text/javascript'; se.async = true;
+          se.src = '//commondatastorage.googleapis.com/code.snapengage.com/js/192c2413-58ab-436c-a729-30286150d3ad.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(se, s);
+        })();
+      }
+      $.cookie("first_time_visit", 'yes', { expires: 365, path : "/"});
+    }
+
+</script>
+
+<script type="text/javascript" src="/javascripts/token.js"></script>
+
+
+
+
+
+
+<!--div id="fb-root"></div-->
+<script src="http://connect.facebook.net/en_US/all.js"></script>
+<script>
+    $(document).ready(function($) {
+        FB.init({
+        appId: "<%= FACEBOOK_APPID %>",
+        status: true,
+        cookie: true,
+        xfbml: true
+        });
+
+    });
+function FacebookInviteFriends()
+{
+  FB.ui({ method: 'apprequests', 
+    message: 'Invitation to join Muvi.'
+  });
+}
+
+   function update_list_block(div_id, type, url){
+        remove_feed_block(div_id, type);
+        window.location = url;
+   }
+
+
+  function suggest(){
+    var map = {};
+    var list_id;
+    $('.movie_name').typeahead({
+      minLength:2,
+      source: function (query,process) {
+        list_id = this.$element.attr('data-id');
+        $.get("/fetch_movies", { term: query ,list_id:list_id}, function (data) {
+           var movies = [];
+           $.each(data, function (i, movie) {
+            map[movie.label] = movie;
+            movies.push(movie.label);
+           });
+           $(".typeahead").css("width","235px");
+           return process(movies);
+        });
+      },
+      updater: function(item){
+        var id = map[item].id;
+        $("#movie_id_"+list_id).val(id);
+        $("#movie_story_"+list_id).html(map[item].story);
+        $("#movie_pic_"+list_id).attr("src",map[item].thumb);
+        return item;
+      }
+
+    });
+  }
+
+
+  function remove_subscription(user_id){
+    if(confirm('Are you sure to cancel your subscription?')) {
+      $("#loading_icon").show();
+      $.post("/cancel_subscription?user_id=" + user_id, function(data) {
+        //alert("Your Subscription is canceled");
+        //location.reload(true);
+        $("#success").html("Your subscription is canceled"); 
+        $("#cancel_subs").css("display", "none");
+        $("#loading_icon").hide();
+	location.reload(true);
+      });
+    }
+  }
+
+  function signout(){
+	  $.ajax({
+	  url: "http://www.maaflix.com/site/logmeout",
+	  dataType: "jsonp",
+	  success: callback
+	     //window.location = "/users/sign_out";
+	});
+  }
+  function callback(){
+	window.location = "/users/sign_out";
+  }
+
+  function check_play_option(subs, movie_id){
+    if(subs == 0){
+      //show popup to pay using credit card
+      $("#payment_div").show();
+      $("#credit_card_fields").hide();
+
+      $("#paid_subscription_modal").modal("show");
+      return false;
+    }else{
+      play_paid(movie_id);
+    }
+    return true;
+  }
+
+  function show_creditcard_fields(){
+    $("#payment_div").hide();
+    $("#credit_card_fields").show();
+  }
+ 
+  function show_creditcard_fields_home(){
+    $("#payment_div_home").hide();
+    $("#credit_card_fields_home").show();
+  }
+ 
+  function update_creditcard_info(user_id){
+    $("#update_creditcard_info").modal("show");
+  }
+
+    function filter_button_click(){
+      is_first = false;
+      $("#filter_search").slideToggle("slow",function(){
+        if($("#filter_search").css('display') == "none"){
+          $("#filter_icon").removeClass('icon-chevron-up');
+          $("#filter_icon").addClass('icon-chevron-down');
+        }else{
+          $("#filter_icon").removeClass('icon-chevron-down');
+          $("#filter_icon").addClass('icon-chevron-up');
+        }
+      });
+   }
+
+   </script>
+
+<!--a href='#' onclick="FacebookInviteFriends();"> Facebook Invite Friends</a-->
+
+
+
+
+
+</body>
+</html>

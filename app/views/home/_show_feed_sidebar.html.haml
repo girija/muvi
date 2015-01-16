@@ -1,0 +1,44 @@
+#seen_activity.well-small{:style => 'height:800px;padding:0px;'}
+  .media{:style => "background-color:#FFFFFF"}
+    .items.scroll-pane.gradient_class{:style => 'overflow:auto;height:766px;'}
+
+
+-m = Movie.last
+.left{:style => "display:none"}
+  = render "/shared/movie_rating", movie_name: m.name, movie_image: "#{m.banner_image_medium}", movie_id: m.id, :button => 'small'
+
+%input{:type => "hidden", :id => "logged_user_movie"}
+
+/=subscribe_to "/home/index"
+
+:javascript
+  if ("#{params[:filter_text]}" != ""){
+    parse_data('#{all_activity.to_json.gsub(/[']/, '\\\\\'')}');
+  }
+
+
+:javascript
+  $(function() {
+    var user_name = "#{current_user.display_name}";
+    if(user_name == ""){
+      window.location.href = "/users/edit";
+    }
+    //var faye = new Faye.Client("#{FAYE_URL}/faye",{timeout: 120});
+    var subscription = faye.subscribe("/home/index/#{current_user.id}", function(res) {
+      parse_data(res);
+    });
+    /*subscription.errback(function(error) {
+       alert(error.message);
+    });*/
+  });
+
+
+:javascript
+  $("#activity_loader").hide();
+  $(document).ready(function() {
+    $("#current_user_id").val('#{current_user.id}');
+    $("#activity_loader").hide();
+    parse_data('#{all_activity.to_json.gsub(/[']/, '\\\\\'')}');
+  });
+
+

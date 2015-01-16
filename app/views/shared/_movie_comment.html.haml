@@ -1,0 +1,41 @@
+-@refer = @movie ? @movie : (@p_item ? @p_item : @celebrity)
+%div
+  = form_for "discussion",:url => "/discussion/save_discussion", :remote => true, :html => {:id => "discussion",:onsubmit=>"return append_new_discussion('#{@refer.permalink}');"} do |f|
+    - user_id = current_user ? current_user.id : ""
+    - secondary_id = @refer.id
+    - secondary_type = @refer.class.to_s
+    - placeholder = "<span style='color:red'>Add a comment about</span>#{@refer.name}".html_safe
+    = f.hidden_field :user_id, :value => user_id
+    = hidden_field_tag :reference_id, secondary_id
+    = hidden_field_tag :reference_type, secondary_type
+    = hidden_field_tag :inner_id, @refer.id
+    = hidden_field_tag :inner_item, "#{@refer.class.to_s.downcase}"
+    = hidden_field_tag :inner_page, "#{@refer.class.to_s.downcase}"
+    %div{:style=>"padding-top:5px"}
+      =f.text_area "question",:id=> "question" , :class => "disc_comm", :onkeypress => "check_event_submit_discussion(event, '#{@refer.id}','#{@refer.class.to_s}','#{@refer.name}','#{@refer.class.to_s.downcase}_page');", :placeholder => "Add a comment about #{@refer.name}"
+  %div{:id=>"dis_comm",:style=>"padding-top:10px;"}
+    =render "shared/inner_discussion"
+:javascript
+  function check_event_submit_discussion(evt,id,cls,name,page){
+    
+    var user_id = $("#user_id").val();
+    if(evt.keyCode == 13){
+      if(user_id != ""){
+        if(page == "movie_page"){ 
+          if(cls == "Movie"){
+            $("#discussion").submit();
+          }else{
+            $("#celeb_discussion").submit();
+          }
+        }else{
+          $("#discussion").submit();
+        }
+      }else{
+        var url = $("#hidden_reply_login").attr('href');
+        $("#hidden_reply_login").attr('href',url+"&login_for=review_reply&refer_type=celebrity&refer_id="+id);
+        $("#hidden_reply_login").click();
+      }
+    }
+  }
+
+

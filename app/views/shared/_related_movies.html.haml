@@ -1,0 +1,32 @@
+=sidebar_content(:heading => "Related Movies", :class => "GrayHeaderBox", :second_heading => "&nbsp;")
+-count = 1
+-total_block = 5
+-@related_movies.each do |movie|
+  -last_item = @related_movies.size
+  -actor_name = ""
+  -actor_link = ""
+  -actors = get_actor_name(movie)
+  -unless actors.blank?
+    -i=0
+    -actors.each do |act|
+      - unless act.celebrity.blank?
+        -if i == 2
+          -break
+        -if actor_name.blank?
+          -actor_name = act.celebrity.name
+          -actor_link = star_path(act.celebrity.permalink)
+        -else
+          -actor_name = actor_name + ","+ act.celebrity.name
+          -actor_link = actor_link + "," + star_path(act.celebrity.permalink)
+        -i=i+1
+  -if count == last_item
+    -begin
+      =sidebar_detail(movie.banner_image_thumb, :name => movie.name, :link_on_name => "/movies/#{movie.permalink}", :width => 42, :height => 42,:subtexts => actor_name, :sublink => actor_link, :end => 1, :right_side_text => movie.muvimeter)
+      -break
+    -rescue
+  -else
+    -begin
+      -count = count + 1
+      =sidebar_detail(movie.banner_image_thumb, :name => movie.name, :link_on_name => "/movies/#{movie.permalink}", :width => 42, :height => 42,:subtexts => actor_name, :sublink => actor_link, :right_side_text => movie.muvimeter)
+    -rescue
+

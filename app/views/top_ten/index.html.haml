@@ -1,0 +1,6 @@
+= render 'shared/meta_title_and_keywords', { :key => 'topten'}
+%div{:style=>"margin-left:400px;"}
+  %img{:src => "/images/loading.gif", :id=>"topten_loader",:style=>"display:none;position:absolute; z-index:2000;"}
+%div{:id => "topten_container"}
+  =render 'topten_page'
+

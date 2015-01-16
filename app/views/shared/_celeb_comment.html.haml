@@ -1,0 +1,16 @@
+%div{:id => "comment_#{comment.id}"}
+  %ul
+    = render '/shared/comment_field', {:comment => comment }
+    - if current_user.blank?
+      = link_to "#{image_tag('comment_arrow.jpg')} reply".html_safe,"#comment_#{comment.id}_form", :onclick => "enableLoginError(registration(), 'You need to login');", :href => "/users/sign_in", :"data-remote" => "true"
+    - else 
+      = link_to "#{image_tag('comment_arrow.jpg')} reply".html_safe,"#comment_#{comment.id}_form", :onclick => "jQuery('#comment_#{comment.id}_children').toggle();jQuery('#comment_#{comment.id}_form').toggle();return false;"
+    %div{:id => "comment_#{comment.id}_children", :style => 'display:none;'}
+      %ul{:id => "comment_#{comment.id}_ul" }
+        -unless comment.descendants.blank?
+          -comment.descendants.includes(:user).each do |com|
+            = render '/shared/comment_field', {:comment => com }
+    %div{:id => "comment_#{comment.id}_form", :style => 'display:none;'}
+      -unless current_user.blank?
+        = render '/comments/celeb_form', {:celebrity => @celebrity, :comment => comment }
+

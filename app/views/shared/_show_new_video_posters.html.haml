@@ -1,0 +1,11 @@
+- @refer = @movie ? @movie : @celebrity
+- if @video_list.size + @poster_list.size > 0
+  -if type == "picture"
+    - if @poster_list.size > 0
+      =render "/shared/show_new_posters", :object_type => @refer.class.to_s
+    .clear
+  -elsif type == "video"
+    - if @video_list.size > 0
+      =render "/shared/show_new_videos", :object_type => @refer.class.to_s
+    .clear
+

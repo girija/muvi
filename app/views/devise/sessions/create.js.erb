@@ -1,0 +1,82 @@
+<% if flash[:alert] %>
+  $('#errors').html("<h3><%= flash[:alert] %> </h3>");
+<%else%>
+  $.cookie('has_logged_in', '1', { expires: 365, path : "/"});
+
+  <% if current_user.is_admin %>
+    location.href = "/admin";
+  <% elsif current_user.is_critic %>
+     location.href = "/my_reviews";
+  <%else%>
+    <% if params[:type] == 'mobile' %>
+      location.href = "/";
+    <% else %>
+      //For homepage activities
+      <%if params[:home_refer_type] == "home_page" %>
+         $.modal.close();
+         $("#home_user_id").val("<%= current_user.id %>");
+         check_userid_in_homepage("<%= params[:path] %>", "<%=params[:id]%>", "<%=params[:method_name]%>", "<%=current_user.id%>", "<%=params[:message]%>", "<%=params[:status]%>", "<%=params[:flag_detail]%>");
+ 
+      <% elsif !params[:act_refer_type].nil? && !params[:act_refer_type].blank? %>
+        //location.reload(true);
+        _gaq.push(['_trackEvent', 'Home', 'Login', 'User Logged in']);
+        window.location.href = "/home/index/<%=current_user.id%>";
+
+      <% elsif !params[:refer_type].nil? && !params[:refer_type].blank? %>
+        $.modal.close();
+        $("#user_id").val("<%= current_user.id %>");
+        <% if !params[:login_for].nil? && params[:login_for] == "want_to_see" %>
+          $("#user_id").val("<%= current_user.id %>");
+          $("#want_to_see_form").submit();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "review_reply" %>
+          $("#user_id").val("<%= current_user.id %>");
+          var review_id = "<%= params[:refer_id] %>";
+          $("#comment_form_"+review_id).submit();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "discussion_reply" %>
+          var discussion_id = "<%= params[:refer_id] %>";
+          $("#comment_form_"+discussion_id).submit();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "discussion_like"%>
+          var discussion_id = "<%= params[:refer_id] %>";
+          $("#discussion_like_link_"+discussion_id).attr("href","/discussion/vote/"+discussion_id+"?item_class=<%= params[:refer_cls]%>");
+          $("#discussion_like_link_"+discussion_id).removeAttr("onclick");
+          $("#discussion_like_link_"+discussion_id).click();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "celeb_tweet_like"%>
+          $("#tweet_like_link_<%= params[:refer_id] %>").removeAttr("onclick");
+          $("#tweet_like_link_<%= params[:refer_id] %>").click();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "celeb_tweet_dislike"%>
+          $("#tweet_dislike_link_<%= params[:refer_id] %>").removeAttr("onclick");
+          $("#tweet_dislike_link_<%= params[:refer_id] %>").click();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "poster_vid_com"%>
+          $("#user_id").val("<%= current_user.id %>");
+          $("#comment_form_<%= params[:refer_id] %>").submit();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "poster_vid_like"%>
+          $("#user_id").val("<%= current_user.id %>");
+          $("#like_form").submit();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "poster_vid_dislike"%>
+          $("#user_id").val("<%= current_user.id %>");
+          $("#dislike_form").submit();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "fan"%>
+          $("#user_id").val("<%= current_user.id %>");
+          $("#fan_form").submit();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "unfan"%>
+          $("#user_id").val("<%= current_user.id %>");
+          $("#not_fan_form").submit();
+        <% elsif !params[:login_for].nil? && params[:login_for] == "like"%>
+          $("#user_id").val("<%= current_user.id %>");
+          $("#new_review").submit();
+        <%else %>
+          $("#discussion_user_id").val("<%= current_user.id %>");
+          $("#discussion").submit();
+        <%end%>
+        $('#header-container').html('<%= escape_javascript(render 'shared/header') %>');
+      <% else %>
+	<% if request.env["HTTP_REFERER"] =~ /forgot_password/ %>
+		location.href = "/";
+	<% else %>
+	        location.reload(true);
+	<% end %>
+      <% end %>
+    <% end %>
+  <%end%>
+<%end%>
+

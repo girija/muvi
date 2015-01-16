@@ -1,0 +1,28 @@
+%h1 Movie Tweets
+
+= link_to "Back to Movie", edit_admin_movie_path(@movie)
+= link_to "Add new tweet",new_admin_movie_movie_tweet_path(@movie)
+%table.listing
+  %tr
+    %th= check_box_tag('check_all')
+    %th Content
+    %th Twitter Screen name
+    %th Tweeted on
+    %th Rating
+    %th Review
+  -unless @tweets.blank?
+    = form_tag(delete_tweets_admin_movie_tweets_path(@movie)) do
+      - @tweets.each do |tweet|
+        %tr
+          %td= check_box_tag("tweet_ids[]", tweet.id, false)
+          %td= tweet.content
+          %td= tweet.twitter_screen_name
+          %td= tweet.tweeted_on.to_date
+          %td= tweet.rating
+          %td= select_tag "review_#{tweet.id}", options_for_select(tweet_review_options, tweet.review), :class => 'tweet_option_change'
+      %tr
+        %td{:colspan => 4} &nbsp;
+        %td= submit_tag "Delete"
+%br
+= will_paginate @tweets
+

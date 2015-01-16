@@ -1,0 +1,24 @@
+$("#user_id").val("<%= current_user.id %>");
+//$("#like_button_<%= params[:id]%>").hide();
+<% if params[:inner_page] == "true" %>
+  $("#<%= @item.class.to_s%>_detail").html("<%= escape_javascript(render :partial => 'shared/show_block_detail',:locals=>{:item => @item}) %>");
+<% elsif params[:profile_page] == "true"%>
+  $("#<%= @item.class.to_s.downcase%>_detail").html("<%= escape_javascript(render :partial => 'user_profiles/poster_video_detail',:locals=>{:item => @item, :type => @item.class.to_s.downcase,:prev_item => @prev_item, :next_item => @next_item}) %>");
+  <% if params[:type] == "like" %>
+    successMessage("You liked this <%= @item.class.to_s %>");
+  <% else %>
+    successMessage("You didn't like this <%= @item.class.to_s %>");
+  <% end %>
+<% else %>
+  <% if !@like_status %>
+    <% if @item.votes.count == 1%> 
+      $("#like_cnt_<%= params[:id]%>").parent().removeAttr("onclick");
+      $("#like_cnt_<%= params[:id]%>").parent().attr("onClick","show_likes_popup('<%= @item.id %>','<%= @item.votes.count %>');"); 
+      $("#header_like_<%= params[:id]%>").html("<%= @item.votes.count%> Liked");
+    <% end %>
+    $("#like_cnt_<%= params[:id]%>").html("<%= @item.votes.count%>");
+    successMessage("You liked this <%= @item.class.to_s %>");
+    badgePoints('to like this <%= @item.class.to_s %>',1);
+    $("#list_like_<%= params[:id] %>").prepend("<%= escape_javascript(render 'shared/discussion_likes', {:vote => @vote}) %>");
+  <% end %>
+<% end %>

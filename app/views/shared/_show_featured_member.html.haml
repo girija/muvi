@@ -1,0 +1,62 @@
+/.large_box.left{:style => "width:760px"}
+%h2
+  %span Featured
+  Member
+
+
+-unless @featured_member.blank?
+  -@user_profile = UserProfile.find_by_id(@featured_member.subject_id)
+  
+  -user = User.find_by_id(@user_profile.user_id)
+
+  -unless @user_profile.blank?
+    .left{:style => "width:112px; height:175px;padding:2px;border:1px solid #dddddd; margin-right:10px"}
+      -unless @user_profile.profile_image_file_name.blank?
+        =link_to image_tag(user_profile_image(@user_profile), :width => "112px", :height => "175px"),"/profile/#{@user_profile.user_id}/#{@user_profile.display_name}"
+      -else
+        -unless user.blank?
+          -unless user.facebook_id.blank?
+            =link_to image_tag("http://graph.facebook.com/#{user.facebook_id}/picture?type=normal", :width => "112px", :height => "175px"),"/profile/#{@user_profile.user_id}/#{@user_profile.display_name}"
+          -else
+            =link_to image_tag("/images/no-profile.png", :width => "112px", :height => "175px"),"/profile/#{@user_profile.user_id}/#{@user_profile.display_name}"
+
+      .clear
+    .left{:style => "width:270px"}
+      %div{:style => "height:100px"}
+        =raw(WantToSee.fm_fan("Fan of", @user_profile.user_id))
+        .clear
+      
+        =raw(Movie.fm_like_dislike("Liked", @user_profile.user_id, "true"))
+        .clear
+ 
+        =raw(Movie.fm_like_dislike("Didn't like", @user_profile.user_id, "false"))
+        .clear
+
+        =raw(WantToSee.fm_want_to_see("Want to see", @user_profile.user_id))
+      .clear
+
+      -unless user.blank?
+        -activity = Activity.where("user_id = #{user.id}").find(:first, :order => ["created_at desc"])
+
+        %div{:style => "height:55px"}
+          -unless activity.blank?
+            Last Activity:
+            =raw(activity.action)
+            .clear
+            =distance_of_time_in_words(Time.now, activity.created_at.to_time) + " ago"
+        .clear{:style => "height:5px"}
+    
+    .left
+      -unless current_user.blank?
+        -@count_follow = UserConnection.find_by_user_id(current_user.id)
+      -begin
+        =render :partial => "/shared/homepage_follow_unfollow"
+      -rescue
+
+    .clear{:style => "height:10px"}
+      =link_to "#{@user_profile.display_name}", "/profile/#{@user_profile.user_id}/#{@user_profile.display_name}"
+    .clear{:style => "height:10px"}
+
+
+
+

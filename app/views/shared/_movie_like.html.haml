@@ -1,0 +1,16 @@
+-total_like = 0
+-unless @movie_user_reviews.blank?
+  -@movie_user_reviews.each do |like|
+    -if like.rating.to_f >= 3
+      - total_like = total_like + 1
+      -movie = Movie.find_by_id(like.movie_id)
+      -unless movie.blank?
+        .profile_fan_div.left
+          =link_to image_tag(movie.banner_image, :width => 80, :height => 114), movie_path(movie)
+          .clear
+          =link_to movie.name, movie_path(movie)
+          .clear
+-if total_like == 0
+  No movie
+
+.clear{:style => "height:20px"}

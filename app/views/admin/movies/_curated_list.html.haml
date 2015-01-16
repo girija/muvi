@@ -1,0 +1,26 @@
+.clear{:style=>"height:10px;"}
+%div{:style => "float:left;width:50%;"}
+  %div{:style=>"font-weight:bold;"}
+    Bollywood movies
+  %div{:style=>"padding-top:10px;"}
+    -@bol_movies.each do |movie_id|
+      - movie = Movie.find_by_id(movie_id)
+      -if movie
+        %div{:style => "float:left;width:400px;"}
+          = movie.name 
+        %div{:style=>"float:left;"}
+          =link_to "delete","/remove_curate/#{movie_id}?lang=bol"
+      %br 
+%div{:style => "float:left;width:50%;"}
+  %div{:style=>"font-weight:bold;"}
+    Hollywood movies
+  %div{:style=>"padding-top:10px;"}
+    -@hol_movies.each do |movie_id|
+      - movie = Movie.find_by_id(movie_id)
+      -if movie
+        %div{:style => "float:left;width:400px;"}
+          = movie.name
+        %div{:style=>"float:left;"}
+          =link_to "delete","/remove_curate/#{movie_id}?lang=hol"
+      %br
+

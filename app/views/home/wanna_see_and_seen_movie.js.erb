@@ -1,0 +1,23 @@
+if("<%=params[:type] %>" == "wanna see"){
+  var v = $("#loggedin_user_wannasee_movie").val();
+  v = v.replace(']',', "<%=params[:movie_id]%>"]');
+  $("#loggedin_user_wannasee_movie").val(v);
+}
+
+if("<%=params[:type] %>" == "seen it"){
+  var v = $("#loggedin_user_seen_movie").val();
+  v = v.replace(']',', "<%=params[:movie_id]%>"]');
+  $("#loggedin_user_seen_movie").val(v);
+}
+
+  <% 
+    @all_activity = AllActivityHelper.display_notification(0, current_user.id)
+    render :partial => "/home/show_feed_sidebar", :locals => {:all_activity => @all_activity}
+  %>
+//setTimeout("show_feed()", 5000);
+function show_feed(){
+  <%
+    #AllActivityHelper.get_notification_list(1, current_user.id.to_i, '', '')
+  %>
+}
+

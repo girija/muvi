@@ -1,0 +1,38 @@
+-unless options["data"]["like"].blank?
+  -unless current_user.blank?
+    -user_id = current_user.id
+  -else
+    -user_id = ""
+
+  -if options["type"] == "video"
+    -type = "video"
+  -elsif options["type"] == "poster"
+    -type = "poster"
+  -elsif options["type"] == "news"
+    -type = "news"
+
+
+
+  -if options["data"]["like"] == 1
+    -class1 = "like_btn_active"
+    -class2 = "dislike_btn"
+
+  -elsif options["data"]["like"] == 0 and options["data"]["dislike"] == 1
+    -class1 = "like_btn"
+    -class2 = "dislike_btn_active"
+
+  -else
+    -class1 = "like_btn"
+    -class2 = "dislike_btn"
+  
+  -opt_type = options["type"] == "poster" ? "picture" : options["type"]
+  %div{:id => "like_div_#{options["id"]}", :class => "left button_container_div", :style => "width: 92px; height: 22px; /*background: url('/images/like_dislike_bg.png') repeat scroll 0px 0px transparent;*/"}
+    .left{:id => "like_span_#{options["id"]}", :class => "btn_div_1 tip_hint tooltipbottom"}
+      %button{:id => "like_btn_#{options["id"]}",  :style => "padding:0px",:onclick => 'like_dislike_except_movie("'"#{options["id"]}"'", "'"#{user_id}"'", "'"#{type}"'", "likes", "like_btn_'"#{options["id"]}"'", "not_like_btn_'"#{options["id"]}"'", "like_btn_active", "dislike_btn", "You liked the '" #{opt_type}"' '"#{options["name"]}"'")', :class => "#{class1} left", :onmouseover => "change_border('#{options["type"]}', 'like_span_#{options["id"]}', 'like_btn_#{options["id"]}', 'like_text_#{options["id"]}', 'like_icon_o.png');", :onmouseout =>  "remove_border('#{class1}', 'like_span_#{options["id"]}', 'like_btn_#{options["id"]}', 'like_text_#{options["id"]}', 'like_icon_b.png');"}
+
+        %div{:id => "like_text_#{options["id"]}", :class => "like_txt"}
+          Liked
+      =generate_tooltip_block("#{options['type']}_like","home_page")
+    .right{:id => "dislike_span_#{options["id"]}", :class => "btn_div_2 tip_hint tooltipbottom"}
+      %button{:id => "not_like_btn_#{options["id"]}", :style => "padding:0px", :class => "#{class2} left", :onclick => 'like_dislike_except_movie("'"#{options["id"]}"'", "'"#{user_id}"'", "'"#{type}"'", "dislikes", "not_like_btn_'"#{options["id"]}"'", "like_btn_'"#{options["id"]}"'", "dislike_btn_active", "like_btn", "You didn\'t like the '" #{opt_type}"' '"#{options["name"]}"'")', :onmouseover => "change_border_1('#{options["type"]}','dislike_span_#{options["id"]}', 'not_like_btn_#{options["id"]}', 'dislike_icon_o.png', #{options["id"]} );", :onmouseout =>  "remove_border_1('#{class2}', 'dislike_span_#{options["id"]}', 'not_like_btn_#{options["id"]}', 'dislike_icon_b.png', #{options["id"]});"}
+      =generate_tooltip_block("#{options['type']}_dislike","home_page")

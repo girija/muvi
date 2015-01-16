@@ -1,0 +1,19 @@
+= render 'shared/meta_title_and_keywords', { :key => 'released'}
+-unless params[:search].blank?
+  = content_for :heading do
+    %span search for
+    = (params[:search][:name_contains] rescue '')
+-else
+  = content_for :heading do
+    .left
+      %b
+        Released
+.clear
+.homeContainerIn.borderDiv
+  = render 'shared/list_movies',  { :from => 'home'}
+  .clear
+
+  .right
+    = will_paginate(@movies)
+  .clear
+

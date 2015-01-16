@@ -1,0 +1,60 @@
+%table.listing
+  %tr
+    %th
+    %td= image_tag(@movie.banner_image)
+  %tr
+    %th  Movies name
+    %td= @movie.name
+  %tr
+    %th Released Date
+    %td= @movie.initial_release_date
+  %tr
+    %th Facebook page id
+    %td= @movie.fbpage_id
+  %tr
+    %th Estimated budget
+    %td= number_to_currency @movie.estimated_budget.to_f
+  %tr
+    %th Revenue
+    %td= number_to_currency @movie.gross_revenue.to_f
+  %tr
+    %th Genre
+    %td= @movie.genre.to_sentence rescue @movie.genre
+  %tr
+    %th actors
+    %td= @actors.collect{ |ob| ob.celebrity.name }.to_sentence
+  %tr
+    %th Director
+    %td= @movie.directors.collect{ |ob| (ob.celebrity.name) }.to_sentence
+
+  %tr
+    %th producers
+    %td= @movie.producers.collect{ |ob| ob.celebrity.name }.to_sentence
+  %tr
+    %th musics
+    %td= @movie.musics.collect{ |ob| ob.celebrity.name }.to_sentence
+  %tr
+    %th writers
+    %td= @movie.writers.collect{ |ob| ob.celebrity.name }.to_sentence
+  %tr
+    %th cinematographers
+    %td= @movie.cinematographers.collect{ |ob| ob.celebrity.name }.to_sentence
+  %tr
+    %th distributors
+    %td= @movie.distributors.collect{ |ob| ob.celebrity.name }.to_sentence
+  %tr
+    %th editors
+    %td= @movie.editors.collect{ |ob| ob.celebrity.name }.to_sentence
+  %tr
+    %th Meta Title
+    %td= @movie.meta_detail.meta_title unless @movie.meta_detail.blank?
+  %tr
+    %th Meta Keywords
+    %td= @movie.meta_detail.meta_keywords unless @movie.meta_detail.blank?
+  %tr
+    %th Meta Description
+    %td= @movie.meta_detail.meta_description unless @movie.meta_detail.blank?
+= link_to 'Edit', edit_admin_movie_path(@movie)
+\- or -
+= link_to 'Back', admin_movies_path
+

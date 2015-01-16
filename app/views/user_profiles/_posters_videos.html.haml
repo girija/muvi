@@ -1,0 +1,81 @@
+-if type == "poster"
+  - data_list = []
+  -@like_posters[0..11].each do |like|
+    -data_list << Poster.find_by_id(like.votable_id)
+-elsif type == "video"
+  - data_list = []
+  -@like_videos[0..7].each do |like|
+    -data_list << Video.find_by_id(like.votable_id)
+.clear{:style => 'height:5px'}
+%div
+  - data_list.each_with_index do |data,i|
+    -if type == "poster"
+      -poster = data
+      - if poster
+        -tag_item = poster.taggings.where("tagger_type = 'Movie' or tagger_type = 'Celebrity'").first
+        -if tag_item
+          -ref_item = tag_item.tagger_type.constantize.find_by_id(tag_item.tagger_id)
+          %div{:class=>"left", :style=>"height:90px;cursor:pointer;padding-right:10px;width:78px;"}
+            -begin
+              .left{:style => "border:1px solid #d2d6d9;"}
+                %div{:style=>"height:77px;width:77px;padding:2px;"}
+                  = image_tag ("/system/posters/#{poster.id}/medium/#{poster.poster_file_name.gsub(" ", "%20")}"), :width => "77px", :height => "77px",:onclick => "javascript:show_poster('#{poster.id}','#{tag_item.tagger_type.downcase}','#{ref_item.permalink}');", :style => "cursor:pointer", :id => "poster#{poster.id}",:title=>"#{poster.name}",:alt => "#{poster.name}"
+
+              .clear
+            -rescue
+              .clear
+              %div{:style=>"font-weight:normal;font-size:13px;color:#000;"}
+                = poster.name
+    -else
+      -video = data
+      -if video
+        -tag_item = video.taggings.where("tagger_type != 'trailer'").first
+        -if tag_item
+          -ref_item = tag_item.tagger_type.constantize.find_by_id(tag_item.tagger_id)
+          %div{:class=>"left", :style=>"height:100px;cursor:pointer;padding-right:10px;width:117px;margin-bottom:5px;"}
+            -begin
+              .left{:style => "border:1px solid #d2d6d9;"}
+                %div{:style=>"height:95px;width:117px;padding:2px;"}
+                  - unless video.video_remote_url.blank?
+                    - video_id_arr = video.video_remote_url.split("/")
+                    - video_id = video_id_arr[video_id_arr.size.to_i - 1]
+                    %div{:style => "position:relative;background:url('http://img.youtube.com/vi/#{video_id}/1.jpg'); height:95px;width:117px;cursor:pointer;", :onclick => "javascript:show_video(#{video.id}, '#{tag_item.tagger_type.downcase}', '#{ref_item.permalink}');", :id => "video#{video.id}", :title => "#{video.name}", :alt => "#{video.name}"}
+                      %img{:src => "#{URL}/images/play_button.png", :style => "position:absolute;right:5px;bottom:5px"}
+                  - else
+                    %div{:style => "position:relative;background:url('#{URL}/system/trailer_thumbnails/#{video.id}/1.jpg'); height:95px;width:117px;cursor:pointer;", :onclick => "javascript:show_video('#{video.id}', '#{tag_item.tagger_type.downcase}', '#{ref_item.permalink}');", :id => "video#{video.id}", :title => "#{video.name}", :alt => "#{video.name}"}
+                      %img{:src => "#{URL}/images/play_button.png", :style => "position:absolute;right:5px;bottom:5px"}
+                .clear
+  
+              .clear
+            -rescue
+              .clear
+              %div{:style=>"font-weight:normal;font-size:13px;color:#000;"}
+                = video.name
+
+:javascript
+  function show_poster(poster_id,object_type, object_id){
+     $.fancybox({
+       'type' : 'ajax',
+       'centerOnScroll' : true,
+       'opacity' : true,
+       'hideOnOverlayClick' :true,
+       'overlayOpacity' : 1,
+       'overlayColor' : '#0e0e0e',
+       'showCloseButton': false,
+       'autoScale' : true,
+       'padding' : 0,
+       'transitionIn': 'elastic',
+       'transitionOut': 'elastic',
+       'onClosed' : function(){
+         $("body").css("overflow", "auto");
+       },
+       'onComplete': function() {
+         $("#fancybox-wrap").css({'top':'10px', 'bottom':'auto'});
+       },
+       'href': "/posters/"+object_type+"/"+object_id+"/"+poster_id+"?hide_link=yes"
+    });
+    var stateObj = { foo: "bar" };
+    history.pushState(stateObj, "", "/"+object_type+"s/"+object_id+"/poster/"+poster_id);
+
+  }
+

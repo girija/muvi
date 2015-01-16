@@ -1,0 +1,24 @@
+= render 'shared/meta_title_and_keywords', { :key => 'connections'}
+
+-if params[:type] == "registered"
+  -unless @registered_user.blank?
+    =render :partial => "show_registered"
+  -else
+    %h4
+      No user present
+
+  .clear{:style => "height:10px"}
+
+-if params[:type] == "invite"
+  -unless @unregistered_user.blank?
+    =render :partial => "show_unregistered"
+  -else
+    %h4
+      No user present
+
+  .clear{:style => "height:10px"}
+
+-if @registered_user.blank? and @unregistered_user.blank?
+  %h4
+    No user present
+

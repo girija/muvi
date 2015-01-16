@@ -1,0 +1,128 @@
+-style = "height: 27px; margin-top:-10px;"
+-if options["type"] == "star"
+  /.bottom_overlay{:style => "#{style};margin-top:-15px; background:none; opacity:1; margin-left:10px; width:212px;", :id => "#{options["type"]}_overlay_#{options["id"]}"}
+
+  /  .left{:style => "padding: 5px 2px 2px 5px; margin-top:-20px; width:165px;"}
+  /    %div{:style => "z-index:1000;color:#FFFFFF; font-size:12px"} 
+  /      /, :class => "glow"}
+  /      %b
+  /        -unless options["name"].blank?
+  /          =options["name"].slice!(0, 22)
+
+  .bottom_overlay{:style => "#{style}overflow: hidden;margin-top:-40px; height:32px; margin-left:6px; width:212px; z-index:1000;", :id => "#{options["type"]}_overlay_#{options["id"]}"}
+    .left{:style => "padding: 10px 2px 2px"}
+      %div{:style => "z-index:1000; color:#FFFFFF"}
+        %b
+          -unless options["name"].blank?
+            /=options["name"].slice!(0, 22)
+            =options["name"].truncate(22)
+      .clear
+
+  -unless options["top_rated"].blank?
+    %div{:class => "v_list"}
+      %div{:style => "border:1px solid #FFFFFF; border-bottom:0px solid #FFF; color:#FFF; background:url('/images/top.png') repeat scroll 0 5px transparent; height: 68px; width:58px;"}
+
+      -c1 = 1
+      -options["top_rated"].each do |top|
+        /-if c1 == options["top_rated"].size
+        /  -b1 = "border:1px solid #FFFFFF"
+        /-else
+        /  -c1 = c1 + 1
+        -b1 = "border:1px solid #FFFFFF; border-bottom:0px"
+        %div{:style => "color:#FFF; height:84px; #{b1}"}
+          %a{:href => "#{top["path"]}"}
+            %img{:width => "58px", :height => "84px", :src => "#{top["image"]}"}
+
+
+-elsif options["type"] == "movie"
+  .clear
+  .bottom_overlay{:style => "#{style}overflow: hidden;margin-top:-40px; height:32px; margin-left:6px; width:212px; z-index:1000", :id => "#{options["type"]}_overlay_#{options["id"]}"}
+    .left{:style => "padding: 10px 2px 2px"}
+      %div{:style => "z-index:1000; color:#FFFFFF"}
+        %b
+          -unless options["name"].blank?
+            /=options_name.slice!(0, 22)
+            =options["name"].truncate(22)
+
+  -unless options["mouseover"].blank?
+    %div{:class => "v_list"}
+      %div{:style => "border:1px solid #FFFFFF; border-bottom:0px solid #FFF; color:#FFF; background:url('/images/cast.png') repeat scroll 0 5px transparent; height: 68px; width:58px;"}
+
+      -c2 = 1
+      -options["mouseover"].each do |over|
+        /-if c2 == options["mouseover"].size
+        /  -b2 = "border:1px solid #FFFFFF"
+        /-else
+        /  -c2 = c2 + 1
+        -b2 = "border:1px solid #FFFFFF; border-bottom:0px"
+
+        %div{:style => "color:#FFF; height:84px; #{b2}"}
+          %a{:href => "#{over["path"]}"}
+            %img{:width => "58px", :height => "84px", :src => "#{over["image"]}"}
+
+-elsif options["type"] == "video" or options["type"] == "poster"
+  .clear
+
+  .left{:class => "mouseover_div"}
+    %span{:style => "color: #FFFFFF; font-size: 9px; text-transform: capitalize; display: none;width:203px", :id => "#{options["type"]}_name_span_#{options["id"]}"}
+      -unless options["mouseover"].blank?
+        -options["mouseover"].each do |over|
+          =link_to(image_tag("#{over["image"]}", :width => "35px", :height => "35px", :style => "border: 1px solid #FFFFFF"),"#{over["path"]}")
+  .clear
+
+  .bottom_overlay{:style => "#{style};margin-top:-35px; ", :id => "#{options["type"]}_overlay_#{options["id"]}"}
+    .left{:style => "padding: 5px 2px 2px;width:203px;"}
+      %div{:style => "z-index:1000; color:#FFFFFF;"}
+        %b
+          %nobr
+            -unless options["name"].blank?
+              /=options_name.slice!(0, 30)
+              =options["name"].truncate(30)
+        -if options["type"]=="poster"
+          .right{:style => 'display:none', :id => "#{options["type"]}_mail_#{options["id"]}"}
+            = link_to(image_tag("mail_on_poster.png"), "/muvicard/#{options['id']}")
+
+      .clear
+      :javascript
+        if( $("##{options["type"]}_info_span_#{options["id"]}").length > 0 ) {
+          $("##{options["type"]}_div_#{options["id"]}").hover(function() {
+            $("##{options["type"]}_info_span_#{options["id"]}").hide("50");
+            $("##{options["type"]}_mail_#{options["id"]}").hide("50");
+          },
+          function() {
+            $("##{options["type"]}_info_span_#{options["id"]}").show("50");
+            $("##{options["type"]}_mail_#{options["id"]}").show("50");
+          });
+        }else{
+          $("##{options["type"]}_div_#{options["id"]}").hover(function() {
+            $("##{options["type"]}_name_span_#{options["id"]}").show("50");
+             $("##{options["type"]}_mail_#{options["id"]}").show("50");
+          },
+          function() {
+            $("##{options["type"]}_name_span_#{options["id"]}").hide("50");
+            $("##{options["type"]}_mail_#{options["id"]}").hide("50");
+          });
+
+        }
+
+-elsif options["type"] == "news"
+  -unless options["mouseover"].blank?
+    .left{:style => "padding: 5px 2px 2px; position: relative; top: -35px; left: 4px;z-index:100;"}
+      %div{:style => "z-index:1000; color:#FFFFFF"}
+        %b
+          -unless options["name"].blank?
+            /=options_name.slice!(0, 30)
+            =options["name"].truncate(30)
+      .clear
+
+      .left{:style => "position: absolute; width:200px;"}
+        %span{:style => "color: #FFFFFF; font-size: 9px; text-transform: capitalize;", :id => "#{options["type"]}_name_span_#{options["id"]}"}
+          -options["mouseover"].each do |over|
+            =link_to(image_tag("#{over["image"]}", :width => "29px", :height => "27px", :style => "border: 1px solid #FFFFFF"),"#{over["path"]}")
+      .clear
+ 
+    .bottom_overlay{:style => "#{style}overflow: hidden;margin-top:-42px; height:50px;opacity:0.3; filter: alpha(opacity=30); width:180px; margin-left: -1px;", :id => "#{options["type"]}_overlay_#{options["id"]}"}
+
+
+
+  

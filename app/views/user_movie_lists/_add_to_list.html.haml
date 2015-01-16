@@ -1,0 +1,24 @@
+.left{:style => "width:100%;"}
+  %ul{:style => "list-style-type: none; margin: 0px; color:#FFFFFF; font-weight:bold; height: 25px; padding:7px 7px 7px 10px; background-color:#0096EC; cursor:pointer;border-bottom:1px solid #ECECEC; "}
+    %li{:style => "float:left"}
+      %div{:id => "new_list_#{params[:movie_id]}"}
+      %span{:href => "#", :id => "new_list_btn_#{params[:movie_id]}", :style => "cursor:pointer;", :onclick => "add_new_list('#{current_user.id}', '#{params[:movie_id]}')"}
+        New List
+
+  -unless @list.blank?
+    .left{:style => "width:100%;", :id => "user_list_#{params[:movie_id]}", :class => "user_list"}
+      %ul{:style => "margin-left:0px; background-color:#CACFD2; margin-bottom:-10px"}
+        -@list.each do |l|
+          -movie_id_arr = ActiveSupport::JSON.decode(l.movie_id)
+          %li
+            -if movie_id_arr.include?(params[:movie_id])
+              -checked = 'checked:true;'
+              %input{:type => "checkbox", :onclick => "remove_from_list(this, '#{current_user.id}', '#{params[:movie_id]}', '#{l.id}', '#{l.tag}')", :checked => true, :class => "left", :style => "-ms-transform: scale(1.3);  -moz-transform: scale(1.3);  -webkit-transform: scale(1.3);   -o-transform: scale(1.3)"}
+            -else
+              %input{:type => "checkbox", :onclick => "add_to_list('#{current_user.id}', '#{params[:movie_id]}', '#{l.id}', '#{l.tag}')", :class => "left", :style => "-ms-transform: scale(1.3);  -moz-transform: scale(1.3);  -webkit-transform: scale(1.3);   -o-transform: scale(1.3)"}
+
+            .left{:style => "margin-left:4px"}
+              =l.tag
+            .clear 
+    .clear
+  .clear{:style => "height:10px"}

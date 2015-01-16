@@ -1,0 +1,52 @@
+.left{:onmouseover => "$('#edit_profile_link').show();", :onmouseout => "$('#edit_profile_link').hide();", :style => "cursor:pointer;padding:2px;"}
+  %div{:style => "background:none;width:188px;"}
+    /= image_tag(@user_profile.profile_image.url(:small),:height => "140", :width => "115") unless @user_profile.profile_image_file_name.blank?
+    = image_tag("/system/profile_images/#{@user_profile.id}/small/#{@user_profile.profile_image_file_name.gsub(' ', '%20')}",:height => "285", :width => "188") unless @user_profile.profile_image_file_name.blank?
+
+    -user = User.find(@user_profile.user_id)
+    -if @user_profile.profile_image_file_name.blank?
+      -unless user.facebook_id.blank?
+        =link_to image_tag("http://graph.facebook.com/#{user.facebook_id}/picture?type=normal",:height => "285", :width => "188"),"/profile/#{@user_profile.user_id}/#{@user_profile.display_name}"
+      -else
+        =link_to image_tag("/images/no-profile.png",:height => "285", :width => "188"),"/profile/#{@user_profile.user_id}/#{@user_profile.display_name}"
+    .clear
+    /=@user_profile.display_name
+
+  .clear{:style => "height:30px"}
+  /=render :partial => "show_follow_unfollow"
+
+  -unless current_user.blank?
+    -if current_user.id == @user_profile.user_id
+      %a{:href => "#", :class => "edit_profilepicture", :id => "edit_profile_link", :onclick => "change_picture();"}
+        Change Picture
+        %span{:class => "edit_profilepicture_icon"}
+
+
+:javascript
+  function browse_file(){
+    $("#profile_picture").click();
+  }
+
+  function upload_image(){
+    $("#crop_div").show();
+    $("#user_edit").submit();
+    
+  }
+  function change_picture(){
+    $('#registration').html('');
+    $('#registration').modal({
+        minHeight:400,
+        minWidth:550,
+        containerId:'register_from',
+        onShow: function(model){
+            var t=setTimeout("$.modal.setContainerDimensions()", 1000);
+        }
+    });
+    $.modal.setContainerDimensions();
+    var cont = "#{escape_javascript(render :partial => 'user_profiles/upload_image')}";
+    $('#registration').html(cont);
+    return false;
+
+  }
+
+

@@ -1,0 +1,20 @@
+- image = (from == 'movies')? 'ratebutton.jpg' : 'express_intrest.png'
+- if current_user.blank?
+    #rating-steps
+        %a{:href=>'#', :id=>'want-to-see2', :class=>'gradient-button2 left', :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+            .gradient-button2
+                .label Want to see
+        -if !@movie.release_date.blank? and @movie.release_date <= Date.today
+            %a{:href=>'#', :id=>'seen_already2', :style=>'line-height: 33px; font-size: 17px; color: #aaa; padding-left: 10px;; text-decoration: none;', :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration());'} Seen already
+    -#= link_to image_tag(image), new_user_session_path(:login => (from == 'movies')? 'rate' : 'express'), :remote => true, :onclick => "login();", :id=>"login_required", :style=>"display: none;"
+    -##rate_movie.rating{:style => "width: 243px; height: 19px; background-color: #aaa"}
+        -#.field
+            -#%label{:class => 'rate left', :style => "font-size: 13px; color: #ffffff; width: auto; line-height: 17px; font-weight: bold;"}
+                -#= 'My rating'
+                -#- ['0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'].each do |rate|
+                    -#%input.star{:class => "{split:2}", :name => "review[rating]", :value => "#{rate}", :type => "radio", :onclick => "login()" }
+- else
+    -#= link_to image_tag(image), '#', :onclick => "$('#rate_movie').modal({minHeight: 272, minWidth: 642,containerId: 'post_reply' });return false;"
+    .clear
+    #rate_movie_div.left
+        = render :partial => "reviews/form", :locals => { :movie => @movie, :review => ((from == 'movies')? false : true) }

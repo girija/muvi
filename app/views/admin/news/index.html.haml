@@ -1,0 +1,42 @@
+%script
+  $(function() { $( "#datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' }); });
+
+= form_tag admin_news_path, :method => :get do
+  Choose date
+  %input{:type => "text", :id => "datepicker", :name => "date", :value => "#{params[:date]}"}
+  Language:
+  = select_tag 'language', options_for_select([['Select',''],['Hollywood','English'], ['Bollywood','Hindi'], ['Tamil','Tamil'],['Telugu','Telugu'], ['Untagged','Untagged']],"#{params[:language]}")
+
+  = submit_tag "Search"
+
+
+= form_tag '/admin/news/delete_news_multiple', :html => {:method => "post"} do
+  %input{:type => "hidden", :name => "redirect_url", :value => "#{request.url}"}
+  %table
+    %tr
+      %th= check_box_tag('check_all')
+      %th{:width => "50%", :align => "left"} News
+      %th{:width => "40%", :align => "left"} Tags
+      %th{:width => "10%", :align => "left"} Actions
+    -unless @all_feed.blank?
+      -@all_feed.each do |feed|
+        %tr
+          %td{:valign => "top"}
+            = check_box_tag("feed_ids[]", feed.id, false)
+          %td= feed.entry_title
+          %td= feed.tags.collect {|t| t.name }.join(", ")
+          %td
+            = link_to "Edit", edit_admin_news_path(feed)
+            |
+            = link_to "Delete", "/admin/delete_news/#{feed.id}", :confirm => 'Are you sure?'
+      %tr
+        %td{:colspan => 4, :align => "right"}= submit_tag "Delete Selected"
+      = will_paginate @all_feed
+
+    -else
+      %tr
+        %td{:colspan => 4}
+          %p Sorry there is no news
+
+
+ 

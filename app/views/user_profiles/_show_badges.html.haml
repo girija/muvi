@@ -1,0 +1,35 @@
+- @ub = UserBadge.find_by_user_id(@user_profile.user_id)
+- unless @ub.blank?
+  .detail
+    %h3 Badges
+    .clear{:style => "height:4px"}
+    - @badges = ActiveSupport::JSON.decode(@ub['badge_points'])
+    .clear{:style => 'height:10px'}
+    - if @badges['movie'].to_i >= 10
+      .left{:style => "width:120px; height:120px;padding:2px; margin-right:5px;"}
+        - if @badges["movie"].to_i < 100 and @badges['movie'].to_i >= 10 
+          .bronze_badge
+            = image_tag("Bronze_badge.png", :width => 120)
+        - elsif @badges["movie"].to_i < 1000 and @badges["movie"].to_i >= 100
+          .silver_badge
+            = image_tag("Silver_badge.png", :width => 120)
+        - elsif @badges["movie"].to_i >= 1000
+          .gold_badge
+            = image_tag("Gold_badge.png", :width => 120)
+    - celebs =  @badges["celeb"]
+    - celebs.each do |celeb|
+      - if celeb['points'].to_i >= 5  and celeb['points'].to_i < 25
+        - star = Celebrity.find_by_id(celeb['id'])
+        - unless star.blank?
+          %div{:style => 'float:left;width:120px; height:120px;padding:2px; margin-right:5px;position:relative;'}
+            = image_tag('/images/Celeb_Bronze.png', :style => "position: absolute; z-index: 1;")
+            .left{:class => "badge", :style => "position: absolute; z-index:0;background: url('#{star.image}')"}
+      - elsif celeb['points'].to_i >= 25
+        - star = Celebrity.find_by_id(celeb['id'])
+        - unless star.blank?
+          %div{:style => 'float:left;width:120px; height:120px;padding:2px; margin-right:5px;position:relative;'}
+            = image_tag('/images/Celeb_Silver.png', :style => "position: absolute; z-index: 1;")
+            .left{:class => "badge", :style => "position: absolute; z-index:0;background: url('#{star.image}')"}
+       
+         
+    .clear{:style => 'height:10px'}

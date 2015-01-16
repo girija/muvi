@@ -1,0 +1,36 @@
+- @movie_user_reviews.in_groups_of(2) do |group|
+  - group.each do |tweet|
+    - unless tweet.blank?
+      - review =  Review.find_by_id(tweet[1])
+      %div{ :style => "margin:0px 0px 8px 8px; width:260px", :class => "left mas_item"}
+        %div.reviewBox.left
+          %div.image.left
+            = display_image(tweet)
+          %div.reviewIcon.right
+            = thumb_class_for_union_result(tweet)
+          %div.names{:style => "min-height:56px"}
+            %p
+              - unless tweet[3].blank?
+                = truncate(tweet[3].html_safe, :length => 100)
+          .clear
+          %div{:class => "bottom_tab_texts", :style => "width:250px"}
+            = link_to display_name(tweet), "/profile/#{tweet[2]}/#{display_name(tweet)}"
+          %div{:style=>"width:250px"}
+            = link_to "like","/reviews/vote_review/#{review.id}/like", "data-remote" => "true", :class => "label",:id=>"review_like_link_#{review.id}",:onclick=>"check_like_login('#{review.id}')"
+            = link_to "dislike","/reviews/vote_review/#{review.id}/dislike", "data-remote" => "true", :class => "label",:id=>"review_like_link_#{review.id}",:onclick=>"check_like_login('#{review.id}')",:style=>"padding-left:20px;"
+            = link_to "<span style='padding-left:20px;'><span id='count_comment_#{review.id}'>#{review.comments.count}</span> comments</span>".html_safe,"javascript:void(0)",:onclick=>"show_user_review_comments('#{review.id}');"
+          .clear
+            %div{:id=>"user_review_reply_#{review.id}",:style=>"display:none;"}
+              = render '/shared/review_replies', {:review => review}
+
+          %div
+            = form_for([review,Comment.new], :remote => true, :html => {:id => "comment_form_#{review.id}"})  do |f|
+
+              %div{:style => "float:left;margin-left:5px"}
+              - user_id = current_user ? current_user.id : ""
+              %input{:type => "hidden", :id => "user_id",:name=>"user_id", :value => user_id}
+              %textarea{:id => "comment_#{review.id}",:name => "movie_review_comment_#{review.id}", :rows => 1, :cols => 28, :class => "commentBox", :onkeypress => "check_event_submit_comment(event, '#{review.id}','#{user_id}');",:onclick=>"show_user_comments_ontext('#{review.id}');", :placeholder => "Write a comment"}
+              %input{:type => "hidden", :id => "movie_id",:name=>"movie_id", :value => @movie.permalink}
+              %input{:type => "hidden", :id => "parent_id_#{review.id}",:name=>"movie_review_comment", :value => review.id}
+              = f.hidden_field "parent_id"
+

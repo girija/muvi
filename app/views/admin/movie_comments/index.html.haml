@@ -1,0 +1,20 @@
+%h1 Movie Comments
+
+= link_to "Back to Movie", edit_admin_movie_path(@movie)
+%br
+%table.listing
+  %tr
+    %th Comment
+    %th by
+    %th commented on
+    %th
+
+  - @comments.each do |comment|
+    %tr
+      %td= comment.comment
+      %td= comment.user.display_name
+      %td= comment.created_at.to_date
+      %td= link_to 'Delete', admin_movie_movie_comment_path(@movie, comment), :confirm => 'Are you sure?', :method => :delete
+
+= will_paginate @comments
+

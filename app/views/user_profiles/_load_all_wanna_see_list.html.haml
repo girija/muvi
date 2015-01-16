@@ -1,0 +1,38 @@
+- @wanna_see_movies = []
+- if @all_wanna_see && !@all_wanna_see.wanna_see_lists.blank?
+  - all_wanna_see_movies = ActiveSupport::JSON.decode(@all_wanna_see.wanna_see_lists)
+  - all_wanna_see_movies.each do |wanna_see|
+    - @wanna_see_movies  << wanna_see["object"]["id"].to_i
+- unless @wanna_see_movies.blank?
+  .row-list-header.media{:style => 'cursor:pointer;border:1px solid #E5E5E5;padding:5px;margin:3px 0;margin-bottom:-1px;margin-top:8px;background:#f9f9f9', "data-id" => @all_wanna_see.id,:id=>"list_header_#{@all_wanna_see.id}_#{@all_wanna_see.user_id}",:onclick=>"open_wanna_see_list('#{@all_wanna_see.id}', 0, '#{@all_wanna_see.user_id}')"}
+    %a.pull-left{:id=>"poster_#{@all_wanna_see.id}"}
+      - movie = Movie.find_by_id(ActiveSupport::JSON.decode(@wanna_see_movies.to_json).last.to_i)
+      = image_tag "#{POSTER_URL}#{movie.banner_image_medium}", :style => 'height:90px;width:60px;', :class => 'media-object list_poster' if movie
+    .media-body
+      .media-heading.pull-left{:style => 'color:#494949;font-size:28px;font-weight:bold;padding-top:10px;line-height:26px;'}
+        All wanna see movies
+      .clear{:style => 'padding-top: 25px;'}
+        .pull-left
+          =image_tag("/images/share.png",:id=>"share_#{@all_wanna_see.id}_#{@all_wanna_see.user_id}",:style=>"display:none;")
+          - unless current_user.blank?
+            - if current_user.id.to_i !=  params[:user_id].to_i
+              - if !@all_wanna_see.followed_by?(current_user)
+                = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow-all btn-primary bold_class btn-medium tip_hint', "data-id" => "#{@all_wanna_see.id}_#{@all_wanna_see.user_id}", :id => "btn-follow-#{@all_wanna_see.id}-#{@all_wanna_see.user_id}", :style => 'border-radius:2px 2px 2px 2px;width:60px',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+              - else
+                = link_to "Following".html_safe, "#" , :class => 'btn btn-following-all btn-primary bold_class disabled btn-medium', "data-id" => "#{@all_wanna_see.id}_#{@all_wanna_see.user_id}", :id => "btn-follow-#{@all_wanna_see.id}-#{@all_wanna_see.user_id}", :style => 'border-radius:2px 2px 2px 2px;width:65px'
+          - else
+            = link_to "Follow".html_safe, "#" , :class => 'btn btn-follow-login btn-primary bold_class btn-medium tip_hint', "data-id" => "#{@all_wanna_see.id}_#{@all_wanna_see.user_id}", :id => "btn-follow-#{@all_wanna_see.id}-#{@all_wanna_see.user_id}", :style => 'border-radius:2px 2px 2px 2px;width:60px',:'data-toggle'=>"tooltip",:'data-original-title'=>generate_tooltip_block('follow','list_page')
+        .pull-left{:id => "followers-all-#{@all_wanna_see.id}-#{@all_wanna_see.user_id}"}
+          = render "followers_all_seen", :@tagged => @all_wanna_see
+        .pull-right{:style => 'font-size:20px;width:48px;margin-top:-30px; cursor:pointer;'}
+          = "<i class='icon-chevron-down' id='marker#{@all_wanna_see.id}_#{@all_wanna_see.user_id}'></i>".html_safe
+
+  .media{:style => 'display:none',:id=>"movie_list_back_#{@all_wanna_see.id}_#{@all_wanna_see.user_id}", :class=>"movie_list_back_#{@all_wanna_see.id}"}
+    =render template: "user_movie_lists/show_wanna_list", :locals=>{:@list=>@all_wanna_see}
+    
+  :javascript
+    $(document).ready(function($) {
+      if(document.URL.indexOf("/all_wanna_see_list") != -1){              
+        open_movie_list('#{@all_wanna_see.id}', 0, '#{@all_wanna_see.user_id}')
+      }
+    });

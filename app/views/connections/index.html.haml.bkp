@@ -1,0 +1,23 @@
+-unless @registered_user.blank?
+  =render :partial => "show_registered"
+
+.clear{:style => "height:10px"}
+
+-unless @unregistered_user.blank?
+  =render :partial => "show_unregistered"
+
+.clear{:style => "height:10px"}
+
+/-unless @remind_user.blank?
+/  =render :partial => "show_remind_user"
+  
+
+-if @registered_user.blank? and @unregistered_user.blank? and @remind_user.blank?
+  %h2{:style => "font-size:12px"}
+    You don't have any connections. 
+    .clear
+    Search for people and add them to your connection!
+/  - if current_user && current_user.facebook_omniauth.blank?
+/    = link_to image_tag("facebook_64.png",  :alt => "facebook"), "/auth/facebook"
+/    %br to see your connections
+

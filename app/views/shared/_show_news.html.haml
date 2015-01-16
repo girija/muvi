@@ -1,0 +1,9 @@
+-@news.each do |n|
+  -feed = Feed.get_news_feed(n.taggable_id)
+  /=link_to Feed.get_news_feed(n.taggable_id), "/news/celebrity/#{@celebrity.name}/#{n.id}", :style => "color:#4F4F4F;font-weight:normal"
+  %h5= link_to feed.entry_title, "/news/star/#{@celebrity.name}/#{n.id}", :style => "color:#4F4F4F;"
+  .clear
+  =feed.summary.html_safe
+  =link_to "More", "/news/star/#{@celebrity.name}/#{n.id}", :class => "right"
+.clear
+

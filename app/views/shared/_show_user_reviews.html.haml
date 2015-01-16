@@ -1,0 +1,72 @@
+.clear{:style=>"height:5px;"}
+  -movie = @movie
+  %div{:style=>"padding-top:5px;"}
+    %div{:style=>"float:left;font-weight:bold;padding-top:9px;font-size:12px;"}
+      Your review
+    = form_for [movie, Review.new],:remote => true,:html=>{:id => "user_review_form"} do |f|
+      %div{:style => "height:33px;width:88px;float:left;padding-left:15px;padding-top:5px;"}
+        %input{:type=> 'hidden', :name => "review[rating]", :value => 0 , :id => 'review_rating_block'}
+        - if current_user && current_user.reviwed_movie?(movie)
+          - if current_user.my_rating(movie) && current_user.my_rating(movie) >= 3
+            %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+              = image_tag("new_like_active.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px;border:0 none;", :id => 'like_it_btn_block')
+              =generate_tooltip_block("movie_like","movie_page")
+            %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+              = image_tag("d_like.png", :style => "float:right;cursor:pointer;padding-right:1px;padding-top:1px;border:0 none;", :onclick => "form_reviewblock_submit('#{movie.id}',2)", :id => 'not_like_it_btn_block')
+              =generate_tooltip_block("movie_dislike","movie_page")
+          - else
+            %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+              = image_tag("new_like.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px;border:0 none;", :onclick => "form_reviewblock_submit('#{movie.id}',4)" , :id => 'like_it_btn_block')
+              =generate_tooltip_block("movie_like","movie_page")
+            %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+              = image_tag("d_like_active.png", :style => "float:right;cursor:pointer;padding-right:1px;padding-top:1px;border:0 none;", :id => 'not_like_it_btn_block')
+              =generate_tooltip_block("movie_dislike","movie_page")
+        - else
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            = image_tag("new_like.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px;border:0 none;", :onclick => "form_reviewblock_submit('#{movie.id}',4)" , :id => 'like_it_btn_block')
+            =generate_tooltip_block("movie_like","movie_page")
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            = image_tag("d_like.png", :style => "float:right;cursor:pointer;pointer;padding-right:1px;padding-top:1px;border:0 none;", :onclick => "form_reviewblock_submit('#{movie.id}',2)", :id => 'not_like_it_btn_block')
+            =generate_tooltip_block("movie_dislike","movie_page")
+      %div{:style => "float:left;padding-left:5px;"}
+        - user_id = current_user ? current_user.id : ""
+        =hidden_field_tag "inner_review","",:value=>"true"
+        =hidden_field_tag "show_com_box","",:value=>"0"
+        =f.text_area :description ,:id => "user_review", :class => "commentBox",:style=>"width:315px;border:1px solid #D2D6D9;display:none;", :onkeypress => "check_event_and_submit_review(event,'#{user_id}');", :placeholder => "Add a comment"
+  .clear
+  - if movie.reviews.count < 2
+    %div{:style=>"height:140px;font-family:Tahoma;color:#999B9C;"}
+      %div{:style=>"font-size:32px;"}
+        Add your review and get featured here
+      %div{:style => "font-size:16px;"}
+        Your reviews get shared with your friends on Facebook and followers on Muvi
+  %div
+    -movie.reviews.order("id desc").limit(5).each do |comment|
+      %div{:id => "comment_#{comment.id}"}
+        %div{:class=>'image left tip_hint tooltipbottom',:style=>"height:37px;width:37px;"}
+          - ub = UserBadge.find_by_user_id(comment.user.id)
+          - if !ub.blank?
+            - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+            - if points >= 1 and points < 5
+              - level = "Level: Muvi Scraper"
+            - elsif points >= 5 and points < 10
+              - level = "Level: Muvi Junkie"
+            - elsif points >= 10
+              - level = "Level: Muvi Maniac"
+          = link_to image_tag(comment.user.user_image, :style=>"width:37px;height:37px;border: 1px solid #EEEEEE;"), "/profile/#{comment.user.id}/#{comment.user.display_name}"
+          .tooltip_description{:style =>'display:none'}
+            %b
+              = comment.user.display_name
+            %br
+              = level
+        %div{:style=>"margin-left:20px;height:40px;float:left;width:420px;"}
+          = "<span style='font-weight:normal;font-size:13px;'>#{comment.description.truncate(125)}</span>".html_safe if comment.description
+          %div{:style=>"color:#8b8484;font-size:10px;"}
+            = link_to comment.user.display_name, "/profile/#{comment.user.id}/#{comment.user.display_name}", :style=>"color:#8b8484;font-size:10px;font-weight:normal;"
+            ,
+            = distance_of_time_in_words(Time.now, comment.created_at.to_time) + " ago"
+        %div.reviewIcon.right{:style=>"padding-right:20px;"}
+          = display_egg(comment)
+      .clear{:style=>"height:10px;"}
+.clear
+

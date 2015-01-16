@@ -1,0 +1,12 @@
+%div.sortbyDate.left
+  %label  Filter By:
+  = select_tag "sort", options_for_select([['All reviews', 'all'], ['Jhakaas','pos'], ['Bakwaas','neg']], params[:sort] || 'release_date' ) , :onchange => "critics_reviews_sort(#{@movie.id}, this.value);"
+.right
+  #pagination
+    = will_paginate(@critics_reviews, :params => {:controller => "critics_reviews" , :action => "index", :id => @movie.id })
+
+.clear
+%div{:id=>"mas_container"}
+  =render '/shared/critics_reviews_page'#, {:critics_reviews => @critics_reviews} 
+.clear
+/= pageless(@critics_reviews.total_pages, "/critics_reviews?id=#{@movie.id}","mas_container")

@@ -1,0 +1,28 @@
+= f.fields_for :film_critic do |fc|
+  = fc.label :name, "Name"
+  = fc.text_field :name
+  .clear
+  = fc.label :organization, "Organization"
+  = fc.text_field :organization
+  .clear
+  = fc.label :thumbnail_image, "Image"
+  /= image_tag(fc.object.thumbnail_image.url(:thumb)) unless fc.object.new_record?
+  -unless fc.object.thumbnail_image_file_name.blank?
+    =image_tag("/system/thumbnail_images/#{fc.object.id}/thumb/#{fc.object.thumbnail_image_file_name.gsub(" ", "%20")}")
+
+  = fc.file_field :thumbnail_image
+  .clear
+
+= f.label :email, "Email"
+= f.text_field :email
+.clear
+= f.label :password, "Password"
+= f.password_field :password
+.clear
+%hr
+.clear
+.actions
+  = f.submit 'Save'
+  \- or -
+  = link_to 'Cancel', admin_film_critics_path
+

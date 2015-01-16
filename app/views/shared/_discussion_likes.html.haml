@@ -1,0 +1,11 @@
+- vote_user = User.find_by_id(vote.voter_id)
+%div
+  %div{:class => "image left",:style=>"height:42px;width:42px;"}
+    =link_to image_tag(vote_user.user_image, :style=>"width:40px;height:40px;border: 1px solid #EEEEEE;"), "/profile/#{vote_user.id}/#{vote_user.display_name}"
+
+
+  %div{:style => "float:left;margin-left:5px"}
+    = link_to vote_user.display_name, "/profile/#{vote_user.id}/#{vote_user.display_name}"
+  .clear
+  %br
+

@@ -1,0 +1,28 @@
+= render 'shared/meta_title_and_keywords', { :object => @movie }
+= content_for :heading do
+  %span Movie Review:
+  = @movie.name
+
+/= content_for :breadcrumb do
+/  %span
+/    = link_to "Home &#187;".html_safe, root_path
+/    = link_to "Reviews &#187;".html_safe, root_path
+/    = @movie.name
+
+%div{ :style => "width:315px;margin:5px 0px 10px 20px;", :class => "left"}
+  %div.reviewBox.left
+    %div.reviewIcon.right
+      = rating_thumb(@review.rating)
+    %div.reviewText.left
+      %p
+        = @review.description.html_safe
+  .clear
+  .review
+    .photo.left
+      = image_tag(@review.user.image)
+    .profile.right
+      %h3= @review.user.display_name
+      %p Muvi
+      %p.date= Time.parse(@review.created_at.to_s).strftime('%d %B %Y').to_s rescue ''
+.clear
+

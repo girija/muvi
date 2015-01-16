@@ -1,0 +1,45 @@
+.sidebar.right
+  .GrayHeaderBox
+    %h3 Friends Activity
+    -if current_user && current_user.facebook_omniauth
+      -Activity.friend_activities(current_user).each do |activity|
+        .row
+          .image.left
+            = image_tag("https://graph.facebook.com/#{activity.facebook_id}/picture")
+          %p
+            = activity_message(activity)
+    - else
+      -if current_user && current_user.facebook_omniauth.blank?
+        %p{:style=>"padding-top: 6px;"}
+          = link_to image_tag("facebook_64.png",  :alt => "facebook"), "/auth/facebook"
+          %br
+          to see movies your friends like and want to watch
+      -else
+        %p{:style=>"padding-top: 6px;"}
+          = link_to "Login", new_user_session_path, :remote => true, :onclick => "login();"
+          to see movies your friends like and want to watch
+  .GrayHeaderBox
+    -if request.fullpath =~ /coming_soon_movies/
+      %h3 Trending Now
+      -TopTrending.includes(:movie).all.each do |tb|
+        .row
+          .image.left
+            =image_tag(tb.movie.banner_image_thumb, :width => 42, :height => 42)
+          .icon.right
+          /  %a{:href => "#"}
+          /    = thumb_class(tb.movie.critics_percent)
+          .names.left
+            %h4= link_to tb.movie.name, path_for_movie(tb.movie)
+
+    -else
+      %h3 Trending Now
+      -unless TopTrending.first.blank?
+        -TopTrending.includes(:movie).all.each do |tb|
+          .row
+            .image.left
+              =image_tag(tb.movie.banner_image_thumb, :width => 42, :height => 42)
+            .icon.right
+            /  %a{:href => "#"}
+            /    = thumb_class(tb.movie.critics_percent)
+            .names.left
+              %h4= link_to tb.movie.name, path_for_movie(tb.movie)

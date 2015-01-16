@@ -1,0 +1,1127 @@
+class Movie < ActiveRecord::Base
+  require 'arel'
+  require 'open-uri'
+  require 'nokogiri'
+
+  #include MixinSitemap
+
+  #TODO: setting-up external database. This works but doesn't look nice. try using some plugin.
+  $config = YAML.load_file(File.join(File.dirname(__FILE__), '../../config/database.yml'))
+  self.establish_connection  $config["muvi_extract"]
+  set_table_name 'films'
+  set_primary_key :id
+  acts_as_commentable
+  # has_friendly_id :name
+  has_permalink [:name], :update => true
+  
+  #has_attached_file :poster, :styles => { :thumb=> "35x35#", :medium  => "130x200#" },
+  #              :url => "/system/:attachment/:id/:style/:filename",
+  #              :path => ":rails_root/public/system/:attachment/:id/:style/:basename.:extension"
+
+  #has_attached_file :poster
+  #has_attached_file :trailer
+
+  def to_param
+    permalink
+  end
+  serialize :genre
+
+  after_save :check_name_is_blank
+  #after_save :if_name_is_dictionary_word
+
+
+  has_many :reviews , :dependent => :destroy
+  has_many :reviwers, :through => :reviews, :source => :user
+  has_many :recommendations, :dependent => :destroy
+  has_many :tweets, :dependent => :destroy
+  has_many :facebook_feeds, :dependent => :destroy
+  has_many :critics_reviews, :dependent => :destroy
+  has_one :meta_detail, :dependent => :destroy
+  #has_many :video, :dependent => :destroy
+  has_many :movie_casts, :dependent => :destroy
+  #has_many :poster, :dependent => :destroy
+  #to do better way .
+
+  has_many :actors,  :class_name => 'MovieCast', :conditions => { "cast_type" => "actor" }
+  has_many :crew_members,  :class_name => 'MovieCast', :conditions => [ "cast_type != ?", 'actor' ]
+#  has_many :producers,  :class_name => 'MovieCast', :conditions => { "cast_type" => "producer" }
+ # has_many :musics,  :class_name => 'MovieCast', :conditions => { "cast_type" => "musics" }
+ # has_many :writers,  :class_name => 'MovieCast', :conditions => { "cast_type" => "writer" }
+ # has_many :cinematographers,  :class_name => 'MovieCast', :conditions => { "cast_type" => "cinematographer" }
+ # has_many :distributors,  :class_name => 'MovieCast', :conditions => { "cast_type" => "distributor" }
+ # has_many :editors,  :class_name => 'MovieCast', :conditions => { "cast_type" => "editor" }
+
+  #accepts_nested_attributes_for :meta_detail,:video, :movie_casts, :critics_reviews,:poster,  :allow_destroy => true
+  accepts_nested_attributes_for :meta_detail, :movie_casts, :critics_reviews,  :allow_destroy => true
+  accepts_nested_attributes_for :movie_casts, :reject_if => proc { |attributes| attributes['celebrity_id'].blank? }, :allow_destroy => true
+  accepts_nested_attributes_for :actors, :reject_if => proc { |attributes| attributes['celebrity_id'].blank? }, :allow_destroy => true
+  accepts_nested_attributes_for :crew_members, :reject_if => proc { |attributes| attributes['celebrity_id'].blank? }, :allow_destroy => true
+  accepts_nested_attributes_for :tweets, :allow_destroy => true
+
+  scope :find_using_id, lambda {|perm| where("permalink = ?", perm) }
+  scope :latest, order('release_date desc nulls last')
+  scope :sort_by_release_date_asc, order('release_date asc nulls last')
+  scope :sort_by_user_interest_desc, order('user_percent desc nulls last')
+  scope :sort_by_media_updated_date, order('media_updated_date desc nulls last')
+  scope :limit, lambda{|l| limit(limit) }
+  scope :name_is_not_blank, where("name IS NOT NULL")
+  scope :released, where("release_date <= ?", (Date.today + 2))
+  scope :comming_soon_movies, where("release_date > ?  or release_date IS NULL", (Date.today + 2))
+  scope :name_without_dictionary_word, where("dictionary_word = ?", false)
+  scope :name_with_dictionary_word, where("dictionary_word = ?", true)
+  scope :this_year, where("release_date >= ?  and release_date IS NOT  NULL", Date.today.beginning_of_year.to_s)
+  scope :todays_new_movies, where(:created_at => (Date.today.beginning_of_day)..Date.today.end_of_day)
+  scope :todays_updated_movies, where(:updated_at => (Date.today.beginning_of_day)..Date.today.end_of_day)
+  scope :todays_poster, where(:poster_updated_at => (Date.today.beginning_of_day)..Date.today.end_of_day)
+  scope :this_month, where("release_date >= ?  and release_date IS NOT  NULL", Date.today.beginning_of_month.to_s)
+  scope :past1month_upcoming_movies, where("release_date >= ?  or release_date IS NULL", (Date.today - 30).to_s)
+  scope :non_dictionary, where(:dictionary_word => false)
+  scope :theatres_this_week, where(:release_date => (Date.today - 4)..(Date.today + 5)).order('release_date desc')
+  scope :dictionary_film, where(:dictionary_word => true)
+  scope :released_tweet_fetch, where(:release_date => (Date.today - 14)..(Date.today))
+  scope :coming_soon_six_months, where(:release_date => (Date.today)..(Date.today + 180))
+  scope :sort_by_tweet_percent_desc, order('tweet_percent desc nulls last')
+
+  scope :this_week, where(:created_at => (Date.today - 4)..(Date.today + 5)).order('created_at desc')
+
+  #def self.find_for_sitemap
+  #  find(:all, :order => "id")
+  #end
+
+
+  def check_name_is_blank
+    self.update_attribute('name', 'unnamed') if self.name.blank?
+  end
+
+
+  def if_name_is_dictionary_word
+    if self.dictionary_word
+      self.tweets.each do |tweet|
+        TweetIgnNeu.create(tweet.attributes.except("id", "updated_at", "created_at"))
+        tweet.destroy
+      end
+      self.facebook_feeds.posts.destroy_all
+    end
+  end
+
+
+  def banner_image
+    #self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/medium/#{self.poster_file_name}"
+    poster = Poster.check_for_default_poster(self.id, "Movie", "Poster", "poster")
+    if poster == false
+      self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/medium/#{self.poster_file_name}"
+    else
+      poster_image = Poster.where("id IN (#{poster})").find(:all, :conditions => ["rank = 1"], :order => ["id desc"]).first
+      unless poster_image.blank?
+        return "/system/posters/#{poster_image.id}/medium/#{poster_image.poster_file_name}"
+      else
+        self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/medium/#{self.poster_file_name}"
+      end
+    end
+  end
+
+  def banner_image_thumb
+    #self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/thumb/#{self.poster_file_name}"
+    poster = Poster.check_for_default_poster(self.id, "Movie", "Poster", "poster")
+    if poster == false
+      self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/thumb/#{self.poster_file_name}"
+    else
+      poster_image = Poster.where("id IN (#{poster})").find(:all, :conditions => ["rank = 1"], :order => ["id desc"]).first
+      unless poster_image.blank?
+        return "/system/posters/#{poster_image.id}/thumb/#{poster_image.poster_file_name}"
+      else
+        self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/thumb/#{self.poster_file_name}"
+      end
+    end
+
+  end
+
+  def full_image
+    #self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/original/#{self.poster_file_name}"
+    poster = Poster.check_for_default_poster(self.id, "Movie", "Poster", "poster")
+    if poster == false
+      self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/original/#{self.poster_file_name}"
+    else
+      poster_image = Poster.where("id IN (#{poster})").find(:all, :conditions => ["rank = 1"], :order => ["id desc"]).first
+      unless poster_image.blank?
+        return "/system/posters/#{poster_image.id}/original/#{poster_image.poster_file_name}"
+      else
+      self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/original/#{self.poster_file_name}"
+      end
+    end
+  end
+
+  def standard_image
+    poster = Poster.check_for_default_poster(self.id, "Movie", "Poster", "poster")
+    if poster == false
+      self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/original/#{self.poster_file_name}"
+    else
+      poster_image = Poster.where("id IN (#{poster})").find(:all, :conditions => ["rank = 1"], :order => ["id desc"]).first
+      unless poster_image.blank?
+        return "/system/posters/#{poster_image.id}/standard/#{poster_image.poster_file_name}"
+      else
+      self.poster_file_name.blank?? '/images/no-image.png' : "/system/posters/#{self.id}/standard/#{self.poster_file_name}"
+      end
+    end
+  end
+
+
+
+  def average_rating
+    reviews.blank? ? 'No ratings yet' : reviews.select("SUM(rating) as total").first.total.to_i / reviews.count
+  end
+
+  def average_rating_percent
+    #reviews.blank? ? 0 : (100 * reviews.select("SUM(rating) as total").first.total.to_i) / (reviews.count * 5) rescue 0
+    tweets.blank? ? 0 : (100 * tweets.select("SUM(rating) as total").first.total.to_i) / tweets.count(:all,:conditions=>["interest = ?","f"]) rescue 0
+  end
+
+  def average_rating_count
+    #reviews.blank? ? 0 : reviews.count
+    tweets.blank? ? 0 : tweets.count rescue 0
+  end
+
+  def average_critics_reviews_rating_percent
+    critics_reviews.blank? ? 0 : (100 * critics_reviews.select("SUM(rating) as total").first.total.to_i) / (critics_reviews.count * 5)
+  end
+
+  def fb_friends_liked(user)
+    #user.facebook_friend_likes(user.facebook_omniauth.uid).by_fb_item_id(self.fbpage_id) unless user.facebook_omniauth.blank?
+    return 0 if user.blank? || user.facebook_friends.blank?
+    return self.facebook_feeds.friend_likes.friends_ids(user.facebook_friends_ids).count rescue 0
+  end
+
+
+  def self.fetch_tweets_and_facebook_feeds
+    delay = 0
+    Movie.name_is_not_blank.name_without_dictionary_word.latest.each do |movie|
+      Tweet.delay({:run_at => delay.minutes.from_now}).fetch_tweet_for_movie(movie)
+      FacebookFeed.delay({:run_at => delay.minutes.from_now}).fetch_all_post_for_movie(movie)
+      delay += 15
+    end
+  end
+
+  def friend_likes(user) # this method is used in movie show
+    return [] if user.blank? || user.facebook_friends.blank?
+    self.facebook_feeds.friend_likes.friends_ids(user.facebook_friends_ids).limit(4)
+  end
+
+  def like_or_interest
+    if self.release_date.blank? || self.release_date > Date.today
+      return 'interested'
+    else
+      return 'liked'
+    end
+  end
+
+  def self.top_box_office(limit_to)
+    self.order(:release_date).order(:gross_revenue).limit(limit_to)
+  end
+
+  def self.top_trending(limit_to)
+    #self.select('films.*, SUM(tweets.id) as no_of_tweets').joins(:tweets).order("no_of_tweets").order(4)
+    []
+  end
+
+  def self.update_reviews_precentage
+    Movie.latest.includes(:tweets, :reviews, :critics_reviews).each do |movie|
+      #review_count = movie.reviews.blank? ? 0 : (100 * movie.reviews.select("SUM(rating) as total").first.total.to_i) / (movie.reviews.count * 5) rescue 0
+      #critics_percent = movie.critics_reviews.blank? ? 0 : (100 * movie.critics_reviews.select("SUM(rating) as total").first.total.to_i) / (movie.critics_reviews.count * 5)
+     # if review_count == 0 || tweet_count == 0
+     #   user_percent =  (review_count + tweet_count)
+     # else
+     #   user_percent =  (review_count + tweet_count)/ 2 rescue 0
+     # end
+      #if movie.release_date.blank?
+      #    tweet_percent = movie.tweets.reviews.pos_or_neg.blank? ? 0 : ((100 * movie.tweets.reviews.pos_or_neg.select("SUM(rating) as total").first.total.to_i) / movie.tweets.reviews.pos_or_neg.count)  rescue 0
+      #elsif  movie.release_date <= Date.today
+      #    tweet_percent = movie.tweets.reviews.pos_or_neg.blank? ? 0 : ((100 * movie.tweets.reviews.pos_or_neg.select("SUM(rating) as total").first.total.to_i) / movie.tweets.reviews.pos_or_neg.count)  rescue 0
+      #else
+      #    tweet_percent = movie.tweets.interests.pos_or_neg.blank? ? 0 : ((100 * movie.tweets.interests.pos_or_neg.select("SUM(rating) as total").first.total.to_i) / movie.tweets.interests.pos_or_neg.count)  rescue 0
+      #end
+      #user_percent = tweet_percent
+      #movie.update_attribute('critics_percent', critics_percent) unless movie.critics_percent == critics_percent
+      #movie.update_attribute('user_percent',  user_percent) unless movie.user_percent == user_percent
+      Movie.update_one_movie_percentage(movie)
+      
+    end
+  end
+
+def self.update_one_movie_percentage(movie)
+      review_count = movie.reviews.blank? ? 0 : (100 * movie.reviews.select("SUM(rating) as total").first.total.to_i) / (movie.reviews.count * 5) rescue 0
+      critics_percent = movie.critics_reviews.blank? ? 0 : movie.critics_reviews.count < 10 ? (((100 * movie.critics_reviews.select("SUM(rating) as total").first.total.to_i) / (movie.critics_reviews.count * 5)) + ( 0.05 * ((100 * movie.critics_reviews.select("SUM(rating) as total").first.total.to_i) / (movie.critics_reviews.count * 5)))) < 100 ? (((100 * movie.critics_reviews.select("SUM(rating) as total").first.total.to_i) / (movie.critics_reviews.count * 5)) + ( 0.05 * ((100 * movie.critics_reviews.select("SUM(rating) as total").first.total.to_i) / (movie.critics_reviews.count * 5)))) > 15 ? (((100 * movie.critics_reviews.select("SUM(rating) as total").first.total.to_i) / (movie.critics_reviews.count * 5)) + ( 0.05 * ((100 * movie.critics_reviews.select("SUM(rating) as total").first.total.to_i) / (movie.critics_reviews.count * 5)))) : 15 : 98 : (100 * (movie.critics_reviews.where("rating > 2.5").count/movie.critics_reviews.count)) < 100 ? (100 * (movie.critics_reviews.where("rating > 2.5").count/movie.critics_reviews.count)) > 15 ? (100 * (movie.critics_reviews.where("rating > 2.5").count/movie.critics_reviews.count)) : 15 : 98
+      user_percent = movie.reviews.blank? ? 0 : movie.reviews.count < 5 ? 0 : (100 * movie.reviews.select("SUM(rating) as total").first.total.to_i) / (movie.reviews.count * 5)
+      if movie.release_date.blank?
+          tweet_percent = movie.tweets.tweets_this_week.interests.pos_or_neg.blank? ? 0 : movie.tweets.tweets_this_week.interests.pos_or_neg.count < 20 ? movie.tweets.tweets_this_week.interests.pos_or_neg.select("SUM(rating) as total").first.total.to_i  : ((100 * movie.tweets.tweets_this_week.interests.pos_or_neg.select("SUM(rating) as total").first.total.to_i) / movie.tweets.tweets_this_week.interests.pos_or_neg.count)  rescue 0
+          tweet_count = movie.tweets.tweets_this_week.reviews.pos_or_neg.count
+      elsif  movie.release_date <= Date.today
+          tweet_percent = movie.tweets.reviews.pos_or_neg.blank? ? 0 : movie.tweets.reviews.pos_or_neg.count < 100 ? 0 : ((100 * movie.tweets.reviews.pos_or_neg.select("SUM(rating) as total").first.total.to_i) / movie.tweets.reviews.pos_or_neg.count)  rescue 0
+          tweet_count = movie.tweets.reviews.pos_or_neg.count
+      else
+          tweet_percent = movie.tweets.tweets_this_week.interests.pos_or_neg.blank? ? 0 : movie.tweets.tweets_this_week.interests.pos_or_neg.count < 20 ? movie.tweets.tweets_this_week.interests.pos_or_neg.select("SUM(rating) as total").first.total.to_i : ((100 * movie.tweets.tweets_this_week.interests.pos_or_neg.select("SUM(rating) as total").first.total.to_i) / movie.tweets.tweets_this_week.interests.pos_or_neg.count)  rescue 0
+          tweet_count = movie.tweets.tweets_this_week.interests.pos_or_neg.count
+      end
+
+      critics_denom =  critics_percent != 0? 2 : 0
+      user_denom = user_percent != 0? 1 : 0
+      tweet_denom = tweet_percent != 0? 1 : 0
+      muvi_meter_denom = critics_denom + user_denom + tweet_denom
+
+      if  muvi_meter_denom != 0
+         muvi_meter = ((2 * critics_percent) + user_percent + tweet_percent)/ muvi_meter_denom
+      else
+          muvi_meter = 0
+      end
+      movie.update_attribute('tweets_count', tweet_count) unless movie.tweets_count == tweet_count
+      movie.update_attribute('tweet_percent', tweet_percent) unless movie.tweet_percent == tweet_percent
+      movie.update_attribute('critics_percent', critics_percent) unless movie.critics_percent == critics_percent
+      movie.update_attribute('user_percent',  user_percent) unless movie.user_percent == user_percent
+      movie.update_attribute('muvimeter',muvi_meter.round) unless movie.muvimeter == muvi_meter.round
+  end
+
+def self.update_muvimeter_all
+ Movie.find(:all).each do |movie|
+  update_one_movie_percentage(movie)
+  puts movie.name
+ end
+end
+
+  def self.update_reviews_percentage_movie(movie_name)
+    puts movie_name
+    Movie.where(:name => movie_name).each do |movie| 
+    puts movie.tweets.reviews.pos_or_neg
+    tweet_count = movie.tweets.reviews.pos_or_neg.blank? ? 0 : ((100 * movie.tweets.reviews.pos_or_neg.select("SUM(rating) as total").first.total.to_i) / movie.tweets.reviews.pos_or_neg.count)  rescue 0
+    puts tweet_count
+    end
+  end
+
+  def self.update_top_box_office
+    TopBoxOffice.destroy_all
+    Movie.top_box_office(4).each_with_index do |movie, idx|
+      TopBoxOffice.create({:movie_id => movie.id, :position => idx})
+    end
+  end
+
+  def self.update_top_trending
+    TopTrending.destroy_all
+    date = (Date.today - 7).to_date.to_s
+    # tweets_count+facebook_feeds_count+reviews_count
+    Movie.find_by_sql("select id, (tweets_count) as count from films where release_date >='#{date}' order by count DESC limit 4;").each_with_index do |movie, idx|
+      TopTrending.create({:movie_id => movie.id, :position => idx})
+    end
+  end
+
+  def self.update_tweets_count
+    Movie.latest.each do |movie|
+     if movie.release_date.blank?
+      movie.update_attributes(:tweets_count => movie.tweets.interests.pos_or_neg.count)
+     elsif movie.release_date > Date.today
+      movie.update_attributes(:tweets_count => movie.tweets.interests.pos_or_neg.count)
+     else
+      movie.update_attributes(:tweets_count => movie.tweets.reviews.pos_or_neg.count)
+     end 
+    end
+  end
+
+  def self.update_all_counters
+    Movie.latest.all.each do |movie|
+      hash = {:tweets_count => -movie.tweets_count, :facebook_feeds_count => -movie.facebook_feeds_count, :movie_casts_count => -movie.movie_casts_count, :critics_reviews_count => -movie.critics_reviews_count, :reviews_count =>  -movie.reviews_count }
+      Movie.update_counters movie.id, hash
+
+      hash = {:tweets_count => movie.tweets.reviews.pos_or_neg.count, :facebook_feeds_count => movie.facebook_feeds.count, :movie_casts_count => movie.movie_casts.count, :critics_reviews_count => movie.critics_reviews.count, :reviews_count => movie.reviews.count}
+      Movie.update_counters movie.id, hash
+    end
+  end
+
+  def update_tweets_count_after_tweet_delete
+    self.update_attribute('tweets_count', self.tweets.reviews.pos_or_neg.count)
+  end
+
+  def self.delete_tweets_and_facebook_posts_for_dictionary_word_movies
+    Movie.name_with_dictionary_word.each do |movie|
+      
+      movie.tweets.destroy_all
+      #movie.tweets.each do |tweet|
+      #  TweetIgnNeu.create(tweet.attributes.except("id", "updated_at", "created_at"))
+      #  tweet.destroy
+      #end
+      movie.facebook_feeds.posts.destroy_all
+    end
+    Movie.delay.update_all_counters
+    Movie.delay.update_reviews_precentage
+  end
+
+
+  def self.fetch_movie_info
+   Movie.where(" wiki_link like  '%imdb.com/title/%' and poster_release_date is null ").each do |movie|
+     begin
+     #imdb_link = "http://www.imdb.com/find?s=tt&q=" + movie.name
+     #doc = Nokogiri::HTML(open(URI.parse(URI.encode(imdb_link))))
+     #puts movie.name,URI.encode(imdb_link)
+     #mov_rel_date = doc.xpath("//div[@id='wrapper']/div[@id='root']/div[@id='pagecontent']/div[@id='content-2-wide']/div[@id='main']/div[@class='article title-overview']/div/table[@id = 'title-overview-widget-layout']/tr/td[@id = 'overview-top']/div[@class = 'infobar']/span[@class = 'nobr']/a").text
+     #if mov_rel_date.length == 0
+     #  mov_rel_date = doc.xpath("//div[@id='wrapper']/div[@id='root']/div[@id='pagecontent']/div[@id='content-2-wide']/div[@id='main']/div[@class='article title-overview']/div/table[@id = 'title-overview-widget-layout']/tr/td[@id = 'overview-top']/h1/span/a").text
+     #end
+     api_link = "http://www.imdbapi.com/?i=" + movie.wiki_link[26..34]
+     doc2 = Net::HTTP.get_response(URI.parse(api_link))
+    data = doc2.body
+    result = JSON.parse(data)
+    mov_poster_path = result["Poster"]
+    puts movie.name
+    puts mov_poster_path.to_s
+     if mov_poster_path.to_s != 'N/A'
+      image = File.new("/home/ubuntu/muvi.in/public/thumbnails/imdb/"+movie.name.gsub(' ','_')+".png","wb")
+      image << open(mov_poster_path.to_s).read
+      movie.poster = File.new('/home/ubuntu/muvi.in/public/thumbnails/imdb/' + movie.name.gsub(' ','_')+'.png')
+      movie.save
+     end
+     #mov_dir_name = doc.xpath("//div[@id='wrapper']/div[@id='root']/div[@id='pagecontent']/div[@id='content-2-wide']/div[@id='main']/div[@class='article title-overview']/div/table[@id = 'title-overview-widget-layout']/tr/td[@id = 'overview-top']/div[@class='txt-block']/a[1]").text
+    #mov_cast_name =doc.xpath("//div[@id='wrapper']/div[@id='root']/div[@id='pagecontent']/div[@id='content-2-wide']/div[@id='main']/div[@class='article title-overview']/div/table[@id = 'title-overview-widget-layout']/tr/td[@id = 'overview-top']/div[@class='txt-block'][2..5]").text
+     #mov_poster_path = doc.xpath("//div[@id='wrapper']/div[@id='root']/div[@id='pagecontent']/div[@id='content-2-wide']/div[@id='main']/div[@class='article title-overview']/div/table[@id = 'title-overview-widget-layout']/tr/td[@id='img_primary']/a/img/@src")
+     #puts mov_poster_path.to_s
+     #if mov_poster_path.to_s != ''
+     # image = File.new("/home/ubuntu/muvi.in/public/thumbnails/imdb/"+movie.name.gsub(' ','_')+".png","wb")
+     # image << open(mov_poster_path.to_s).read
+     # movie.poster = File.new('/home/ubuntu/muvi.in/public/thumbnails/imdb/' + movie.name.gsub(' ','_')+'.png')
+     # movie.save
+    #end
+    rescue
+     puts movie.name
+     next
+  #  begin
+     #api_link = "http://www.imdbapi.com/?i=" + movie.wiki_link[26..34]
+     #puts api_link
+     #doc2 = Net::HTTP.get_response(URI.parse(api_link))
+     #data = doc2.body
+     #result = JSON.parse(data)
+     #puts result
+     #puts mov_rel_date
+     #puts mov_dir_name
+     #puts mov_cast_name
+    #movie.update_attributes(:initial_release_date => mov_rel_date, :wiki_link => movie.wiki_link + " , " + URI.encode(imdb_link))
+  #  rescue
+  #   puts movie.name + "INFO"
+  #   next
+    end
+    end
+  end
+
+  def self.google_fetch_poster
+    goog_link = "http://www.google.com/search?tbm=isch&hl=en&source=hp&q="
+    goog_options = "&btnG=Search+Images&gbv=2&aq=f&aqi=&oq=&sout=1&biw=1&bih=1"
+    Movie.where(" release_date is not null and poster_file_name is null ").each do |movie|
+      begin
+      fetch_url1 = goog_link + movie.name + " " + movie.release_date.to_s[0..3] + goog_options
+      doc = Nokogiri::HTML(open(URI.parse(URI.encode(fetch_url1))))
+      poster_link = /http(.*?)\&/.match(doc.xpath("//table/tr[1]/td[1]/a[1]/@href").to_s)
+      movie_poster_path =  poster_link.to_s.chop
+      puts movie.name , movie_poster_path
+      image = File.new("/home/ubuntu/muvi.in/public/thumbnails/imdb/"+movie.name.gsub(' ','_')+movie_poster_path[-4,4],"wb")
+      image << open(movie_poster_path).read
+      movie.poster = File.new('/home/ubuntu/muvi.in/public/thumbnails/imdb/' + movie.name.gsub(' ','_')+movie_poster_path[-4,4])
+      movie.save
+
+      rescue
+        begin
+        puts "rescued"+movie.name
+        poster_link_1 = /http(.*?)http/.match(doc.xpath("//table/tr[1]/td[1]/a[1]/img/@src").to_s)
+        poster_link = poster_link_1.to_s.chop.chop.chop.chop.chop
+        puts poster_link
+        image = File.new("/home/ubuntu/muvi.in/public/thumbnails/imdb/"+movie.name.gsub(' ','_')+".jpg","wb")
+        image << open(poster_link).read
+        movie.poster = File.new('/home/ubuntu/muvi.in/public/thumbnails/imdb/' + movie.name.gsub(' ','_')+".jpg")
+        movie.save
+        rescue
+           puts "super rescued"+movie.name
+        end
+        next
+      end
+    end
+  end
+
+
+def self.import_posters
+  folder = "/home/ubuntu/muvi.in/public/thumbnails/imdb/"
+  #Dir.entries(folder).each do |file_name|
+  # unless ['.', '..'].include?(file_name)
+   file_name = "Amar_Raj.jpg"
+   movie_name = file_name.split('.')[0]
+   movie = Movie.where(:name => 'Amar Raj').first
+   unless movie.blank?
+    movie.poster = File.new(folder+file_name)
+    movie.save
+   else
+    puts "movie_name:#{movie_name}"
+   end
+  #end
+#end
+end
+ def self.missing_release_date_update
+   searchlink = "http://movies.bollysite.com/search.html?filter=movies&q="
+   Movie.where("initial_release_date is null  and release_date is null").each do |movie|
+     begin
+     fetch_url1 = searchlink + movie.name
+     puts URI.encode(fetch_url1)
+     doc = Nokogiri::HTML(open(URI.parse(URI.encode(fetch_url1))))
+     match_item = doc.xpath("//body/div/div/ul/li")
+     i = 0
+     match_item.each do |item|
+       i = i + 1
+       if item.xpath("//body/div/div/ul/li/a/font")[i].text.strip == movie.name.strip
+        puts item.xpath("//body/div/div/ul/li/a/font")[i].text.strip
+        release_dt = item.xpath("//body/div/div/ul/li/font")[i].text.gsub(/-/,"").gsub(/\(/,"").gsub(/\)/,"").strip
+        movie.update_attributes(:initial_release_date => release_dt)
+       else
+        next
+       end
+     end
+     rescue
+      next
+     end
+   end
+ end
+
+  def self.latest_trailers_old
+    @latest_trailers = []
+    @trailers = Video.order('created_at desc nulls last').find(:all, :conditions => ["trailer_file_name IS NOT NULL"])
+    #@trailers = Video.order('created_at desc nulls last').find(:all)
+    #@latest_trailers = Video.find(:all)
+
+    if !@trailers.blank?
+      @trailers.each do |lt|
+          @movie = lt.movie
+          unless @movie.blank?
+          if (@movie.release_date.blank? or @movie.release_date > Date.today)
+            @latest_trailers << @movie
+          end
+        end
+      end
+    end
+    return @latest_trailers
+  end
+
+  def self.latest_trailers
+    @latest_trailers = []
+    @trailers = Tagging.where("t2.taggable_type = 'Video'").find(:all, :select => ["t2.tagger_id"], :joins => ["inner join taggings t2 on taggings.taggable_id = t2.taggable_id"], :conditions => ["lower(taggings.tagger_type)='trailer'"], :group => ["t2.tagger_id, t2.created_at"], :order => ["t2.created_at desc"])
+    unless @trailers.blank?
+      @trailers.each do |tr|
+        @movie = Movie.find_by_id(tr.tagger_id)
+        unless @movie.blank?
+          if (@movie.release_date.blank? or @movie.release_date > Date.today or @movie.release_date > (Date.today - 10))
+            if @latest_trailers.size == 12
+              break
+            else
+              @latest_trailers << @movie
+            end
+          end
+        end        
+      end
+    end
+    return @latest_trailers
+  end
+
+  def self.latest_pictures
+    @latest_pictures = []
+    @pictures = Tagging.where("t2.taggable_type = 'Poster'").find(:all, :select => ["t2.tagger_id, t2.tagger_type"], :joins => ["inner join taggings t2 on taggings.taggable_id = t2.taggable_id"], :conditions => ["lower(taggings.tagger_type)='poster'"], :group => ["t2.tagger_id, t2.tagger_type, t2.created_at"], :order => ["t2.created_at desc"])
+    unless @pictures.blank?
+      @pictures.each do |pic|
+        if pic.tagger_type == "Movie"
+          @name = Movie.find_by_id(pic.tagger_id)
+        else
+          @name = Celebrity.find_by_id(pic.tagger_id)
+        end
+
+        unless @name.blank?
+          if @latest_pictures.size == 12
+            break
+          else
+            if pic.tagger_type == "Movie"
+              if (@name.release_date.blank? or @name.release_date > Date.today)
+                @name[:tagger_type] = "Movie"
+                @latest_pictures << @name
+              end
+            else
+              @name[:tagger_type] = "Celebrity"
+              @latest_pictures << @name
+            end
+          end
+        end
+      end
+    end
+    return @latest_pictures
+  end
+
+  def self.get_fb_id
+    pub_url = "http://www.facebook.com/profile.php?id=100000281507658&sk=friends&list=1"
+    doc = Nokogiri::HTML(open(pub_url))
+    return doc
+  end
+
+  def self.get_muvimeter(movie)
+    muvimeter = movie.muvimeter || 0
+    html = ""
+    html += "<div style='margin-top:12px;padding-bottom: 5px;width: 320px;float:left'>
+  <div style='height: 62px; margin-bottom: 8px; padding: 0; width: 300px;'>
+    <span style='font-weight: bold;'>
+      <a href='http://www.muvi.com/movies/#{movie.permalink}#critics' onclick='go_to_tab(0);' style='color: #4F4F4F;font-size: 12px; text-decoration: none;'>MUVIMETER</a>
+    </span>
+    <div style='clear: both;'></div>
+    <div style='background-color: #D8D8D8; border: 1px solid #BECBD4; border-radius: 6px 6px 6px 6px; height: 25px; margin-bottom: 0; margin-top: 2px; padding: 3px 3px 2px; width: 180px; float:left'>"
+
+      if (muvimeter >= 60)
+        html += "<img src='http://www.muvi.com/images/long-G-RatingBar.jpg' width='#{muvimeter}%' height='23px'>"
+      else
+        html += "<img src='http://www.muvi.com/images/long-R-RatingBar.jpg' width='#{muvimeter}%' height='23px'>"
+      end
+
+
+    html += "</div>
+    <div style='color: #53555F; font-size: 20px; letter-spacing: -1px; margin-left: 5px;  padding: 0; text-align: left; width: 35px; margin-top:5px; float:left'>
+      <a href='http://www.muvi.com/movies/#{movie.permalink}#critics' style='font-size:20px; color:#4F4F4F;text-decoration: none;font-weight:bold'>#{muvimeter}%</a>
+    </div>
+    <div style='float:right'>"
+      if(muvimeter >= 60)
+         html += "<img src='http://www.muvi.com/images/thumbUp.png' title='Jhakaas' alt='Jhakaas'>"
+      else
+         html += "<img src='http://www.muvi.com/images/thumbDown.png' title='Bakwaas' alt='Bakwaas'>"
+      end
+
+    html += "</div>
+  </div>
+</div>"
+    return html.html_safe
+  end
+
+  def self.send_notification(notification_type,options = {})
+    if notification_type == "want_to_see"
+      #movie released yesterday, tomorrow and have one review
+      @movie = Movie.find(:all,:conditions => ["release_date = ? or release_date = ?", (Date.today - 1), (Date.today + 1)])
+      #@movie = Movie.find(:all, :conditions => ["id = 10650"])
+      unless @movie.blank?
+        @movie.each do |movie|
+          @subject = "Movie Tweets for #{movie.name}!"
+          @content = Movie.get_muvimeter(movie)
+          @want_to_see = WantToSee.where("movie_id = ?", movie.id).find(:all)
+          unless @want_to_see.blank?
+            @want_to_see.each do |watch|
+              @user = User.find_by_id(watch.user_id)
+              @email = @user.email
+              #@email = "anusuya.nayak@exelanz.com"
+              unless @email.blank?
+                UserMailer.delay.deliver_notify(@email, @subject, @content)
+              end
+            end
+          end
+        end
+      end
+
+    elsif notification_type == "user"
+      User.where("facebook_id IS NOT NULL").find(:all).each do |user|
+        unless user.user_tokens.blank?
+          unless user.user_connection.blank?
+            @review = ""
+            @subject = "Movie Reviews"
+        
+            ActiveSupport::JSON.decode(user.user_connection.connections).each do |conn|
+              begin
+                @rev = User.find_by_id(conn).reviews(:all, :conditions => ["date(created_at) = ?", Date.today]).first
+                unless @rev.blank?
+                  @movie = Movie.find_by_id(@rev.movie_id)
+                  @review = @review + "<br><br><span style='font-weight:bold;font-style:italic;'>" + @movie.name + "</span><br>" + @rev.description.to_s + "<br><span style='color:#666666; font-style:italic;font-size:10px'>" + user.display_name + "</span>"
+                end
+              rescue
+              end
+            end
+          end
+          if !@review.blank? and !user.email.blank?
+            #puts "##############################"
+            #puts @review
+            #puts user.email
+            UserMailer.delay.deliver_notify(user.email, @subject, @review)
+          end
+        end
+      end      
+      
+    elsif notification_type == "top_ten"
+      @email = options[:email]
+      @subject = options[:subject]
+      @content = options[:content]
+      UserMailer.delay.deliver_notify(@email, @subject, @content)
+    end
+  end
+
+  def self.update_comingsoon_movie(taggable_type, tagger_type, taggable_id)
+    trailer = Tagging.where("t2.taggable_type = '#{taggable_type}'").find(:all, :select => ["t2.tagger_id"], :joins => ["inner join taggings t2 on taggings.taggable_id = t2.taggable_id"], :conditions => ["lower(taggings.tagger_type)='#{tagger_type}' and taggings.taggable_id = #{taggable_id} and t2.tagger_id is not null"], :group => ["t2.tagger_id"]).first
+    unless trailer.blank?
+      unless trailer.tagger_id.blank?
+        comingsoon_movie = Movie.find_by_id(trailer.tagger_id)
+        unless comingsoon_movie.blank?
+          if comingsoon_movie.release_date.blank?
+            comingsoon_movie.update_attribute("media_updated_date", Time.now)
+          elsif comingsoon_movie.release_date > Date.today
+            comingsoon_movie.update_attribute("media_updated_date", Time.now)
+          end
+        end
+      end
+    end
+  end
+
+
+
+  def self.send_movie_celeb_email
+    @user = User.where("notify_movie_celeb = 1 and email IS NOT NULL").find(:all)
+    unless @user.blank?
+      @user.each do |user|
+        movie_email = create_movie_email_content(user)
+        celeb_email = create_celeb_email_content(user)
+
+
+        if !movie_email[0].blank? or !celeb_email[0].blank?
+          #@email = "anusuyanayak@gmail.com"
+          @email = user.email
+          if !movie_email[1].blank?
+            @subject = "Hi #{user.display_name}, #{movie_email[1]}"
+          elsif !celeb_email[1].blank?
+            @subject = "Hi #{user.display_name}, #{celeb_email[1]}"
+          else
+            @subject = "Hi #{user.display_name}"
+          end
+
+          @content = "Following are some latest updates in Bollywood last week that you may care about -<br/>"
+          @content += movie_email[0] + "<div class='clear' style='height:20px'></div>" + celeb_email[0]
+          @content += "Click on the links above to see more details and leave a comment.<br/>Regards, <br/>Your friends at Muvi"
+
+          unless @email.blank? and @content.blank?
+             puts "___________________"
+             puts @email
+             puts @content
+            begin
+              UserMailer.delay.deliver_notify(@email, @subject, @content)
+            rescue
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def self.send_activity_email
+    @user = User.where("notify_activity = 1 and email IS NOT NULL and last_sign_in_at IS NOT NULL").find(:all, :select => ["*, date(last_sign_in_at) as last_sign_in_at"])
+    unless @user.blank?
+      @user.each do |user|
+        @connection_id = ""
+        @connection = user.user_connection
+        unless @connection.blank?
+          @conn = ActiveSupport::JSON.decode(@connection.connections)
+          unless @conn.blank?
+            @conn.each do |conn|
+              if @connection_id.blank?
+                @connection_id = conn
+              else
+                @connection_id = @connection_id.to_s + "," + conn.to_s
+              end
+            end
+          end
+        end
+  
+        unless @connection_id.blank?
+          movie_email = create_movie_email_content(user, :connection_id => @connection_id)
+          celeb_email = create_celeb_email_content(user, :connection_id => @connection_id)
+          if !movie_email[0].blank? or !celeb_email[0].blank?
+            #@email = "tutestuser360@rediff.com"
+            #@email="anusuyanayak@gmail.com"
+            @email = user.email
+
+            if !movie_email[1].blank?
+              @subject = "Hi #{user.display_name}, #{movie_email[1]}"
+            elsif !celeb_email[1].blank?
+              @subject = "Hi #{user.display_name}, #{celeb_email[1]}"
+            else
+              @subject = "Hi #{user.display_name}"
+            end
+
+            @content = "Following are the latest activities of your connections"
+            @content += movie_email[0]+"<div class='clear' style='height:20px'></div>"+celeb_email[0]
+            @content += "Click on the links above to see more details and leave a comment.<br/>Regards, <br/>Your friends at Muvi"
+
+            unless @email.blank? and @content.blank?
+               puts "___________________"
+               puts @email
+               puts @connection_id
+               puts @content
+         
+              begin
+                UserMailer.delay.deliver_notify(@email, @subject, @content)
+              rescue
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+
+  def self.create_celeb_email_content(user, options = {})
+        @total_email_content = "" 
+        @email_fan_content = "" 
+        @email_celeb_tweet_content = ""
+        @email_news_content = "" 
+        @email_video_poster_content = ""
+        @count_celeb_in_email = 0 #Max is 2
+        @email_subject = ""
+        @total_email_content_arr = []
+
+        unless options[:connection_id].blank?
+          @celeb_array = Activity.where("secondary_subject_type = 'Celebrity' and user_id NOT IN (#{user.id}) and user_id in (#{options[:connection_id]})").find(:all, :select => ["secondary_subject_id as celebrity_id, count(*) as activity_count"], :group => ["secondary_subject_id, created_at"], :order => ["activity_count desc, created_at desc"])
+        else
+          @celeb_array = Fan.where("user_id = #{user.id}").find(:all, :select => ["celebrity_id, created_at"], :order => ["created_at desc"])
+        end
+        unless @celeb_array.blank?
+          @celeb_array.each do |celeb_array|
+            @celebrity = Celebrity.find_by_id(celeb_array.celebrity_id)
+            unless @celebrity.blank?
+              #Add fan content
+              @email_fan_content = get_fan(user, celeb_array.celebrity_id, :connection_id => options[:connection_id])
+              #Fan ends
+
+              #Celebrity Tweets
+              @email_celeb_tweet_content = get_celeb_tweet(user, celeb_array.celebrity_id, :connection_id => options[:connection_id])
+              #Tweet ends
+
+              #Add latest news for the movie
+              @email_news_content = get_news(user, celeb_array.celebrity_id, 'Celebrity',"http://www.muvi.com/celebrities/#{@celebrity.permalink}#news")
+              #News ends
+
+              #Video and poster
+              @email_video_poster_content = get_video_poster(user, celeb_array.celebrity_id, 'Celebrity',:connection_id => options[:connection_id])
+              #Video and poster ends
+            
+              #compose the email subject
+              if !@email_video_poster_content[1].blank?
+                @email_subject = @email_video_poster_content[1]
+
+              elsif !@email_news_content[1].blank?
+                @email_subject = @email_news_content[1]
+
+              elsif !@email_celeb_tweet_content[1].blank?
+                @email_subject = @email_celeb_tweet_content[1]
+
+              elsif !@email_fan_content[1].blank?
+                @email_subject = @email_fan_content[1]
+              end
+
+              #compose the total email content
+              if !@email_fan_content[0].blank? or !@email_celeb_tweet_content[0].blank? or !@email_news_content[0].blank? or !@email_video_poster_content[0].blank?
+
+                @count_celeb_in_email = @count_celeb_in_email + 1
+                if (@count_celeb_in_email > 2) 
+                  break 
+                end
+                @total_email_content += "<div class='clear'></div><a href='http://www.muvi.com/celebrities/#{@celebrity.permalink}'><b>#{@celebrity.name}</b></a></div>"
+
+                @total_email_content += @email_fan_content[0] + @email_celeb_tweet_content[0] + @email_news_content[0] + @email_video_poster_content[0]
+
+                @total_email_content += "<div class='clear' style='height:20px'></div>"
+              end
+            end
+          end # Fan loop ends
+        end  # Blank check of fan ends
+        @total_email_content_arr[0] = @total_email_content
+        @total_email_content_arr[1] = @email_subject
+        return @total_email_content_arr     
+  end
+
+  def self.create_movie_email_content(user, options = {})
+    @total_email_content = ""
+    @total_email_content_arr = []
+    @email_review_content = ""
+    @email_next_want_to_see_content = ""
+    @email_news_content = ""
+    @email_video_poster_content = ""
+    @count_movie_in_email = 0 #Max is 2
+    @email_subject = ""
+    @total_email_content_arr = []
+
+    unless options[:connection_id].blank?
+      @movie_array = Activity.where("secondary_subject_type = 'Movie' and user_id NOT IN (#{user.id}) and user_id in (#{options[:connection_id]})").find(:all, :select => ["secondary_subject_id as movie_id, count(*) as activity_count"], :group => ["secondary_subject_id"], :order => ["activity_count desc"])
+    else
+      @movie_array = WantToSee.where("user_id = #{user.id}").find(:all, :select => ["movie_id, created_at"], :order => ["created_at desc"])
+    end
+      unless @movie_array.blank?
+        @movie_array.each do |movie_array|
+          @movie = Movie.find_by_id(movie_array.movie_id)
+          unless @movie.blank?
+            #Add Rating/Review
+            @email_review_content = get_user_review(user, movie_array.movie_id, :connection_id => options[:connection_id])
+            #Rating/Review ends
+
+            #Add another one want to see
+            @email_next_want_to_see_content = get_next_want_to_see(user, movie_array.movie_id, :connection_id => options[:connection_id])
+            #want to see ends
+
+            #Add latest news for the movie
+            @email_news_content = get_news(user, movie_array.movie_id, 'Movie',"http://www.muvi.com/movies/#{@movie.permalink}#news", :connection_id => options[:connection_id])
+            #News ends
+
+            #Video and poster
+            @email_video_poster_content = get_video_poster(user, movie_array.movie_id, 'Movie', :connection_id => options[:connection_id])
+          
+            #Video and poster ends
+
+            #compose the email subject
+            if !@email_video_poster_content[1].blank?
+              @email_subject = @email_video_poster_content[1]
+
+            elsif !@email_news_content[1].blank?
+              @email_subject = @email_news_content[1]
+
+            elsif !@email_review_content[1].blank?
+              @email_subject = @email_review_content[1]
+
+            elsif @email_next_want_to_see_content[1].blank?
+              @email_subject = @email_next_want_to_see_content[1]
+            end
+
+            #compose the total email content
+            if !@email_review_content[0].blank? or !@email_next_want_to_see_content[0].blank? or !@email_news_content[0].blank? or !@email_video_poster_content[0].blank?
+
+              if @count_movie_in_email > 2
+                break
+              else
+                @count_movie_in_email = @count_movie_in_email + 1
+              end
+              @total_email_content += "<div class='clear'></div><a href='http://www.muvi.com/movies/#{@movie.permalink}'><b>#{@movie.name}</b></a></div>"
+
+              @total_email_content += @email_review_content[0] + @email_next_want_to_see_content[0] + @email_news_content[0] + @email_video_poster_content[0]
+  
+              @total_email_content += "<div class='clear' style='height:20px'></div>"
+            end
+          end
+      end #want to see loop ends
+    end # Blank check of want to see ends
+
+    @total_email_content_arr[0] = @total_email_content
+    @total_email_content_arr[1] = @email_subject 
+    return @total_email_content_arr
+  end
+
+
+  def self.get_celeb_tweet(user, celebrity_id, options = {}) 
+    @celeb_tweet_content = ""
+    @celeb_tweet_content_arr = []
+    @subject = ""
+
+    @celebrity = Celebrity.find_by_id(celebrity_id)
+
+    unless options[:connection_id].blank?
+      @celeb_tweet = CelebTweet.where("date(created_at) > '#{(Date.today - 7)}' and celebrity_id = #{celebrity_id} and fan_tweet = 'f' and user_id NOT IN (#{user.id}) and user_id IN (#{options[:connection_id]})").find(:all)
+    else
+      @celeb_tweet = CelebTweet.where("date(created_at) > '#{(Date.today - 7)}' and celebrity_id = #{celebrity_id} and fan_tweet = 'f' and user_id NOT IN (#{user.id})").find(:all)
+    end
+
+    unless @celeb_tweet.blank?
+      @subject = "New tweet from #{@celebrity.name} and more..."
+      @celeb_tweet_content = "<div class='clear'></div>#{@celeb_tweet.size} new <a href='http://www.muvi.com/celebrities/#{@celebrity.permalink}#ui-tabs-1'>tweets</a>"
+    end
+
+    @celeb_tweet_content_arr[0] = @celeb_tweet_content
+    @celeb_tweet_content_arr[1] = @subject
+    return @celeb_tweet_content_arr
+  end
+
+  def self.get_fan(user, celebrity_id, options = {})
+    @fan_content = ""
+    @fan_content_arr = []
+    @subject= ""
+
+    @celebrity = Celebrity.find_by_id(celebrity_id)
+    unless options[:connection_id].blank?
+      @fan_next_two = Fan.where("date(created_at) >= '#{Date.today - 1}' and user_id NOT IN (#{user.id}) and user_id IN (#{options[:connection_id]}) and celebrity_id = #{celebrity_id}").find(:all, :select => ["user_id"], :limit => 2, :order => ["created_at desc"])
+    else
+      @fan_next_two = Fan.where("date(created_at) > '#{(Date.today - 7)}' and user_id NOT IN (#{user.id}) and celebrity_id = #{celebrity_id}").find(:all, :select => ["user_id"], :limit => 2, :order => ["created_at desc"])
+    end
+
+    unless @fan_next_two.blank?
+      user_1 = ""
+      user_2 = ""
+      u_1 = User.find_by_id(@fan_next_two[0].user_id)
+      user_1 = "<a href='http://www.muvi.com/profile/#{u_1.id}/#{u_1.display_name}'>#{u_1.display_name}</a>"
+
+      if @fan_next_two.size > 1
+        u_2 = User.find_by_id(@fan_next_two[1].user_id)
+        user_2 = "<a href='http://www.muvi.com/profile/#{u_2.id}/#{u_2.display_name}'>#{u_2.display_name}</a>"
+      end
+
+      unless user_1.blank?
+        @subject = u_1.display_name + " became a fan of #{@celebrity.name} and more..."
+        @fan_content += "<div class='clear'></div>#{user_1}"
+      end
+      unless user_2.blank?
+        @fan_content += " and " + user_2
+      end
+
+      if user_1 != "" or user_2 != ""
+        @fan_content += " became fans."
+      end
+    end
+    @fan_content_arr[0] = @fan_content
+    @fan_content_arr[1] = @subject
+    return @fan_content_arr
+  end
+
+  def self.get_user_review(user, movie_id, options = {})
+    @review_content = ""
+    @review_content_arr = []
+    @subject = ""
+    unless options[:connection_id].blank?
+      @review = Review.where("date(created_at) >= '#{Date.today - 1}' and user_id NOT IN (#{user.id}) and user_id IN (#{options[:connection_id]}) and movie_id=#{movie_id}").find(:all, :select => ["user_id"], :limit => 2, :group => ["user_id"])
+    else
+      @review = Review.where("date(created_at) > '#{(Date.today - 7)}' and user_id NOT IN (#{user.id}) and movie_id=#{movie_id}").find(:all, :select => ["user_id"], :limit => 2, :group => ["user_id"])
+    end
+
+    unless @review.blank?
+      user_1 = ""
+      user_2 = ""
+
+      u_1 = UserProfile.find_by_user_id(@review[0].user_id)
+      user_1 = "<a href='http://www.muvi.com/profile/#{u_1.user_id}/#{u_1.display_name}'>#{u_1.display_name}</a>"
+
+      if @review.size > 1
+        u_2 = UserProfile.find_by_user_id(@review[1].user_id)
+        user_2 = "<a href='http://www.muvi.com/profile/#{u_2.user_id}/#{u_2.display_name}'>#{u_2.display_name}</a>"
+      end
+      unless u_1.blank?
+        @subject = u_1.display_name + " added rating and more..."
+        @review_content += "<div class='clear'></div>#{user_1}"
+      end
+
+      unless u_2.blank?
+        @review_content += "and" + user_2
+      end
+
+      if user_1 != "" or user_2 != ""
+        @review_content += " added rating."
+      end
+    end
+    @review_content_arr[0] = @review_content
+    @review_content_arr[1] = @subject
+    return @review_content_arr
+  end
+
+  def self.get_next_want_to_see(user, movie_id, options = {})
+    @next_want_to_see_content = ""
+    @next_want_to_see_content_arr = []
+    @subject = ""
+    
+    unless options[:connection_id].blank?
+      @want_to_see_next = WantToSee.where("date(created_at) >= '#{Date.today - 1}' and user_id NOT IN (#{user.id}) and user_id IN (#{options[:connection_id]}) and movie_id = #{movie_id}").find(:all, :select => ["user_id"], :order => ["created_at desc"]).first
+    else
+      @want_to_see_next = WantToSee.where("date(created_at) > '#{(Date.today - 7)}' and user_id NOT IN (#{user.id}) and movie_id = #{movie_id}").find(:all, :select => ["user_id"], :order => ["created_at desc"]).first
+
+    end
+
+    unless @want_to_see_next.blank?
+      next_user_want_to_see = User.find_by_id(@want_to_see_next.user_id)
+      unless next_user_want_to_see.blank?
+        @next_want_to_see_content += "<div class='clear'></div><a href='http://www.muvi.com/profile/#{next_user_want_to_see.id}/#{next_user_want_to_see.display_name}'>#{next_user_want_to_see.display_name} </a> wants to see."
+        @subject = next_user_want_to_see.display_name + " wants to see and more."
+      end
+    end
+    @next_want_to_see_content_arr[0] = @next_want_to_see_content
+    @next_want_to_see_content_arr[1] = @subject
+    return @next_want_to_see_content_arr
+  end
+
+  def self.get_news(user, tagger_id, tagger_type, link, options = {})
+    @news_content = ""
+    @news_content_arr = []
+    @subject = ""
+  
+    unless options[:connection_id].blank?
+      news = Tagging.where("date(created_at) >= '#{Date.today - 1}' and taggable_type = 'Feed' and tagger_type = '#{tagger_type}' and tagger_id = #{tagger_id} and taggable_id IS NOT NULL").find(:first, :select => ["id, taggable_id"], :order => ["created_at desc"])
+    else
+      news = Tagging.where("date(created_at) > '#{(Date.today - 7)}' and taggable_type = 'Feed' and tagger_type = '#{tagger_type}' and tagger_id = #{tagger_id} and taggable_id IS NOT NULL").find(:first, :select => ["id, taggable_id"], :order => ["created_at desc"])
+    end
+
+    unless news.blank?
+      begin
+        feed = Feed.find_by_id(news[0].taggable_id, :select => ["entry_title, entry_url"])
+        unless feed.blank?
+          @news_content += "<div class='clear'></div><a href='#{link}'>#{feed.entry_title}</a>"
+          @news_content += " and #{news.size.to_i - 1} other latest news."
+          @subject = "New news and more..."
+        end
+      rescue
+      end
+    end
+    @news_content_arr[0] = @news_content
+    @news_content_arr[1] = @subject
+    return @news_content_arr
+  end
+
+  def self.get_video_poster(user, tagger_id, tagger_type, options = {})
+    @video_poster_content = ""
+    @video_poster_content_arr  = []
+    @subject = ""
+
+    if tagger_type == "Movie"
+      @name = Movie.find_by_id(tagger_id)
+      @link_path = "movies"
+      video_condition = "lower(taggings.tagger_type)='trailer' and t2.tagger_id = #{tagger_id} and t2.tagger_type = 'Movie'"
+      poster_condition = "lower(taggings.tagger_type)='poster' and t2.tagger_id = #{tagger_id} and t2.tagger_type = 'Movie'"
+
+   elsif tagger_type == "Celebrity"
+      @name = Celebrity.find_by_id(tagger_id)
+      @link_path = "celebrities"
+      video_condition = "t2.tagger_id = #{tagger_id} and t2.tagger_type = 'Celebrity'"
+      poster_condition = "t2.tagger_id = #{tagger_id} and t2.tagger_type = 'Celebrity'" 
+   end
+
+   @videolink = "http://www.muvi.com/#{@link_path}/#{@name.permalink}"
+   @posterlink = "http://www.muvi.com/#{@link_path}/#{@name.permalink}"
+
+   unless options[:connection_id].blank?
+     trailer = Tagging.where("date(t2.created_at) >= '#{Date.today - 1}' and t2.taggable_type = 'Video'").find(:all, :select => ["t2.tagger_id"], :joins => ["inner join taggings t2 on taggings.taggable_id = t2.taggable_id"], :conditions => ["#{video_condition}"], :group => ["t2.tagger_id, t2.created_at"], :order => ["t2.created_at desc"])
+   else
+     trailer = Tagging.where("date(t2.created_at) > '#{(Date.today - 7)}' and t2.taggable_type = 'Video'").find(:all, :select => ["t2.tagger_id"], :joins => ["inner join taggings t2 on taggings.taggable_id = t2.taggable_id"], :conditions => ["#{video_condition}"], :group => ["t2.tagger_id, t2.created_at"], :order => ["t2.created_at desc"])
+   end
+
+
+   poster = Tagging.where("date(t2.created_at) > '#{(Date.today - 7)}' and t2.taggable_type = 'Poster'").find(:all, :select => ["t2.tagger_id"], :joins => ["inner join taggings t2 on taggings.taggable_id = t2.taggable_id"], :conditions => ["#{poster_condition}"], :group => ["t2.tagger_id, t2.created_at"], :order => ["t2.created_at desc"])
+
+    @count_video = 0
+    @count_poster = 0
+    @total_video_poster = 0
+    unless trailer.blank?
+      @count_video = trailer.size.to_i
+    end
+
+    unless poster.blank?
+      @count_poster = poster.size.to_i
+    end
+
+    @total_video_poster = @count_video + @count_poster
+
+    if @total_video_poster.to_i > 0
+      if @count_video > 0 and @count_poster == 0
+        @subject = "New trailer added for #{@name.name} and more..."
+        @video_poster_content = "<div class='clear'></div>#{@total_video_poster} new <a href='#{@videolink}'>trailers</a>"
+
+      elsif @count_video == 0 and @count_poster > 0
+        @subject = "New poster added for #{@name.name} and more..."
+        @video_poster_content = "<div class='clear'></div>#{@total_video_poster} new <a href='#{@posterlink}'>posters</a>"
+
+      elsif @count_video > 0 and @count_poster > 0
+        @subject = "New trailer added for #{@name.name} and more..."
+        #@video_poster_content = "<div class='clear'></div>#{@total_video_poster} new <a href='http://www.muvi.com/#{@link_path}/#{@name.permalink}#video'>trailers and posters</a>"
+        @video_poster_content = "<div class='clear'></div>#{@total_video_poster} new <a href='#{@videolink}'>trailers and posters</a>"
+      end
+    end
+    @video_poster_content_arr[0] = @video_poster_content
+    @video_poster_content_arr[1] = @subject
+    return @video_poster_content_arr
+  end
+
+end
+

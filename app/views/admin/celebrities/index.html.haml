@@ -1,0 +1,65 @@
+-begin
+  = form_for "search", :url => admin_celebrities_path, :html => {:method => :get} do |f|
+
+    = f.label :name_contains, 'Celebrity title'
+    = f.text_field :name_contains
+
+    = f.check_box :profile_picture_file_name_is_blank
+    = f.label :profile_picture_file_name_is_blank, 'Missing Picture'
+
+    = f.submit "Search"
+    = link_to "New Celebrity", new_admin_celebrity_path
+    .clear
+-rescue
+
+%br
+
+
+%br
+
+- unless @celebrities.blank?
+  %table.listing
+    %tr
+      %th= check_box_tag('check_all')
+      %th Celebrity Name
+      %th Celeb ID
+      %th Type
+      %th Actions
+
+    = form_tag(delete_celebrities_admin_celebrities_path) do
+      - @celebrities.each do |celebrity|
+        %tr
+          %td= check_box_tag("celebrity_ids[]", celebrity.id, false)
+          %td
+            = image_tag(celebrity.profile_picture.url(:thumb) )
+            = celebrity.name
+          %td
+            =celebrity.id
+          %td= celebrity.celebrity_type
+          %td
+            -begin
+              = link_to "show", admin_celebrity_path(celebrity)
+            -rescue
+
+            |
+            
+            -begin
+              = link_to "Edit", edit_admin_celebrity_path(celebrity)
+            -rescue
+            |
+
+            -begin
+              = link_to "Delete", admin_celebrity_path(celebrity) , :confirm => 'Are you sure?', :method => :delete
+            -rescue
+            -rescue
+      %tr
+        %td{:colspan => 3} &nbsp;
+        %td= submit_tag "Delete"
+-else
+  %p
+    %b
+      Sorry there are no results for your filter request(s)
+
+- unless @celebrities.blank?
+  = will_paginate @movies
+

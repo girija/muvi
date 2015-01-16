@@ -1,0 +1,38 @@
+=image_tag("banner_connections.png")
+
+.clear{:style => "height:20px"}
+
+%div{:style => "height: 110px;cursor: pointer; position: absolute; margin-top: -165px; width: 125px; margin-left: 30px; background:url(/images/banner_play.png) no-repeat", :onclick => "play_video()"}
+
+%div{:style => "font-size:18px; font-weight:bold;"}
+  Rate movies.
+  = succeed "." do
+    %span{:style => "color:#F7600D"} Share with your friends
+  Earn points and badges
+
+.clear{:style => "height:10px"}
+
+%div{:style => "font-size:16px; font-weight:bold;"}
+  %a{:href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");', :style => "color:#3F48CC"}
+    Login
+.clear
+%div{:style => "font-size:16px; font-weight:bold;"}
+  Don't have a login? 
+  %a{:onclick => "registration('fauth');", "data-remote" => "true", :href=> "/users/sign_up", :style => "color:#3F48CC"} Join Now with Facebook!
+
+
+:javascript
+  function play_video(){
+    $('#registration').html('');
+    $('#registration').modal({
+        minHeight:400,
+        minWidth:600,
+        containerId:'register_from',
+        onShow: function(model){
+            var t=setTimeout("$.modal.setContainerDimensions()", 1000);
+        }
+    });
+    $.modal.setContainerDimensions();
+    var html = '<div style="margin:10px"><iframe width="560" height="315" src="http://www.youtube.com/embed/K4V0H13E3hA" frameborder="0" allowfullscreen></iframe></div>'
+    $('#registration').html(html);                                  
+  }

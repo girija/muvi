@@ -1,0 +1,87 @@
+/-@p_item = @celebrity #? @celebrity : @p_item
+-movie_item = item
+%div
+  %div{:style=>"border:1px solid #D2D6D9;width:128px;height:195px;float:left;"}
+    %div{:style => "width:124px;height:191px;padding:2px;"}
+      =link_to image_tag(movie_item.banner_image,:style=>"height:191px;width:124px;"),movie_path(movie_item.permalink), :style => "cursor:pointer"
+  %div{:style=>"padding-left:10px;width:390px;float:right"}
+    %div{:style=>"height:20px;"}
+      %div{:style=>"width:180px;"}
+        %div{:id=>"like_#{movie_item.id}",:style=>"width:40px;height:20px;border:1px solid #D2D6D9;background-color:#EDEDED;border-radius:3px;float:left;"}
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            =link_to image_tag("/images/t_up.png",:style=>"padding:2px;"),"javascript:void(0);",:remote=>'true', :onclick => "check_login_review_movie('#{movie_item.id}','#{type}','#{movie_item.class.to_s.downcase}_like_link_','#{@p_item.class.to_s}', '#{@p_item.id}','like');", :id=>"like_review_#{movie_item.id}"
+            =generate_tooltip_block("movie_like","#{@p_item.class.to_s.downcase}_page")
+          %div{:style=>"padding:4px;float:right;"}
+            =link_to "#{movie_item.like_votes.count}", "javascript:void(0);",:id =>"like_view_#{movie_item.id}" ,:onclick => "show_likes_popup('#{movie_item.id}','#{movie_item.class.to_s}','like','#{movie_item.like_votes.count}','300','counter_popup');",:style=>"font-weight:normal;"
+        %div{:id=>"dislike_#{movie_item.id}",:style=>"width:40px;height:20px;border:1px solid #D2D6D9;background-color:#EDEDED;border-radius:3px;float:left;margin-left:20px;"}
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            =link_to image_tag("/images/t_down.png",:style=>"padding:2px;"),"javascript:void(0);",:remote=>'true', :onclick => "check_login_review_movie('#{movie_item.id}','#{type}','#{movie_item.class.to_s.downcase}_dislike_link_','#{@p_item.class.to_s}', '#{@p_item.id}','dislike');", :id=>"dislike_review_#{movie_item.id}"
+            =generate_tooltip_block("movie_dislike","#{@p_item.class.to_s.downcase}_page")
+          %div{:style=>"padding:4px;float:right;"}
+            =link_to "#{movie_item.dislike_votes.count}", "javascript:void(0);",:id =>"dislike_view_#{movie_item.id}" ,:onclick => "show_likes_popup('#{movie_item.id}','#{movie_item.class.to_s}','dislike','#{movie_item.dislike_votes.count}','300','counter_popup');",:style=>"font-weight:normal;"
+        %div{:id=>"comment_#{movie_item.id}",:style=>"width:40px;height:20px;border:1px solid #D2D6D9;background-color:#EDEDED;border-radius:3px;float:left;margin-left:20px;"}
+          =image_tag("/images/chat.png",:style=>"padding:2px;")
+          %div{:style=>"padding:4px;float:right;"}
+            =link_to "#{movie_item.discussions.count}", "javascript:void(0);",:id =>"comment_view_#{movie_item.id}" ,:onclick => "show_likes_popup('#{movie_item.id}','#{movie_item.class.to_s}','comment','#{movie_item.discussions.count}','300','counter_popup');",:style=>"font-weight:normal;"
+      %div{:style=>"float:right;padding-right:5px;height:13px"}
+        %div{:class=>"prev_btn",:onclick=>"show_muvi_block_item('#{movie_item.class.to_s}','#{movie_item.id}','#{@p_item.class.to_s}','#{@p_item.id}','prev','#{type}');"}
+        %div{:style=>"width:4px;float:left"}
+        %div{:class=>"next_btn",:onclick=>"show_muvi_block_item('#{movie_item.class.to_s}','#{movie_item.id}','#{@p_item.class.to_s}','#{@p_item.id}','next','#{type}');"}
+    %div{:style=>"height:35px;padding-top:5px;"}
+      = form_for "discussion",:url => "/discussion/save_discussion", :remote => true, :html => {:id => "discussion_#{movie_item.id}",:onsubmit=>"return post_discussion('#{movie_item.permalink}','#{movie_item.id}');"} do |f|
+        - user_id = current_user ? current_user.id : ""
+        - secondary_id = movie_item.id
+        - secondary_type = movie_item.class.to_s
+        = f.hidden_field :user_id, :value => user_id
+        =hidden_field_tag :reference_id, secondary_id
+        = hidden_field_tag :reference_type, secondary_type
+        = hidden_field_tag :inner_page, "celebrity"
+        = hidden_field_tag :inner_id, @p_item.id
+        = hidden_field_tag :block_type, "#{type}"
+        =f.text_area "question",:id=> "question_#{movie_item.id}", :onkeypress => "check_event_submit_discussion_block(event, '#{movie_item.id}','#{movie_item.class.to_s}','#{movie_item.name}','movie_page');", :placeholder => "Add a comment", :class => "commentBox",:style=>"width:385px;border:1px solid #D2D6D9;"
+    .clear
+    %div
+      -movie_item.discussions.order("id desc").limit(3).each do |comment|
+        %div{:id => "comment_#{comment.id}"}
+          %div{:style => "float:left;"}
+            -if comment.user
+              %div{:class=>'image left tip_hint tooltipbottom',:style=>"height:37px;width:37px;"}
+                - ub = UserBadge.find_by_user_id(comment.user.id)
+                - if !ub.blank?
+                  - points = ActiveSupport::JSON.decode(ub.badge_points)['movie'].to_i
+                  - if points >= 1 and points < 5
+                    - level = "Level: Muvi Scraper"
+                  - elsif points >= 5 and points < 10
+                    - level = "Level: Muvi Junkie"
+                  - elsif points >= 10
+                    - level = "Level: Muvi Maniac"
+                = link_to image_tag(comment.user.user_image, :style=>"width:37px;height:37px;border: 1px solid #EEEEEE;"), "/profile/#{comment.user.id}/#{comment.user.display_name}"
+                .tooltip_description{:style =>'display:none'}
+                  %b
+                    = comment.user.display_name
+                  %br
+                  = level
+              %div{:style=>"margin-left:45px;height:40px;"}
+                = "<span style='font-weight:normal;font-size:13px;'>#{comment.question.truncate(100)}</span>".html_safe
+                .small_light_gray
+                  = link_to comment.user.display_name, "/profile/#{comment.user.id}/#{comment.user.display_name}", :class => "small_light_gray"
+                  -
+                  = distance_of_time_in_words(Time.now, comment.created_at.to_time) + " ago"
+        .clear{:style=>"height:10px;"}
+  .clear
+
+
+:javascript
+  function check_event_submit_discussion_block(evt,id,cls,name,page){
+    var user_id = $("#user_id").val();
+    if(evt.keyCode == 13){
+      if(user_id != ""){
+        $("#discussion_"+id).submit();
+      }else{
+        var url = $("#hidden_reply_login").attr('href');
+        $("#hidden_reply_login").attr('href',url+"&login_for=review_reply&refer_type=celebrity&refer_id="+id);
+        $("#hidden_reply_login").click();
+      }
+    }
+  }
+

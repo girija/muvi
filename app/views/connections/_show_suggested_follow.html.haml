@@ -1,0 +1,41 @@
+-count_user = 0
+-@sort_by_activity.each do |reg|
+  /=create_connection_block(reg)
+  -user = UserProfile.find(:first,:conditions => ["user_id = ?",reg.user_id])
+  -user_fb_id = User.find(:first,:conditions => ["id = ?",reg.user_id])
+ 
+  -unless user.blank?
+    -if count_user.to_i == 5
+      -break
+    -else
+      -count_user = count_user + 1
+
+    .smallbox.left{:style => "height:95px"}
+      .friendsBox.left
+        -unless user.profile_image_file_name.blank?
+          =link_to image_tag(user_profile_image(user)),"/profile/#{user.user_id}/#{user.display_name}"
+        -else
+          -unless user_fb_id.blank?
+            -unless user_fb_id.facebook_id.blank?
+              =link_to image_tag("http://graph.facebook.com/#{user_fb_id.facebook_id}/picture"),"/profile/#{user.user_id}/#{user.display_name}"
+            -else
+              =link_to image_tag("/images/no-profile.png"),"/profile/#{user.user_id}/#{user.display_name}"
+
+      .friendtitle.left
+        =link_to user.display_name, "/profile/#{user.user_id}/#{user.display_name}"
+        .clear{:style => "height:3px"}
+        -activity = Activity.find(:first,:conditions => ["user_id = ? and subject_type != ?", user.user_id, 'Activity'], :order => ["created_at desc"], :limit => 1)
+        -unless activity.blank?
+          %p{:class => "small_orange_font"}
+            =raw(activity.action)
+        .clear
+
+      %div{:style => 'float:right;margin-top:28px'}
+        = form_for "connections",:url => "/connections/follow", :html => {:id => "follow_form"},  :remote => true do |f|
+          = f.hidden_field :user_id, :value => reg.user_id
+          .actions.left
+            .gradient-input-button.ui-corner-all{:style => "width:80px;height:25px"}
+              .gradient-input-button.ui-corner-all{:style => "height:25px"}
+                %input{:type => "submit", :value => "Follow", :name => "commit", :id => "comment_submit", :class => "label", :style => "font-size:11px;margin-top:0px"}
+          .clear{:style => "height:4px"}
+

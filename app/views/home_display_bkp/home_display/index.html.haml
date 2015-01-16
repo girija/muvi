@@ -1,0 +1,493 @@
+- if params[:action] == 'trailers'
+  = render 'shared/meta_title_and_keywords', { :key => 'trailers'}
+- elsif params[:controller] == 'celebrities'
+  = render 'shared/meta_title_and_keywords', { :key => 'stars'}
+- elsif params[:action] == "released" or params[:action] == "upcoming" or params[:action] == "recommended"
+  - if params[:action] == "released"
+    = render 'shared/meta_title_and_keywords', { :key => 'released'}
+  - elsif params[:action] == "upcoming"
+    = render 'shared/meta_title_and_keywords', { :key => 'upcoming'}
+  - elsif params[:action] == "recommended"
+    = render 'shared/meta_title_and_keywords', { :key => 'recommended'}
+- else
+  = render 'shared/meta_title_and_keywords', { :key => 'home'}
+
+-if params[:action] == "released" or params[:action] == "upcoming" or params[:action] == "recommended"
+  =render :partial => "show_top_link"
+
+%input{:type => "hidden", :id => "total_pages"}
+#home_page_container
+%input{:type => "hidden", :id => "home_user_id"}
+%input{:type => "hidden", :id => "refer_type",:name=>"refer_type", :value => "home_page"}
+
+:javascript
+
+  var language = "";
+  var languages = "";
+  if ($.cookie('hindi') == 'yes') {
+    languages  = languages + "hindi,";
+  }
+  if ($.cookie('telugu') == 'yes') {
+    languages  = languages + "telugu,";
+  }
+  if ($.cookie('tamil') == 'yes') {
+    languages  = languages + "tamil,";
+  }
+  if ($.cookie('english') == 'yes') {
+    languages  = languages + "english,";
+  }
+  language = languages.slice(0, languages.length - 1);
+
+  var serviceUrl = "#{SERVICE_URL}";
+
+  $(document).ready(function() {
+    $(".glow").FontEffect({outline:true});
+
+    var post_url = "/load_page/#{type}"
+    //show_loading_page();
+    var x = (window.innerWidth / 2) - 180;
+    var y = 200;
+    $("#loading_div").offset({ top: y, left: x})
+    $("#loading_div").fadeIn();
+
+    $.post(post_url, function(data) {
+      alert(data);
+      $('#home_page_container').html("");
+      $('#home_page_container').append(data);
+      check_adjust_boxes();
+      $("#loading_div").fadeOut();
+
+      for(var i = 0 ; i < 2; i++){
+        page++;
+        var post_url = "/load_page/#{type}"
+ 
+        var param = "";
+        if(language == ""){
+          language = "hindi"
+        }
+
+        if(language != ""){
+          param = 'page=' + page + '&lang=' + language;
+        }else{
+          param = 'page=' + page
+        }
+ 
+        $.ajax({
+          url: post_url +'?' + param,
+          type: 'post',
+          dataType: 'script',
+          success: function() {
+            //$(window).sausage('draw');
+            try{
+              $('#home_page_container').masonry("reload");
+              check_adjust_boxes();
+            }catch(E){}
+            $(".glow").FontEffect({outline:true});
+          }
+        });
+      }
+    });
+  });
+
+  $(document).ready(function($) {
+    $(".container").css("background-color", '#EBEBEB');
+    $(".container").css("border", '0px');
+    //adjust_boxes();
+    $(".glow").FontEffect({outline:true});
+  });
+  
+
+  (function() {
+    loading = false;
+
+    function nearBottomOfPage() {
+      return $(window).scrollTop() > $(document).height() - $(window).height() - 900;
+    }
+
+    $(window).scroll(function(){
+      total_page = $("#total_pages").val();
+      if (loading) {
+        return;
+      }
+
+      if(nearBottomOfPage()) {
+        loading=true;
+        page++;
+    
+        if(page <= total_page){
+          var post_url = "/load_page/#{type}"
+          $("#bottom_loading_div").fadeIn();
+
+          var param = "";
+          if(language != ""){
+            param = 'page=' + page + '&lang=' + language;
+          }else{
+            param = 'page=' + page
+          }
+
+          $.ajax({
+            url: post_url +'?' + param,
+            type: 'post',
+            dataType: 'script',
+            success: function() {
+              //$(window).sausage('draw');
+              try{
+                $('#home_page_container').masonry("reload");
+              }catch(E){}
+              $(".glow").FontEffect({outline:true}); 
+              $("#bottom_loading_div").fadeOut();
+              loading=false;
+            }
+          });
+        }
+        //else{
+        //  page = 1;
+        //}
+      }
+    });
+    //$(window).sausage();
+  }());
+
+
+  function fetch_released(){
+    $.post("/fetch_movie?movie_type=released&type=get", function(data){
+      $("#home_page_container").html(data);
+    })
+  }
+  function fetch_upcoming(){
+    $.post("/fetch_movie?movie_type=upcoming&type=get", function(data){
+      $("#home_page_container").html(data);
+    });
+  }
+  function fetch_recommended(){
+    $.post("/fetch_movie?movie_type=recommended&type=get", function(data){
+      $("#home_page_container").html(data);
+    })
+  }
+
+  function show_div(flag, id,show_div, hide_div, active_btn, inactive_btn, active_class, inactive_class){
+
+    var cl = active_class.split("_");
+    remove_class = cl[0]+"_"+cl[1];
+
+    var remove_from_active = inactive_class + "_active";
+    $("#"+active_btn).removeClass(remove_class);
+    $("#"+active_btn).addClass(active_class);
+
+    $("#"+inactive_btn).removeClass(remove_from_active);
+    $("#"+inactive_btn).addClass(inactive_class);
+    
+    $("#"+show_div).show();
+    $("#"+hide_div).hide();
+
+    if(flag == 0){
+      $("#rating_area_"+id).hide();
+    }
+    adjust_boxes();
+  }
+
+  function hide_dropdown(id){
+    //$("#like_div_"+id).hide();
+  }
+
+  function set_value(id, v, rate){
+    $("#rating_flag_"+id).val(v);
+    $("#rating_type_"+id).val(rate);
+  }
+
+  function play_movie_video_url(movie_id, video_id, path){
+    window.location.href = "/movies/"+movie_id+"/"+path.substring(0, path.length-1)+"/"+video_id;
+  }
+  function play_movie_video(movie_id, video_id, path){
+     $.fancybox({
+       'type' : 'ajax',
+       'centerOnScroll' : true,
+       'opacity' : true,
+       'hideOnOverlayClick' :true,
+       'overlayOpacity' : 1,
+       'overlayColor' : '#0e0e0e',
+       'showCloseButton': false,
+       'autoScale' : true,
+       'padding' : 0,
+       'transitionIn': 'elastic',
+       'transitionOut': 'elastic',
+       'onClosed' : function(){
+         $("body").css("overflow", "auto");
+       },
+       'onComplete': function() {
+         $("#fancybox-wrap").css({'top':'10px', 'bottom':'auto'});
+       },
+       'href': "/"+path+"/movie/"+movie_id+"/"+video_id
+    });
+  }
+
+  function play_celeb_video(celeb_id, video_id, path){
+     $.fancybox({
+       'type' : 'ajax',
+       'centerOnScroll' : true,
+       'opacity' : true,
+       'hideOnOverlayClick' :true,
+       'overlayOpacity' : 1,
+       'overlayColor' : '#0e0e0e',
+       'showCloseButton': false,
+       'autoScale' : true,
+       'padding' : 0,
+       'transitionIn': 'elastic',
+       'transitionOut': 'elastic',
+       'onClosed' : function(){
+         $("body").css("overflow", "auto");
+       },
+       'onComplete': function() {
+         $("#fancybox-wrap").css({'top':'10px', 'bottom':'auto'});
+       },
+       'href': "/"+path+"/celebrity/"+celeb_id+"/"+video_id
+    });
+  }
+
+  function set_review_comment(movie_id, user_id, flag_detail){
+    var action = "";
+    if($("#rating_flag_"+movie_id).val() == 1){
+      action = "1";
+    }
+    else{
+      action = "0";
+    }
+    var review = $("#review_"+movie_id).val(); 
+    var url = serviceUrl+"/muvi/movie/"+movie_id+"/comment/"+user_id+".json";
+
+    if ($.browser.msie && window.XDomainRequest) {
+      var xdr = new XDomainRequest();
+      xdr.open("post", url);
+      xdr.send("comment="+review+"&status="+action);
+    }
+    else{
+      var xmlhttp;
+      if (window.XMLHttpRequest){
+        xmlhttp=new XMLHttpRequest();
+      }else{
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+      }
+      xmlhttp.onreadystatechange=function(){
+        if (xmlhttp.readyState==4){
+          
+        }
+      }
+      xmlhttp.open("POST", serviceUrl+"/muvi/movie/"+movie_id+"/comment/"+user_id+".json",true);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send("comment="+review+"&status="+action);
+    }
+  
+    $.post("/home_display/refresh_comment",{type: "movie", id: movie_id, flag_detail: flag_detail}, function(data){
+      if(data != ""){
+        $("#box_"+movie_id).html(data);
+      }
+    });
+
+  }
+
+
+
+  function like_dislike(movie_id, user_id, method_name, active_btn, inactive_btn, active_class, inactive_class, message){
+
+    $("#seen_div_"+movie_id).hide();
+
+    var cl = active_class.split("_");
+    remove_class = cl[0]+"_"+cl[1];
+
+    var remove_from_active = inactive_class + "_active";
+    $("#"+active_btn).removeClass(remove_class);
+    $("#"+active_btn).addClass(active_class);
+
+    $("#"+inactive_btn).removeClass(remove_from_active);
+    $("#"+inactive_btn).addClass(inactive_class);
+    
+    $("#rating_area_"+movie_id).show();
+
+    adjust_boxes();
+
+    var action = "";
+    if($("#rating_flag_"+movie_id).val() == 1){
+      status = "1";
+    }
+    else{
+      status = "0";
+    }
+
+    var uid = $("#home_user_id").val();
+    if(user_id == "" && uid == ""){
+      check_login_in_homepage("#{FACEBOOK_APPID}", "movies",movie_id, method_name, message, status);
+    }
+    else{
+      if(user_id != "" && uid == ""){
+        post_to_service_url("movies", movie_id, method_name, user_id, message, status);
+      }else if(uid != ""){
+        post_to_service_url("movies", movie_id, method_name, uid, message, status);
+      }
+    }
+    set_value(movie_id, 1, method_name);
+  }
+
+
+  function want_and_not_want(movie_id, user_id, method_name, active_btn, inactive_btn, active_class, inactive_class, message){
+
+    $("#seen_div_"+movie_id).hide();
+
+    var cl = active_class.split("_");
+    remove_class = cl[0]+"_"+cl[1];
+
+    var remove_from_active = inactive_class + "_active";
+    $("#"+active_btn).removeClass(remove_class);
+    $("#"+active_btn).addClass(active_class);
+  
+    $("#"+inactive_btn).removeClass(remove_from_active);
+    $("#"+inactive_btn).addClass(inactive_class);
+
+    
+    var uid = $("#home_user_id").val();
+    if(user_id == "" && uid == ""){
+      check_login_in_homepage("#{FACEBOOK_APPID}", "movies",movie_id, method_name, message, "");
+    }
+    else{
+      if(user_id != "" && uid == ""){
+        post_to_service_url("movies", movie_id, method_name, user_id, message, "");
+      }else if(uid != ""){
+        post_to_service_url("movies", movie_id, method_name, uid, message, "");
+      }
+    }
+  }
+
+
+
+  function fan_unfan(star_id, user_id, method_name, active_btn, inactive_btn, active_class, inactive_class, message){
+
+    var cl = active_class.split("_");
+    remove_class = cl[0]+"_"+cl[1];
+
+    var remove_from_active = inactive_class + "_active";
+    $("#"+active_btn).removeClass(remove_class);
+    $("#"+active_btn).addClass(active_class);
+
+    $("#"+inactive_btn).removeClass(remove_from_active);
+    $("#"+inactive_btn).addClass(inactive_class);
+    
+
+    var uid = $("#home_user_id").val();
+    if(user_id == "" && uid == ""){
+      check_login_in_homepage("#{FACEBOOK_APPID}", "stars", star_id, method_name, message, "");
+    }
+    else{
+      if(user_id != "" && uid == ""){
+        post_to_service_url("stars", star_id, method_name, user_id, message, "");
+      }else if(uid != ""){
+        post_to_service_url("stars", star_id, method_name, uid, message, "");
+      }
+    }
+
+
+  }
+
+  function like_dislike_except_movie(id, user_id, type, method_name, active_btn, inactive_btn, active_class, inactive_class, message){
+
+    var cl = active_class.split("_");
+    remove_class = cl[0]+"_"+cl[1];
+
+    var remove_from_active = inactive_class + "_active";
+    $("#"+active_btn).removeClass(remove_class);
+    $("#"+active_btn).addClass(active_class);
+
+    $("#"+inactive_btn).removeClass(remove_from_active);
+    $("#"+inactive_btn).addClass(inactive_class);
+
+
+    var uid = $("#home_user_id").val();
+    if(user_id == "" && uid == ""){
+      check_login_in_homepage("#{FACEBOOK_APPID}", type, id, method_name, message, "");
+    }
+    else{
+      if(user_id != "" && uid == ""){
+        post_to_service_url(type, id, method_name, user_id, message, "");
+      }else if(uid != ""){
+        post_to_service_url(type, id, method_name, uid, message, "");
+      }
+    }
+
+
+  }
+
+  function show_video_comment(id, user_id, hide_id, show_id, flag_detail, path){
+    var hint = "Add a comment";
+    if(path == "movie"){
+      hint = "Add a comment about this movie";
+    }
+    else if(path == "star"){
+      hint = "Add a comment about this celebrity";
+    }
+    else if(path == "poster"){
+      hint = "Add a comment about this picture";
+    }
+    else if(path == "video"){
+      hint = "Add a comment about this video";
+    }
+
+   
+    $('#video_poster_comment_div_"+id+"').remove();
+    var content = "<div class='clear'></div><div style='margin-left:5px; width:215px;' id='video_poster_comment_div_"+id+"'>";
+
+    content += "<textarea type='text' placeholder='"+hint+"' style='border:1px solid #CACACA; background-color:#F9F9F9; height:30px; width:212px; padding:0px; margin:-17px 0 0' rows='2' onkeypress=\"show_video_btn(event, '"+id+"', '"+user_id+"', 'video_poster_comment_div_"+id+"', 'video_poster_comment_btn_"+id+"', 'video_poster_comment_"+id+"', '"+path+"', 'You have added comment!', '"+flag_detail+"');\" id='video_poster_comment_"+id+"' cols='19'></textarea>";
+
+    content += "<div style='height:10px' class='clear'></div>";
+    content += "<div class='right'>";
+
+    content += "<input type='button' value='Submit' onclick=\"show_video_btn('submit', '"+id+"', '"+user_id+"', 'video_poster_comment_div_"+id+"', 'video_poster_comment_btn_"+id+"', 'video_poster_comment_"+id+"', '"+path+"', 'You have added comment!', '"+flag_detail+"');\" class='home_login_link'>";
+
+    content += "&nbsp; &nbsp;";
+
+    content += "<input type='button' value='Cancel' onclick=\"cancel_comment('video_poster_comment_div_"+id+"', 'video_poster_comment_btn_"+id+"');\"  class='home_login_link'>";
+ 
+    content += "</div>";
+    content += "<div style='height:10px' class='clear'></div>";
+    content += "</div>";
+ 
+    $('#home_box_'+id).append(content).masonry("appended", content);  
+    $("#video_poster_comment_"+id).focus();
+
+    $("#"+hide_id).hide();
+    adjust_boxes();
+  }
+
+  function cancel_comment(hide_id, show_id){
+    $("#"+hide_id).remove();
+    $("#"+show_id).show();
+    adjust_boxes();
+  }
+
+
+  function show_video_btn(e,video_id, user_id, hide_id, show_id, comment_box, type, message, flag_detail){
+    if((e.keyCode == 13) || (e == "submit")){      
+      var comment = $("#"+comment_box).val();
+
+      if(type == "movie" || type == "star"){
+        var act = "discussion";
+      }else{
+        var act = "comment";
+      }
+
+      var uid = $("#home_user_id").val();
+      if(user_id == "" && uid == ""){
+        check_login_in_homepage("#{FACEBOOK_APPID}", type, video_id, act, message, "", flag_detail);
+      }
+      else{
+        if(user_id != "" && uid == ""){
+          post_to_service_url(type, video_id, act, user_id, message, "", flag_detail);
+        }else if(uid != ""){
+          post_to_service_url(type, video_id, act, uid, message, "", flag_detail);
+        }
+      }
+      
+      $("#"+hide_id).hide();
+      $("#"+show_id).show();
+      adjust_boxes();
+    }
+  }
+
+

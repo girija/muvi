@@ -1,0 +1,11 @@
+/= link_to "Admin Updates", admin_updates_admin_reports_path
+
+/&nbsp;&nbsp; | &nbsp;&nbsp;
+
+/= link_to "Scheduler Updates", scheduler_updates_admin_reports_path
+
+%ul{:style => "list-style:none"}
+  %li{:style => "float:left; border:1px solid gray;border-bottom:0px;-moz-border-radius:6px 6px 0px 0px;padding:5px 10px;margin-right:1px;width:100px; text-align:center"}
+    Movie
+  %li{:style => "float:left; border:1px solid gray;-moz-border-radius:6px 6px 0px 0px;padding:5px 10px; background-color:#cccccc;width:100px; text-align:center"}
+    =link_to "Celebs", celeb_tweets_admin_new_tweets_path

@@ -1,0 +1,45 @@
+= render 'menu'
+%br
+%br
+%table.listing
+  %tr
+    %th Name
+    %th Users
+    %th Items
+    %th Date
+    %th Rank
+    %th Actions
+  - unless @topten_celebrities.blank?
+    = form_tag(delete_item_admin_top_tens_path) do
+      - @topten_celebrities.each do |celeb|
+        %tr
+          %td{:valign =>'top'}
+            = celeb.name
+          %td{:valign =>'top'}
+            = TopTen.display_name(celeb.user_id)
+          %td{:valign =>'top'}
+            %table
+              %tr
+                %th Item name
+                %th Notes
+                - items =  ActiveSupport::JSON.decode(celeb.items)
+                - items['items'].each do |item|
+                  %tr
+                    %td
+                      = get_celebrity_name(item['id']) if !item['id'].blank?
+                    %td
+                      = item['notes']
+          %td{:valign =>'top'}
+            = celeb.created_at.to_date
+          %td{:valign =>'top'}
+            = celeb.rank
+          %td{:valign =>'top'}
+            = link_to "Edit", edit_admin_top_ten_path(celeb)
+            |
+            = link_to "Delete", "/admin/top_tens/#{celeb.id}/delete" , :confirm => 'Are you sure?'
+  - else
+    %tr
+      %td{:colspan => 3}
+        %p Sorry there are no top 10
+
+= will_paginate @topten_celebrities

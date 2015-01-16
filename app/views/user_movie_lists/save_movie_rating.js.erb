@@ -1,0 +1,11 @@
+var btn_html = "<a href='#rated' class='btn btn-success'><i class='icon-ok'></i> Rated</a>";
+$("#rate_<%=params[:movie_id]%>").html(btn_html);
+
+$("#rate_div_<%=current_user.id%>_<%=params[:movie_id]%>").html(btn_html);
+
+
+if("<%= params["hidden-tags"] %>" != ""){
+  _gaq.push(['_trackEvent', 'List', 'Created list', 'Created list']);  
+}
+_gaq.push(['_trackEvent', 'Rate', 'Rated movie', 'Rated movie']);
+

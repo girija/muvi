@@ -1,0 +1,16 @@
+-unless @topten_by_years.blank?
+  .box.left
+    .moviBox.left
+      = image_tag(@topten_by_years.banner_image, :width => "130", :height => "174")
+    .title.left
+      = link_to raw("<h3>Top 10 Movies by Year</h3>"), "/top_ten/default/#{Time.new.year}/all/all", :style => 'font-size:15px'
+      .clear
+
+-unless @topten_by_tweets.blank?
+  .box.left
+    .moviBox.left
+      = image_tag(@topten_by_tweets.banner_image, :width => "130", :height => "174")
+    .title.left
+      = link_to raw("<h3>Top 10 Upcoming movies</h3>"), "/top_ten/upcoming/", :style => 'font-size:15px'
+      .clear
+

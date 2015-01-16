@@ -1,0 +1,44 @@
+<% if params[:block_type] == "notwant_see" || params[:block_type] == "wantsee" %>
+  $("#<%= params[:block_type]%>_movie_detail").html("<%= escape_javascript(render 'user_profiles/profile_movie_detail',:item=>@movie,:type => params[:block_type],:prev_item => @prev_item, :next_item => @next_item) %>");
+  <% if params[:action_type] == "notsee" %>
+    successMessage("You didn't want to see <%= @movie.name%>")
+  <%else%>
+    successMessage("You wanted to see <%= @movie.name%>")
+  <%end%>
+<% else %>
+  $("#want_to_see_form").attr("action","/want_to_see");
+  $('#want_to_see_div').dialog('destroy');
+  <% if @wanttosee == true%>
+    //$("#want_to_see_btn").attr('src','/images/want_to_see_hover.png');
+    //$("#not_seen_it_btn").attr('src', '/images/want_to_see_hover.png');
+    //$("#not_seen_it_btn").parent().css('width','118px');
+  <% else %>
+    //$("#want_to_see_btn").attr('src','/images/want_to_see_normal.png');
+  <%end%>
+  <% if @notwanttosee == true%>
+    //$("#not_want_to_see_btn").attr('src','/images/not_want-hover.png');
+    //$("#not_seen_it_btn").attr('src', '/images/not_want-hover.png');
+    //$("#not_seen_it_btn").parent().css('width','64px');
+  <% else %>
+    //$("#not_want_to_see_btn").attr('src','/images/not_want_normal.png');
+  <%end%>
+  if ($('#seen_it').length > 0) {
+    if ($('#seen_it').is(':visible')) {
+      $("#want_it").hide("slow");
+    }
+  }
+  <% if params[:action_type] == "notsee" %>
+    successMessage("You didn't want to see <%= @movie.name%>")
+    $("#not_want_to_see_btn").attr('src','/images/not_want-hover.png');
+    $("#not_seen_it_btn").attr('src', '/images/not_want-hover.png');
+    $("#not_seen_it_btn").parent().css('width','64px');
+    $("#want_to_see_btn").attr('src','/images/want_to_see_normal.png');
+  <%else%>
+    successMessage("You wanted to see <%= @movie.name%>")
+    $("#want_to_see_btn").attr('src','/images/want_to_see_hover.png');
+    $("#not_seen_it_btn").attr('src', '/images/want_to_see_hover.png');
+    $("#not_seen_it_btn").parent().css('width','118px');
+    $("#not_want_to_see_btn").attr('src','/images/not_want_normal.png');
+  <%end%>
+<%end%>
+

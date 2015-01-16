@@ -1,0 +1,35 @@
+-if options["is_upcoming"] == true
+  -unless current_user.blank?
+    -user_id = current_user.id
+  -else
+    -user_id = ""
+
+  -class_name1 = "want_btn"
+  -class_name2 = "not_want_btn"  
+
+  // If want to see
+  -if options["data"]["watch"] == 1
+    -class_name1 = "want_btn_active"
+    -class_name2 = "not_want_btn"
+
+  -elsif options["data"]["unwatch"].to_i == 1
+    -class_name1 = "want_btn"
+    -class_name2 = "not_want_btn_active"
+
+
+  %div{:id => "want_div_#{options["id"]}", :class => "left button_container_div", :style => "width: 156px; height: 22px; /*background: url('/images/wts_nwts_bg.png') repeat scroll 0px 0px transparent;*/"}
+  
+    .left{:id => "wts_span_#{options["id"]}", :class => "btn_div_1 tip_hint tooltipbottom"}
+
+      %button{:id => "want_btn_#{options["id"]}",:style => "padding:0px; margin-left:1px", :class => "#{class_name1} left", :onclick => 'want_and_not_want("'"#{options["id"]}"'", "'"#{user_id}"'","wanttosee", "want_btn_'"#{options["id"]}"'", "not_want_btn_'"#{options["id"]}"'", "want_btn_active", "not_want_btn", "You wanted to see '"#{options["name"]}"'");', :onmouseover => "change_border('#{options["type"]}', 'wts_span_#{options["id"]}', 'want_btn_#{options["id"]}', 'wts_text_#{options["id"]}', 'wts_icon_o.png');", :onmouseout =>  "remove_border('#{class_name1}', 'wts_span_#{options["id"]}', 'want_btn_#{options["id"]}', 'wts_text_#{options["id"]}', 'wts_icon_b.png');"}
+
+        %div{:id => "wts_text_#{options["id"]}", :class => "wts_text"}
+          Want to see      
+      =generate_tooltip_block("wantto_see","home_page")
+    .right{:id => "nwts_span_#{options["id"]}", :class => "btn_div_2 tip_hint tooltipbottom"}
+      %button{:id => "not_want_btn_#{options["id"]}", :style => "padding:0px", :class => "#{class_name2} left", :onclick => 'want_and_not_want("'"#{options["id"]}"'", "'"#{user_id}"'","notanymore", "not_want_btn_'"#{options["id"]}"'", "want_btn_'"#{options["id"]}"'", "not_want_btn_active", "want_btn", "You didn\'t want to see '"#{options["name"]}"'");', :onmouseover => "change_border('#{options["type"]}', 'nwts_span_#{options["id"]}', 'not_want_btn_#{options["id"]}', 'not_want_text_#{options["id"]}', 'nwts_icon_o.png');", :onmouseout =>  "remove_border('#{class_name2}', 'nwts_span_#{options["id"]}', 'not_want_btn_#{options["id"]}', 'not_want_text_#{options["id"]}', 'nwts_icon_b.png');"}
+
+        %div{:id => "not_want_text_#{options["id"]}", :class => "nwts_text"}
+          No
+      =generate_tooltip_block("notwant_see","home_page")
+      

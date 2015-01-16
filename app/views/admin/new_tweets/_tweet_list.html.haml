@@ -1,0 +1,15 @@
+-unless @new_tweets.blank?
+  -@new_tweets.each do |new_tweet|
+    %tr
+      %td{:valign => "top"}
+        = check_box_tag("tweet_ids[]", new_tweet.id, false)
+      %td
+        =new_tweet.review
+      %td{:valign => "top"}
+        = new_tweet.content
+      %td
+        -if !new_tweet.movie_id.nil? and !new_tweet.movie_id.blank?
+          =get_movie_name(new_tweet.movie_id)
+      %td
+        =new_tweet.twitter_screen_name
+        

@@ -1,0 +1,21 @@
+-if type == "fan"
+  - celeb_list = []
+  -@fan_celebs[0..4].each do |fan|
+    -celeb_list << fan.celebrity
+-elsif type == "unfan"
+  - celeb_list = []
+  -@unfan_celebs[0..4].each do |unfan|
+    -celeb_list << unfan.celebrity
+.clear{:style => 'height:5px'}
+%div
+  - celeb_list[0..4].each_with_index do |celeb,i|
+    -unless celeb.blank?
+      %div{:class=>"left", :style=>"height:180px;cursor:pointer;padding-right:10px;width:90px;", :onclick => "window.location.href='#{star_path(celeb.permalink)}'"}
+        -begin
+          .left{:style => "border:1px solid #d2d6d9;"}
+            %div{:style=>"height:124px;width:84px;padding:2px;"}
+              =link_to image_tag(celeb.image,:style=>"height:124px;width:84px;"),star_path(celeb.permalink)
+          .clear
+        -rescue
+        .clear
+        = link_to celeb.name,star_path(celeb.permalink),:style=>"font-weight:normal;font-size:13px;color:#000;"

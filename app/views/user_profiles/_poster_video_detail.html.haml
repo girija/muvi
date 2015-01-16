@@ -1,0 +1,74 @@
+- @user_profile = @user_profile ? @user_profile : UserProfile.find_by_user_id(current_user.id)
+%div
+  -if type == "poster"
+    - @item  = item ? item : @poster
+    -poster = @item
+    %div{:style=>"border:1px solid #D2D6D9;width:128px;height:195px;float:left;"}
+      %div{:style => "width:124px;height:191px;padding:2px;"}
+        -tag_item = poster.taggings.where("tagger_type = 'Movie' or tagger_type = 'Celebrirty'").first
+        -if tag_item
+          -ref_item = tag_item.tagger_type.constantize.find_by_id(tag_item.tagger_id)
+          = image_tag ("/system/posters/#{poster.id}/medium/#{poster.poster_file_name.gsub(" ", "%20")}"), :width => "124px", :height => "191px",:onclick => "javascript:show_poster('#{poster.id}','#{tag_item.tagger_type.downcase}','#{ref_item.permalink}');", :style => "cursor:pointer", :id => "poster#{poster.id}",:title=>"#{poster.name}",:alt => "#{poster.name}"
+  -elsif type == "video"
+    - @item  = item ? item : @video
+    - video = @item
+    %div{:style=>"border:1px solid #D2D6D9;width:128px;height:114px;float:left;"}
+      %div{:style => "width:124px;height:130px;padding:2px;"}
+        -tag_item = video.taggings.where("tagger_type = 'Movie' or tagger_type = 'Celebrirty'").first
+        -if tag_item
+          -ref_item = tag_item.tagger_type.constantize.find_by_id(tag_item.tagger_id)
+          -if ref_item
+            %div{:id => "video_image_#{video.id}", :class => "video_list", :style=>"width:128px;"}
+              - unless video.video_remote_url.blank?
+                - video_id_arr = video.video_remote_url.split("/")
+                - video_id = video_id_arr[video_id_arr.size.to_i - 1]
+                %div{:style => "position:relative;background:url('http://img.youtube.com/vi/#{video_id}/1.jpg'); height:110px;width:124px;cursor:pointer;", :onclick => "javascript:show_video(#{video.id}, '#{tag_item.tagger_type.downcase}','#{ref_item.permalink}');", :id => "video#{video.id}", :title => "#{video.name}", :alt => "#{video.name}"}
+                  %img{:src => "#{URL}/images/play_button.png", :style => "position:absolute;right:5px;bottom:5px"}
+              - else
+                %div{:style => "position:relative;background:url('#{URL}/system/trailer_thumbnails/#{video.id}/1.jpg'); height:110px;width:124px;cursor:pointer;", :onclick => "javascript:show_video('#{video.id}', '#{tag_item.tagger_type.downcase}','#{ref_item.permalink}');", :id => "video#{video.id}", :title => "#{video.name}", :alt => "#{video.name}"}
+                  %img{:src => "#{URL}/images/play_button.png", :style => "position:absolute;right:5px;bottom:5px"}
+  %div{:style=>"padding-left:10px;width:390px;float:right"}
+    %div{:style=>"float:right;padding-right:5px;height:13px"}
+      %div{:class=>"prev_btn",:onclick=>"show_profile_block_item('#{@item.class.to_s}','#{prev_item.id}','prev','#{type}_detail','#{type}','#{@user_profile.user_id}');"}
+      %div{:style=>"width:4px;float:left"}
+      -unless next_item.blank?
+        %div{:class=>"next_btn",:onclick=>"show_profile_block_item('#{@item.class.to_s}','#{next_item.id}','next','#{type}_detail','#{type}','#{@user_profile.user_id}');"}
+      -else
+        %div{:class=>"next_btn"}
+
+    -cls_name = type.capitalize
+    -@count_vote = current_user ? Vote.find(:all,:conditions =>["voter_id = ? AND votable_id = ? AND votable_type = ?",current_user.id,@item.id,cls_name]) : ""
+    -check_vote = Vote.find(:all,:conditions =>["voter_id = ? AND votable_id = ? AND votable_type = ?", @user_profile.user_id,@item.id,cls_name]).first
+    %div{:style=>"height:128px;"}
+      %div{:style=>"float: left; width: 30px;"}
+        =image_tag("/images/double_quote_1.png")
+      %div{:class=>"right_sctivity"}
+        -if check_vote.vote_flag == true
+          ="#{@user_profile.display_name} liked #{@item.name}"
+        -else
+          ="#{@user_profile.display_name} didn't Like #{@item.name}"
+      %div{:style=>"float:right; width: 18px;"}
+        =image_tag("/images/double_quote_2.png")
+    %div{:style=>"width:88px;"}
+      -if !@count_vote.blank?
+        -if @count_vote.first.vote_flag == true
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            =link_to image_tag("new_like_active.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px"),"javascript:void(0);",:remote=>'true', :onclick => "check_profile_like_login('#{@user_profile.id}','#{@item.id}','#{@item.class}','like')",:id=>"like_#{@item.class}_#{@item.id}"
+            =generate_tooltip_block("#{@item.class.to_s.downcase}_like","profile_page")
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            = link_to image_tag("d_like.png", :style => "float:right;cursor:pointer;padding-right:1px;padding-top:1px"),"javascript:void(0);",:remote=>'true',:id=>"bad_#{@item.class}_#{@item.id}", :onclick => "check_profile_like_login('#{@user_profile.id}','#{@item.id}','#{@item.class}','bad')"
+            =generate_tooltip_block("#{@item.class.to_s.downcase}_dislike","profile_page")
+        -else
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            = link_to image_tag("new_like.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px"),"javascript:void(0);",:remote=>'true',:id=>"like_#{@item.class}_#{@item.id}", :onclick => "check_profile_like_login('#{@user_profile.id}','#{@item.id}','#{@item.class}','like')"
+            =generate_tooltip_block("#{@item.class.to_s.downcase}_like","profile_page")
+          %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+            = link_to image_tag("d_like_active.png", :style => "float:right;cursor:pointer;padding-right:1px;padding-top:1px"),"javascript:void(0);",:remote=>'true',:id=>"bad_#{@item.class}_#{@item.id}", :onclick => "check_profile_like_login('#{@user_profile.id}','#{@item.id}','#{@item.class}','bad')"
+            =generate_tooltip_block("#{@item.class.to_s.downcase}_dislike","profile_page")
+      -else
+        %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+          = link_to image_tag("new_like.png", :style => "float:left;cursor:pointer;padding-left:1px;padding-top:1px"),"javascript:void(0);",:remote=>'true',:id=>"like_#{@item.class}_#{@item.id}", :onclick => "check_profile_like_login('#{@user_profile.id}','#{@item.id}','#{@item.class}','like')"
+          =generate_tooltip_block("#{@item.class.to_s.downcase}_like","profile_page")
+        %div{:style=>"float:left;",:class=>"tip_hint tooltipbottom"}
+          = link_to image_tag("d_like.png", :style => "float:right;cursor:pointer;pointer;padding-right:1px;padding-top:1px"),"javascript:void(0);",:remote=>'true',:id=>"bad_#{@item.class}_#{@item.id}", :onclick => "check_profile_like_login('#{@user_profile.id}','#{@item.id}','#{@item.class}','bad')"
+          =generate_tooltip_block("#{@item.class.to_s.downcase}_dislike","profile_page")

@@ -1,0 +1,45 @@
+= render 'menu'
+%br
+%br
+%table.listing
+  %tr
+    %th Name
+    %th Users
+    %th Items
+    %th Date
+    %th Rank
+    %th Actions
+  - unless @topten_movies.blank?
+    = form_tag(delete_item_admin_top_tens_path) do
+      - @topten_movies.each do |movie|
+        %tr
+          %td{:valign =>'top'}
+            = movie.name
+          %td{:valign =>'top'}
+            = TopTen.display_name(movie.user_id)
+          %td{:valign =>'top'}
+            %table
+              %tr
+                %th Item name
+                %th Notes
+                - items =  ActiveSupport::JSON.decode(movie.items)
+                - items['items'].each do |item|
+                  %tr
+                    %td
+                      = get_movie_name(item['id'])
+                    %td
+                      = item['notes']
+          %td{:valign =>'top'}
+            = movie.created_at.to_date
+          %td{:valign =>'top'}
+            = movie.rank
+          %td{:valign =>'top'}
+            = link_to "Edit", edit_admin_top_ten_path(movie)
+            |
+            = link_to "Delete", "/admin/top_tens/#{movie.id}/delete" , :confirm => 'Are you sure?'
+  - else
+    %tr
+      %td{:colspan => 3}
+        %p Sorry there are no top 10(s)
+
+= will_paginate @topten_movies

@@ -1,0 +1,139 @@
+@charset "utf-8";
+body {
+font: 100%/1.4 Arial, Helvetica, sans-serif,   sans-serif;
+background: #f3f3f3;
+margin: 0;
+padding: 0;
+color: #000;
+/* background:#f3f3f3 url('/public/images/ms_bg.png') repeat-x right top; */
+}
+img{
+ border:0;
+}
+.ms_topbar {
+  background: url('/public/images/ms_topbar_bg.png') repeat-x;
+  height:41px;
+}
+.ms_menu {
+  width:977px;
+  margin:0 auto;
+}
+.ms_header{
+  background:#f3f3f3 url('/public/images/ms_header_bg.png') repeat-x center center;
+  height:392px;
+  margin: 0;
+}
+.ms_bullet{
+  float:left;
+}
+.ms_bullet li{
+  font-family: 'HelveticaNeueLTStd37ThCnOb';
+  color:#fff;
+  font-size:21px;
+  font-weight: normal;
+  font-style: normal;
+}
+.ms_login_box{
+  width:977px;
+  margin:0 auto;
+}
+#ms_login{
+  height:254px;
+  width:250px;
+  background: url('/public/images/ms_login_bg.png');
+  float:right;
+  margin-top:40px;
+}
+.ms_login_control{
+ margin-top:10px;
+ margin-left:20px;
+}
+
+.ms_login_control > * {
+ vertical-align:middle;
+}
+.ms_input > * {
+ float:left;
+}
+.ms_input > div{
+ width:60px;
+ vertical-align:middle;
+ display:table-cell
+}
+
+.ms_input{
+  background: url('/public/images/ms_input_bg.png') no-repeat 0 center; 
+  width:100%;
+  clear:both;
+  color:#fff;
+  margin-left:20px;
+  font-size:11px;
+  vertical-align:middle;
+  padding:0 5px;
+  display:table;
+}
+.ms_input input{
+ width:120px;
+ color:#fff;
+ background:none repeat scroll 0 0 transparent;
+ border: 0;
+}
+.ms_thumb{
+ width:1000px;
+ margin:0 auto;
+ display:table;
+ padding:20px;
+}
+.ms_block{
+  height: 300px;
+  width: 240px;
+  text-align:center;
+  margin:5px;
+  float:left;
+}
+.ms_image{
+  background: url('/public/images/ms_thumb_bg.png') no-repeat center center;
+  height:149px;
+  width:233px;
+}
+.ms_image img{
+ padding-top:7px;
+}
+.ms_title{
+ text-align:left;
+ padding-top:20px;
+}
+.ms_content{
+ width: 200px;
+ color:#2a323b;
+ text-align:left;
+ font-size:12px; 
+}
+.left{
+ display:table-cell;
+}
+.ms_footer{
+  color:#2b2728;
+  width:997px;
+  margin :0 auto;
+  font-size:12px;
+  border-top:1px solid #c1c1c1;
+  margin-top:10px;
+  padding-top:15px;
+  padding-bottom:30px
+}
+.ms_footer a{
+  color:#2b2728;
+  text-decoration:none;
+}
+.ms_footer a:hover{
+ text-decoration : underline;
+}
+
+.ms_login_control a{
+ text-decoration:none;
+}
+.ms_login_control a:hover{
+ text-decoration : underline;
+}
+

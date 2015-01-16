@@ -1,0 +1,37 @@
+%div{:style=>"min-height:500px;"}
+  %div
+    = select_tag 'lang', "<option value='Hindi'>Bollywood</option><option value='English'>Hollywood</option>".html_safe#,:onchange => "change_lang();"
+
+    %input{:type=>"text",:size => "50",:class=>"curate_movie", :onkeyup => "search_movie();"}
+    %input{:type=>"hidden",:id => "movie_id"}
+    %input{:type=>"button",:value => "Add", :onclick => "add_curate_movie();"}
+
+  %div{:id=>"curated_movies"}
+    =render :partial => "curated_list",:locals => {:bol_movies => @bol_movies}
+
+:javascript
+  var lang = "Hindi";
+  //$(document).ready(function() { 
+  function search_movie(){
+    $(".curate_movie").autocomplete({
+      source: '/curate_autocomplete?lang='+$("#lang").val(),
+      select: function( event, ui ) {$("#movie_id").val(ui.item.id)}
+    }); 
+  }
+  //});
+
+  function change_lang(){
+    lang = $("#lang").val();
+  }
+  function add_curate_movie(){ 
+    var lang = $("#lang").val();
+    var movie_id = $("#movie_id").val();
+    if(movie_id != ""){
+    $.post("/add_curate_movie",{lang:lang,movie_id:movie_id},function(res){
+      $("#movie_id").val("");
+      $(".curate_movie").val("");
+      $("#curated_movies").html(res);
+    });
+    }
+  }
+

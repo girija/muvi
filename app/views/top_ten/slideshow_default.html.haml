@@ -1,0 +1,67 @@
+/= content_for :breadcrumb do
+/  %span
+/    = link_to "Home &#187;".html_safe, root_path
+/    = link_to "Top 10s &#187;".html_safe, top_ten_path
+/    Top 10 by Year
+
+= content_for :heading do
+  .left
+    %div{:style => "width:575px; float:left; font-weight:bold;"}
+      %span Top 10 by Muvimeter:
+      = @title
+- if params[:type] == 'default'
+  .right.latestUpdate
+    = select_tag :release_year, options_for_select(@release_year,@selected_year), :onchange => "gotoTopTen()"
+    /= select_tag :celebrity, options_for_select(@celebrities, @selected_celebrity), :onchange => "gotoTopTen()"
+    /= select_tag :genre, options_for_select(@genres, @selected_genre), :onchange => "gotoTopTen()"
+
+.clear
+
+#top_ten
+- unless @topten.blank?
+  .homeContainerIn.homeborderDiv
+    .sliderWrapper
+      #slider.slider
+        %ul
+          - ctr = @movies_array.size + 1
+          - @movies_array.each do |movie|
+            %li
+              .album
+                - @movie = Movie.find(movie)
+                = link_to image_tag("#{@movie.full_image}" , :size=>'260x400'), movie_path(@movie)
+                .desc
+                  %h2
+                    %span
+                      = ctr -1
+                    = link_to get_movie_name(movie) , movie_path(@movie)
+                %div{ :style => "margin-top:12px;width:240px;", :class => "moviRatingBox left"}
+                  -if !@movie.release_date.nil? and !@movie.release_date.blank? and @movie.release_date <= Date.today
+                    .rating{:style=>"width:240px;"}
+                      %span.gray_bold
+                        MUVIMETER
+                      .clear
+                      .ratingBar.left{:style=>"height:19px;padding:2px;width:175px"}
+                        = ratingbar(@movie.muvimeter,"muvimeter")
+                      -if @movie.muvimeter != 0 and !@movie.muvimeter.blank? and !@movie.muvimeter.nil?
+                        .ratingvalue.left{:style => "margin-top:2px;"}
+                          -muvimeter = "#{@movie.muvimeter || 0}%"
+                          = link_to muvimeter, '#critics', :onclick => "go_to_tab(0);",:style => "font-size:20px; color:#4F4F4F"
+                      .clear{:style => "height:4px"}
+            - ctr = ctr - 1
+      -if params[:msn_embed] != "msn_embed"
+        - if params[:type] == 'default'
+          .left{:style => 'font-size:17px;line-height:1.5em'}  Don't agree with this list?&nbsp;
+          .actions.left
+            - if current_user
+              %a{:href=> "/top_ten/edit/default/#{params[:release_year]}/#{params[:genre]}/#{params[:celebrity]}", :class=>'gradient-button2'}
+                .gradient-button2
+                  .label Remix
+
+            - else 
+              /%a{:href=>'#', :id=>'remix', :class=>'gradient-button2', :href=>new_user_session_path, "data-remote" => "true", :onclick => 'enableLoginError(registration(), "You need to login");' }
+              %a{:onclick => "check_login();", :class=>'gradient-button2', :style => "cursor:pointer", :id => "remix"}
+                .gradient-button2
+                  .label Remix
+          .left{:style => 'font-size:17px;line-height:1.5em'}   &nbsp;Show for other users
+
+    .clear{:style=> 'height:20px'}

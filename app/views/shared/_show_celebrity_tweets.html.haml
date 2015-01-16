@@ -1,0 +1,30 @@
+.large_box.left
+  %h2
+    %span Celebrity
+    %span{:style => "color:#31B2DC"}
+      tweets
+
+  .div_with_icon
+    %div{:style => "height:50px; margin-top:-30px;margin-left:298px"}
+      =image_tag ("/images/tweeter_icon.png")
+    -if @celebrity_tweets.blank?
+      %h4 Tweets are  not present by this celebrity
+
+    -else
+      - @celebrity_tweets.in_groups_of(2) do |group|
+        - group.each do |tweet|
+          - unless tweet.blank?
+            .row
+              .image.left
+                %a{:href=>"http://www.twitter.com/#!/#{display_name(tweet)}", :target=>"_blank"}
+                  %img{:src => "http://api.twitter.com/1/users/profile_image?screen_name=#{display_name(tweet)}&size=normal"}
+              .names
+                - unless tweet[1].blank?
+                  = truncate(tweet[1].html_safe, :length => 100)
+                %br
+                %a{:href=>"http://www.twitter.com/#!/#{display_name(tweet)}", :target=>"_blank", :style => "font-weight:normal"}
+                  =display_name(tweet)
+                  = Time.parse(tweet[5]).strftime('%d %B %Y').to_s rescue ''
+      .clear
+
+ 

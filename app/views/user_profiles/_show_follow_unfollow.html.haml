@@ -1,0 +1,22 @@
+-unless current_user.blank?
+  -if current_user.id != @user_profile.user_id
+    -unless @count_follow.blank?
+      =render '/connections/form'
+    -else
+      = form_for "connections",:url => "/connections/follow", :html => {:id => "follow_form"},  :remote => true do |f|
+        = f.hidden_field :user_id, :value => @user_profile.user_id
+        %div{:style => 'width:45%;float:left',:id => "follow_div"}
+          .actions.left
+            .gradient-input-button.ui-corner-all
+              .gradient-input-button.ui-corner-all{:class=>"tip_hint tooltipbottom"}
+                %input{:type => "submit", :value => "Follow", :name => "commit", :id => "comment_submit", :class => "label"}
+                =generate_tooltip_block("follow_btn","profile_page")
+        .clear
+  -else
+    =render :partial => "/user_profiles/show_follow_suggesion"
+-else
+  %div{:class=>"tip_hint tooltipbottom"}
+    %a{:href => new_user_session_path(:login => 'fan'), :onclick => "enableLoginError(registration(), 'You need to login');", "data-remote" => "true",:class=>"gradient-button3", :style => "width:110px"}
+      Follow
+    =generate_tooltip_block("follow_btn","profile_page")
+

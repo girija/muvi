@@ -1,0 +1,14 @@
+%input{:type => "text", :id => "featured_topten_item", :name => "featured_topten" ,:placeholder => 'Enter the name of topten'}
+= hidden_field_tag "id_featured_topten_item" , 0, :name => 'featured_topten_id'
+.clear
+
+-unless @featured_topten.blank?
+  -topten = TopTen.find_by_id(@featured_topten.subject_id)
+
+  -unless topten.blank?
+    %script
+      $("#featured_topten_item").val("#{topten.name}");
+      $("#id_featured_topten_item").val("#{@featured_topten.subject_id}");
+
+
+

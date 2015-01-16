@@ -1,0 +1,23 @@
+//window.location.href = "/show_invite";
+
+/*if("<%#= params[:from]%>" != ""){
+  location.reload(true);
+}else{
+  $(".header").css("opacity","0.2"); 
+
+  $('.header').append('<div style="position: absolute;top:0;left:0;width: 100%;height:100%;z-index:2;opacity:0.4;filter: alpha(opacity = 50)"></div>');
+  $("#modal-9").addClass("md-show");
+}
+*/
+<%
+        loc = DisplayHelper.get_location(request.remote_ip)
+%>
+        var loc_language = "";
+        loc_language = "<%=loc%>"
+        $.cookie(loc_language, 'yes');
+        //location.reload(true);
+        $.post("/update_user_language", function(data) {
+          location.reload(true);
+        });
+
+

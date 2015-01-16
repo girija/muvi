@@ -1,0 +1,130 @@
+<div class='row-fluid'>
+  <div id='err'></div>
+  <form action='/save_movie_rating' method='post' data-remote='true' onsubmit='validate();'>
+    <div class='span12'>
+      <div class='clear'></div>
+      <div style='margin-left:15px'><a style='font-weight:bold; font-size:24px;' href='http://<%=request.env["HTTP_HOST"]%>/movies/<%= @movie.permalink%>'><%= @movie.name %></a></div>
+    </div>
+
+    <div class='span12'>
+      <div class='clear' style='height:20px;'></div>
+      <div style='float:left; width:100px; font-weight:bold; color:#666666; '>How was it?</div>
+      <% review =  @movie.reviews.where("user_id = #{current_user.id}").first  if current_user%>
+      <div style="float:left;width:80px;">
+        <% if  review && review.rating.to_s ==  "2.0" %>
+          <input type='button' id='boring' title='Boring' class='boring_active' onclick='set_rate_value(this, 2);'>
+        <% else %>
+          <input type='button' id='boring' title='Boring' class='boring'  onclick='set_rate_value(this, 2);'>
+        <% end %>
+      </div>
+      <div style="float:left;width:80px;">
+        <% if review && review.rating.to_s ==  "4.0" %>
+          <input type='button' id='ok' title='Ok' class='ok_active' onclick='set_rate_value(this, 4);'>
+        <% else %>
+          <input type='button' id='ok' title='Ok' class='ok'  onclick='set_rate_value(this, 4);'>
+        <% end %>
+      </div>
+      <div style="float:left;width:80px;">
+        <% if review && review.rating.to_s ==  "5.0" %>
+          <input type='button' id='good' title='Good' class='good_active' onclick='set_rate_value(this, 5);'>
+        <% else %>
+          <input type='button' id='good' title='Good' class='good' onclick='set_rate_value(this, 5);'>
+        <% end %>
+      </div>
+      <div class='clear' style='height:40px'></div>
+    </div>
+
+    <div class='span12'>
+      <label>Add to a List</label>
+      <div class="clear"></div>
+      <input type='text' name='tags' placeholder='Add to any list such as My top movies, Top action movies. Separate by comma' class='tagManager' style='width:550px'>
+    </div>
+    <%
+      tags = []
+      already_tagged = []
+      list = []
+      list = UserMovieList.find(:all, :conditions => ["user_id = #{current_user.id}"],:order => "created_at desc") unless current_user.nil?
+      list.each do |l|
+        unless l.tag.blank?
+          tags << l.tag
+        end
+        movie_ids = ActiveSupport::JSON.decode(l.movie_id)
+        if movie_ids.include?(@movie.id.to_s)
+          already_tagged << l.tag unless l.tag.blank?
+        end
+      end
+    %>
+    <% already_tagged.each do |al| %>
+      <script>
+        var tag_val = "<%= al%>";
+        $(".tagManager").tagsManager('pushTag',tag_val);
+      </script>
+    <% end %>
+
+    <div class='span12'>
+      <% tags[0..3].each  do |t|%>
+        <span class='tag_list' onclick="add_tolist('<%= t %>')"><%= t %></span>
+      <% end %>
+    </div>
+
+    <div class='clear' style='height:10px'></div>
+
+    <div class='span12'>
+      <div class='clear' style='height:10px'></div>
+      <textarea cols=20 rows=4 id='review_text' name='review_text' style='width:550px; height:30px' placeholder='Write something...'></textarea>
+      <div class='clear'></div>
+    </div>
+
+    <div class='span12' style='text-align:right; padding-right:25px'>
+      <input type='hidden' name='movie_id' id='movie_id' value='<%= @movie.id%>'>
+      <% if  review && review.rating %>
+        <input type='hidden' name='hid_rate' id='hid_rate' value='<%= review.rating %>'>
+      <% else %>
+        <input type='hidden' name='hid_rate' id='hid_rate'>
+      <% end %>
+      <input type='submit' value='Save' class='btn btn-success'>
+      <input type='button' class='btn' data-dismiss='modal' aria-hidden='true' value='Close' onclick="close_modal(this);"></button>
+    </div>
+  </form>
+</div>
+<script>
+  function add_tolist(tag_val){
+    if(tag_val != ""){
+      $(".tagManager").tagsManager('pushTag',tag_val);
+    }
+  }
+  function close_modal(ev){
+    $("#rating_popup").dialog("close");  
+  }
+  function validate(){
+    var movie_id = $("#movie_id").val();
+    _gaq.push(['_trackEvent', 'Movie Inside Page', 'rating popup submit', movie_id]);
+    if($("#hid_rate").val() == ""){
+      $("#err").html("Please choose how you feel the movie was !");
+      $('#err').css("color", "red");
+      return false;
+    }else{
+      //$("#hid_rate").val("");
+      $("#rating_popup").dialog("close");
+      $('#hide_button').click();
+      return true;
+    }
+  }
+
+  function set_rate_value(ev, rate){
+    $("#hid_rate").val(rate);
+
+    $(".boring").removeClass("boring_active");
+    $(".ok").removeClass("ok_active");
+    $(".good").removeClass("good_active");
+
+    if(ev.id == 'boring'){
+      $(ev).addClass("boring_active");
+    }else if(ev.id == 'ok'){
+      $(ev).addClass("ok_active");
+    }else if(ev.id == 'good'){
+      $(ev).addClass("good_active");
+    }
+
+  }
+</script>

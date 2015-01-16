@@ -1,0 +1,38 @@
+var muvimeter = "<%= @movie.muvimeter || 0 %>%";
+
+var muvi = "<div style='margin-top:12px;padding-bottom: 5px;width: 320px;float:left'>";
+muvi += "     <div style='height: 62px; margin-bottom: 8px; padding: 0; width: 300px;'>";
+muvi += "       <span style='font-weight: bold;'>";
+muvi += "         <a href='#critics' onclick='go_to_tab(0);' style='color: #4F4F4F;font-size: 12px; text-decoration: none;'>MUVIMETER</a>";
+muvi += "       </span>";
+muvi += "       <div style='clear: both;'></div>";
+muvi += "       <div style='background-color: #D8D8D8; border: 1px solid #BECBD4; border-radius: 6px 6px 6px 6px; height: 25px; margin-bottom: 0; margin-top: 2px; padding: 3px 3px 2px; width: 180px; float:left'>";
+                  if (parseInt(<%= @movie.muvimeter %>) >= 60){
+muvi += "           <div class='positive' style='width:"+muvimeter+";-moz-border-radius:6px;-webkit-border-radius:6px;height:23px;background:url(http://www.muvi.com/images/long-G-RatingBar.jpg) repeat-x'>&nbsp;</div>";
+                  }
+                  else{
+muvi += "           <div class='negative' style='width:"+muvimeter+";-moz-border-radius:6px;-webkit-border-radius:6px;height:23px;background:url(http://www.muvi.com/images/long-R-RatingBar.jpg) repeat-x'>&nbsp;</div>";
+                  }
+
+
+muvi += "       </div>";
+muvi += "       <div style='color: #53555F; font-size: 20px; letter-spacing: -1px; margin-left: 5px;  padding: 0; text-align: left; width: 35px; margin-top:5px; float:left'>";
+muvi += "         <a href='#' style='font-size:20px; color:#4F4F4F;text-decoration: none;font-weight:bold'>"+ muvimeter +"</a>";
+muvi += "       </div>";
+muvi += "       <div style='float:right'>";
+
+                  if(parseInt(<%= @movie.muvimeter %>) >= 60){
+muvi += "            <img src='http://www.muvi.com/images/thumbUp.png' title='Jhakaas' alt='Jhakaas'>";
+                  }
+                  else{
+muvi += "            <img src='http://www.muvi.com/images/thumbDown.png' title='Bakwaas' alt='Bakwaas'>";
+                  }
+
+muvi += "       </div>";
+muvi += "     </div>";
+muvi += "   </div>";
+
+    document.write(muvi);
+    alert("hi");
+    //document.getElementById("ctl00_MainContent_mainProgInnerTitle").innerHTML += muvi;
+

@@ -1,0 +1,39 @@
+-unless @feed.blank?
+  .containerIn.borderDiv
+    .moviBanner.left
+      .moviImage
+        -unless @celebrity.blank?
+          -begin
+            =link_to image_tag(@celebrity.image, :width => "130", :height => "200"),star_path(@celebrity)
+          -rescue
+
+        -unless @movie.blank?
+          -begin
+            =link_to image_tag(@movie.banner_image, :width => "130", :height => "200"),movie_path(@movie)
+          -rescue
+
+
+    .moviDetail.left
+      .detail{:style => "background:none"}
+        /%h3 News
+        %h1{:style => "font-size:18px"}
+          %a{:href => "#{@feed.entry_url}", :target => "_blank", :style => "color:#4F4F4F"}
+            =@feed.entry_title
+        %i        
+          =@feed.source        
+          ,
+          =@feed.created_at.strftime('%B %d, %Y')
+
+        .clear{:style => "height:10px"}
+        %div{:style => "font-size:14px"}
+          =@feed.summary.html_safe unless @feed.summary.blank?
+        .clear
+    .clear{:style => "height:70px"}
+  
+    %hr{:style => "height:1px; background-color:#DDDDDD"}
+    %div{:style => "opacity:0.4;filter: alpha(opacity=40);width: 100%;"}
+      %iframe{:src => "#{@feed.entry_url}", :width => "100%", :style => "min-height:600px"}
+
+-else
+  %h2
+    Currently no news present for this
